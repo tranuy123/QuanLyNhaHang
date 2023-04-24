@@ -1,0 +1,398 @@
+﻿@using System.Net.NetworkInformation
+@{
+    Layout = null;
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    
+    ThucDon getTD(int? id)
+    {
+        ThucDon nv = context.ThucDon.Find(id);
+        if (nv != null) return nv;
+        else return new ThucDon();
+    }
+    string macAddress = "";
+    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+    {
+        // Only consider Ethernet network interfaces
+        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+            nic.OperationalStatus == OperationalStatus.Up)
+        {
+            macAddress = nic.GetPhysicalAddress().ToString();
+            break;
+        }
+    }
+    var idb = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress);
+    int idban = idb.Idban;
+
+    ViewBag.IDMAC = macAddress;
+    var IDkhu = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress);
+    var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
+    List<ChiTietHoaDonTam> getListCTHDT()
+    {
+        return context.ChiTietHoaDonTam.Where(x => x.Ipmac == macAddress).ToList();
+    }
+   
+
+}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QuanLyNhaHang</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="~/favicon.ico">
+    <title>Tiny Dashboard - A Bootstrap Dashboard Template</title>
+    <!-- Simple bar CSS -->
+    <link rel="stylesheet" href="~/css/simplebar.css">
+    <!-- Fonts CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <!-- Icons CSS -->
+    <link rel="stylesheet" href="~/css/feather.css">
+    <link rel="stylesheet" href="~/css/select2.css">
+    <link rel="stylesheet" href="~/css/dropzone.css">
+    <link rel="stylesheet" href="~/css/uppy.min.css">
+    <link rel="stylesheet" href="~/css/jquery.steps.css">
+    <link rel="stylesheet" href="~/css/jquery.timepicker.css">
+    <link rel="stylesheet" href="~/css/quill.snow.css">
+    <!-- Date Range Picker CSS -->
+    <link rel="stylesheet" href="~/css/daterangepicker.css">
+    <!-- App CSS -->
+    <link rel="stylesheet" href="~/css/app-light.css" id="lightTheme">
+    <link rel="stylesheet" href="~/css/app-dark.css" id="darkTheme" disabled>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="~/js/jquery-3.6.4.min.js"></script>
+
+  </head>
+  <body class="vertical  light  ">
+    <div class="wrapper">
+      <nav class="topnav navbar navbar-light">
+        <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
+          <i class="fe fe-menu navbar-toggler-icon"></i>
+        </button>
+        <form class="form-inline mr-auto searchform text-muted">
+          <input class="form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted" type="search" placeholder="Type something..." aria-label="Search">
+        </form>
+        <ul class="nav">
+            <li class="nav-item nav-notif">
+            <a class="nav-link text-muted my-2" href="./#">
+              <span class="fe fe-bell fe-16"></span>
+              <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+              <i class="fe fe-sun fe-16"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
+              <span class="fe fe-grid fe-16"></span>
+            </a>
+          </li>
+          <li class="nav-item nav-notif">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
+              <span class="fe fe-bell fe-16"></span>
+              <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="avatar avatar-sm mt-2">
+                <img src="./assets/avatars/face-1.jpg" alt="..." class="avatar-img rounded-circle">
+              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="#">Profile</a>
+              <a class="dropdown-item" href="#">Settings</a>
+              <a class="dropdown-item" href="#">Activities</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+
+      <main role="main" class="main-content">
+        <div class="container-fluid">
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <div class="row">
+                <!-- Small table -->
+                <div class="col-md-12 my-4">
+                  <h2 class="h4 mb-1">Chọn số lượng món ăn</h2>
+                  <p class="mb-3">Additional table rendering with vertical border, rich content formatting for cell</p>
+                  <div class="card shadow">
+                    <div class="card-body">
+                      <div class="toolbar">
+                        <form class="form">
+                          <div class="form-row">
+                            <div class="form-group col-auto mr-auto">
+                              <label class="my-1 mr-2 sr-only" for="inlineFormCustomSelectPref1">Show</label>
+                              
+                            </div>
+                            <div class="form-group col-auto">
+                              <label for="search" class="sr-only">Search</label>
+                              <input type="text" class="form-control" id="search1" value="" placeholder="Search">
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                      <!-- table -->
+                    <input type="hidden" name="ipmac" id="IDMAC" value="@macAddress" />
+                    <input type="hidden" name="idban" value="@idban" />
+                      <table class="table table-borderless table-hover" id="tableGoiMon">
+                        <thead>
+                          <tr>
+                            
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Company</th>
+                            <th>Contact</th>
+                            <th class="w-25">Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody id="tbodyNTA" >
+                        @foreach (ChiTietHoaDonTam item in getListCTHDT())
+                                                {
+                                                    
+
+
+
+                                  <tr>
+                                    
+                                    <td>
+                                      <div class="avatar avatar-md">
+                                        <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
+                                      </div>
+                                    </td>
+                                    <td>
+                                       <input type="hidden" id="IDCTHDT" value="@item.Idcthdt" />
+                                      <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
+
+                                    </td>
+                                    <td style="display:none"><input class='inputDisabled text-center' name="Idtd" value=@item.Idtd type=text></td>
+                                    <td style="display:none"><input class='inputDisabled text-center' name="DonGia" value=@item.DonGia type=text></td>
+                                    <td>
+                                       <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
+                                    </td>
+                                    <td>
+                                      <p class="dongia mb-0 text-muted" id="tdDonGia" ><a >@item.DonGia</a></p>
+                                    </td>
+                                    <td class="w-25"><input type="number" min="0" id="SL" value="@item.Sl"/></td>
+                                    <td class="text-muted" id="tdThanhTien" > @(item.Sl*item.DonGia) </td>
+                                    <td><button class="btn btn-secondary"> hủy chọn món </button>
+                                    </td>
+                                  </tr>
+                                                    
+                                                   
+                                                }
+                                <tr>
+                                    <td>Tổng</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><input name="tongtien" id="total"/></td>
+                                    <td><button class="btn-addcthd btn btn-primary"> Xác nhận </button></td>
+                                </tr>
+
+                        </tbody>
+                      </table>
+                                      
+                    </div>
+                  </div>
+                </div> <!-- customized table -->
+              </div> <!-- end section -->
+              <!-- end section -->
+            <!-- end section -->
+            </div> <!-- .col-12 -->
+          </div> <!-- .row -->
+        </div> <!-- .container-fluid -->
+
+            <div class="container">
+
+                <div class="row p-1">
+                    <div class="col-5"><input type="text" class="w-100" id="messageInput"  /></div>
+                </div>
+                <div class="row p-1">
+                    <div class="col-6 text-end">
+                        <input type="button" id="sendButton" value="Send Message" />
+                    </div>
+                </div>
+                <div class="row p-1">
+                    <div class="col-6">
+                        <hr />
+                    </div>
+                </div>
+                <div class="row p-1">
+                    <div class="col-6">
+                        <ul id="messagesList"></ul>
+                    </div>
+                </div>
+
+            </div>
+           
+        
+        
+      </main> <!-- main -->
+    </div> <!-- .wrapper -->
+    
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/popper.min.js"></script>
+    <script src="~/js/moment.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/simplebar.min.js"></script>
+    <script src="~/js/daterangepicker.js"></script>
+    <script src="~/js/jquery.stickOnScroll.js"></script>
+    <script src="~/js/tinycolor-min.js"></script>
+    <script src="~/js/config.js"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+      $('#dataTable-1').DataTable(
+      {
+        autoWidth: true,
+        "lengthMenu": [
+          [16, 32, 64, -1],
+          [16, 32, 64, "All"]
+        ]
+      });
+    </script>
+    <script src="~/js/apps.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag()
+      {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-56159088-1');
+        $(document).ready(function () {
+            // Tính tổng giá trị của các ô "Thành tiền"
+            var total = 0;
+            $('#tbodyNTA tr').each(function () {
+                var quantity = $(this).find('input[type="number"]').val();
+                var price = $(this).find('.dongia').text();
+                if (price != null && price != '') {
+                    var subtotal = parseInt(quantity) * parseFloat(price);
+                    total += subtotal;
+                    $(this).find('.subtotal').text(subtotal.toFixed(2));
+                }
+            });
+
+            // Gán giá trị tổng vào ô "Tổng"
+            $('#total').val(total.toFixed(2));
+        });
+
+
+
+       function loadNhomThucAn(){
+         var idnta = $('#nhomTA').val();
+           $.ajax({
+              type: "post",
+              url: "/loadNhomThucAn",
+              data: "&idnta=" + idnta  ,
+              success: function (result) {
+
+               $('#tbodyNTA').replaceWith(result);
+
+
+                   },
+                  error: function () {
+                  alert("Fail");
+                }
+            });
+         }
+
+         
+        $(function () {
+            $("#tableGoiMon").on("click", ".btnaddcthd", function () {
+                var tongtien = $('#total').val();
+                var ipmac = $('#IDMAC').val();
+                var idban = $('input[name="idban"]').val();
+                $.ajax({
+                    type: "post",
+                    url: "/addChiTietHoaDon",
+                    data: "ipmac=" + ipmac + "&tongtien=" + tongtien + "&idban=" + idban,
+                    success: function (result) {
+                        $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
+                            // callback function
+                        });
+                        $("#tableGoiMon").load(location.href + " #tableGoiMon>*", function () {
+                            // callback function
+                        });
+                    },
+                    error: function () {
+                        alert(ipmac);
+                        alert("Fail");
+                    }
+                });
+            });
+           
+            // Bắt sự kiện khi giá trị ô số lượng thay đổi
+            $('#tbodyNTA').on('change', 'input[type="number"]', function () {
+                // Lấy số lượng và đơn giá của món ăn
+                var $row = $(this).closest('tr');
+                var sl = parseInt($(this).val());
+                var donGia = parseInt($row.find('td:eq(3) input').val());
+
+                // Tính thành tiền
+                var thanhTien = sl * donGia;
+                $row.find('td:eq(7)').text(thanhTien);
+
+                // Tính tổng tiền
+                var tongTien = 0;
+                $('#tbodyNTA tr').each(function () {
+                    var tt = parseInt($(this).find('td:eq(7)').text());
+                    if (!isNaN(tt)) {
+                        tongTien += tt;
+                    }
+                });
+                $('#tbodyNTA tr:last td:eq(5) input').val(tongTien);
+            });
+
+             $("#tbodyNTA").on("blur", "#SL", function () {
+                var sl = $(this).val(); // Lấy giá trị của ô input số lượng
+                var idcthdt = $(this).closest('tr').find('#IDCTHDT').val();
+                var dongia = $(this).parents('tr').find("td:eq(5)").text();
+                var thanhtien =$(this).parents('tr').find("td:eq(7)").text();
+
+
+                $.ajax({
+                    type: "post",
+                    url: "/UpdateSL",
+                    data: "&IDCTHDT=" + idcthdt + "&SL=" + sl +"&DonGia=" + dongia +"&ThanhTien=" + thanhtien,
+                    success: function (result) {
+                        
+                        // Xử lý khi thành công
+                    },
+                    error: function () {
+                        alert(thanhtien);
+                        alert("Fail");
+                    }
+                });
+            });
+
+        });
+        // Thêm sự kiện click vào nút "Gọi món"
+        $(".btn-addcthd").on("click", function () {
+            // Hiển thị toast "Gọi món thành công"
+
+            // Chuyển hướng tới trang HoaDon
+            window.location.href = "/KhachHang/HoaDon";
+        });
+
+    </script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chat.js"></script>
+  </body>
+</html>

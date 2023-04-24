@@ -1,0 +1,238 @@
+﻿@using System.Net.NetworkInformation
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+  
+    ThucDon getTD(int? id)
+    {
+        ThucDon nv = context.ThucDon.Find(id);
+        if (nv != null) return nv;
+        else return new ThucDon();
+    }
+   
+    string macAddress = "";
+    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+    {
+        // Only consider Ethernet network interfaces
+        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+            nic.OperationalStatus == OperationalStatus.Up)
+        {
+            macAddress = nic.GetPhysicalAddress().ToString();
+            break;
+        }
+    }
+    ViewBag.IDMAC = macAddress;
+    var IDkhu = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress);
+    var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
+    List<ChiTietHoaDon> getListCTHD()
+    {
+        return context.ChiTietHoaDon.Include(x=>x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep == null).ToList();
+    }
+    List<ChiTietHoaDon> getListCTHD1()
+    {
+        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep != null).ToList();
+    }
+  
+
+}
+
+      
+
+     
+    <div class="row">
+                <!-- simple table -->
+                <div class="col-md-6 my-4">
+                  <div class="card shadow">
+                    <div class="card-body">
+                      <h5 class="card-title">Món chờ xác nhận</h5>
+                      <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                <table class="table TableTGBEP table-hover" id="TableTGBEP">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Company</th>
+                            <th>Address</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                    <tbody id="tbodyNB">
+                            @{
+                                int i = 0;
+                            }
+                        @foreach (ChiTietHoaDon item in getListCTHD())
+                        {
+                            i++;
+                            <tr>
+                                <td>@i</td>
+                                <td class="idcthdNB">@item.Idcthd</td>
+                                <td><strong>@getTD(@item.Idtd).Ten</strong></td>
+                                <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
+                                @if(item.TrangThaiOrder==true){
+                                    <td class="trangthaicthd">Khách đang sửa yêu cầu</td>
+
+                                }else{
+                                    <td class="trangthaicthd"></td>
+
+                                }
+                                <td>
+                                </td>
+                          @if(item.TrangThaiOrder==true){
+
+                                <td>
+                                   <button  class="xacnhan btn btn-primary"  disabled>Xác nhận</button>
+                                 </td>
+                          }else{
+                                 <td class="xacnhan2">
+                                   <button id="xacnhan1" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
+                                 </td>
+                                           
+
+                                    });
+                          }
+                            </tr>
+                        }
+                          
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div> <!-- simple table -->
+                <!-- Bordered table -->
+                <div class="row p-1">
+                    <div class="col-6">
+                        <ul id="messagesList"></ul>
+                    </div>
+                </div>
+
+                <div class="col-md-6 my-4">
+                  <div class="card shadow">
+                    <div class="card-body">
+                      <h5 class="card-title">Xác nhận món đã hoàn thành</h5>
+                      <p class="card-text">Add .table-bordered for borders on all sides of the table and cells.</p>
+                <table class="table table-bordered table-hover mb-0" id="TableTGHoanThanh">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Company</th>
+                            <th>Address</th>
+                            <th>Date</th>
+                            <th>Activate</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        @{
+                            int j = 0;
+                        }
+                        @foreach (ChiTietHoaDon item in getListCTHD1())
+                        {
+                            j++;
+
+                            <tr>
+                                <td>@j</td>
+                                <td><strong>@getTD(@item.Idtd).Ten</strong></td>
+                                <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
+                                <td>901-6206 Cras Av.</td>
+                                <td>Apr 24, 2019</td>
+                                <td><button id="btnxacnhan" class="btn btn-primary">Xác nhận</button></td>
+                            </tr>
+                        }
+                        </tbody>
+                      </table>
+                <button class="btn btn-primary" id="btnedit"> sửa </button>
+
+                <div class="container">
+                    <input id="inputidcthd"  />
+
+                    <div class="row p-1">
+                        <div class="col-6 text-end">
+                            <input type="button" id="sendButton" value="Send Message" />
+                        </div>
+                    </div>
+                    <div class="row p-1">
+                        <div class="col-6">
+                            <hr />
+                        </div>
+                    </div>
+                    <div class="row p-1">
+                        <div class="col-6">
+                            <ul id="messagesList"></ul>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                  </div>
+                </div> <!-- Bordered table -->
+              </div>
+
+
+
+
+    
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/popper.min.js"></script>
+    <script src="~/js/moment.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/simplebar.min.js"></script>
+    <script src="~/js/daterangepicker.js"></script>
+    <script src="~/js/jquery.stickOnScroll.js"></script>
+    <script src="~/js/tinycolor-min.js"></script>
+    <script src="~/js/config.js"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+
+    
+
+
+
+
+        $('#dataTable-1').DataTable(
+            {
+                autoWidth: true,
+                "lengthMenu": [
+                    [16, 32, 64, -1],
+                    [16, 32, 64, "All"]
+                ]
+            });
+    </script>
+    <script src="~/js/apps.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+   
+
+
+    //    $(function () {
+    //        $("#TableTGBEP").on("click", ".xacnhan2", function () {
+    //            var ipmac = $('#IDMAC').val();
+    //        var id = $(this).find('#xacnhan1').val();
+
+    //            var thiss = $(this);
+
+    //            $.ajax({
+    //                type: "post",
+    //                url: "/XacNhanMon",
+    //                data: "id=" + id,
+    //                success: function (result) {
+    //                $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
+    //                 });
+    //                $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
+    //                });
+    //                },
+    //                error: function () {
+    //                    alert("Fail");
+    //                }
+    //            });
+    //        });
+    //})
+       
+    </script>
+
+
+
+
+

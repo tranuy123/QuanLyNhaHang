@@ -1,0 +1,478 @@
+﻿@using System.Net.NetworkInformation
+@{
+    Layout=null;
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<NhomThucAn> getListNTA()
+    {
+        return context.NhomThucAn.Where(x => x.Active == true).ToList();
+    }
+    ThucDon getTD(int? id)
+  {
+    ThucDon nv = context.ThucDon.Find(id);
+    if (nv != null) return nv;
+    else return new ThucDon();
+  }
+    string macAddress = "";
+    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+    {
+        // Only consider Ethernet network interfaces
+        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+            nic.OperationalStatus == OperationalStatus.Up)
+        {
+            macAddress = nic.GetPhysicalAddress().ToString();
+            break;
+        }
+    }
+    ViewBag.IDMAC = macAddress;
+    var IDkhu = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress);
+    var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
+    List<Gia> getListGia()
+    {
+        return context.Gia.Where(x => x.Idsanh == IDSanh.Idsanh).ToList();
+    }
+    ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd)
+    {
+        return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd==idtd);
+    }
+
+}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - QuanLyNhaHang</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="~/favicon.ico">
+    <title>Tiny Dashboard - A Bootstrap Dashboard Template</title>
+    <!-- Simple bar CSS -->
+    <link rel="stylesheet" href="~/css/simplebar.css">
+    <!-- Fonts CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <!-- Icons CSS -->
+    <link rel="stylesheet" href="~/css/feather.css">
+    <link rel="stylesheet" href="~/css/select2.css">
+    <link rel="stylesheet" href="~/css/dropzone.css">
+    <link rel="stylesheet" href="~/css/uppy.min.css">
+    <link rel="stylesheet" href="~/css/jquery.steps.css">
+    <link rel="stylesheet" href="~/css/jquery.timepicker.css">
+    <link rel="stylesheet" href="~/css/quill.snow.css">
+    <!-- Date Range Picker CSS -->
+    <link rel="stylesheet" href="~/css/daterangepicker.css">
+    <!-- App CSS -->
+    <link rel="stylesheet" href="~/css/app-light.css" id="lightTheme">
+    <link rel="stylesheet" href="~/css/app-dark.css" id="darkTheme" disabled>
+  </head>
+  <body class="vertical  light  ">
+    <div class="wrapper">
+      <nav class="topnav navbar navbar-light">
+        <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
+          <i class="fe fe-menu navbar-toggler-icon"></i>
+        </button>
+        <form class="form-inline mr-auto searchform text-muted">
+          <input class="form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted" type="search" placeholder="Type something..." aria-label="Search">
+        </form>
+        <ul class="nav">
+            <li class="nav-item nav-notif">Gọi Món
+                    <a class="nav-link text-muted my-2" href="/KhachHang/GoiMon">
+              <span class="fe fe-bell fe-16"></span>
+              <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item nav-notif">Hóa Đơn
+                    <a class="nav-link text-muted my-2" href="/KhachHang/HoaDon">
+              <span class="fe fe-bell fe-16"></span>
+              <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+              <i class="fe fe-sun fe-16"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
+              <span class="fe fe-grid fe-16"></span>
+            </a>
+          </li>
+          <li class="nav-item nav-notif">
+            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
+              <span class="fe fe-bell fe-16"></span>
+              <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="avatar avatar-sm mt-2">
+                <img src="./assets/avatars/face-1.jpg" alt="..." class="avatar-img rounded-circle">
+              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item" href="#">Profile</a>
+              <a class="dropdown-item" href="#">Settings</a>
+              <a class="dropdown-item" href="#">Activities</a>
+            </div>
+          </li>
+        </ul>
+      </nav>
+     
+      <main role="main" class="main-content">
+        <div class="container-fluid">
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <div class="row">
+                <!-- Small table -->
+                <div class="col-md-12 my-4">
+                  <h2 class="h4 mb-1">Customize table rendering</h2>
+                  <p class="mb-3">Additional table rendering with vertical border, rich content formatting for cell</p>
+                  <div class="card shadow">
+                    <div class="card-body">
+                      <div class="toolbar">
+                        <form class="form">
+                          <div class="form-row">
+                            <div class="form-group col-auto mr-auto">
+                              <label class="my-1 mr-2 sr-only" for="inlineFormCustomSelectPref1">Show</label>
+                              <select  class="custom-select mr-sm-2"  id="nhomTA" onchange="loadNhomThucAn()">
+                                <option selected value=""> -- Nhóm thức ăn --</option>
+                                <option value="0">Tất cả</option>
+                                @foreach (NhomThucAn item in getListNTA())
+                               {
+                                   <option value="@item.Idnta">@item.TenNta</option>
+                               }
+                               
+                              </select>
+                            </div>
+                            <div class="form-group col-auto">
+                              <label for="search" class="sr-only">Search</label>
+                              <input type="text" class="form-control" id="search1" value="" placeholder="Search">
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                      <!-- table -->
+                    <input type="hidden" id="IDMAC" value="@macAddress" />
+
+                      <table class="table table-borderless table-hover" id="myTable">
+                        <thead>
+                          <tr>
+                            <td>
+                              <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="all2">
+                                <label class="custom-control-label" for="all2"></label>
+                              </div>
+                            </td>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Company</th>
+                            <th>Contact</th>
+                            <th class="w-25">Bio</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody id="tbodyNTA" >
+                            @foreach (Gia item in getListGia())
+                           {
+                              if (getCTHDT(macAddress, item.Idtd) !=null)
+                              {
+                                  
+                               
+
+                          <tr>
+                            <td>
+                              <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input">
+                                <label class="custom-control-label"></label>
+                              </div>
+                            </td>
+                            <td>
+                              <div class="avatar avatar-md">
+                                <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
+                              </div>
+                            </td>
+                            <td>
+                              <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
+
+                              <small class="mb-0 text-muted">2474</small>
+                            </td>
+                            <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text ></td>
+                            <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text ></td>
+                            <td>
+                                                            <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
+                              <small class="mb-0 text-muted">Ap #331-7123 Lobortis Avenue</small>
+                            </td>
+                            <td>
+                              <p class="mb-0 text-muted"><a href="#" class="text-muted">@item.Gia1</a></p>
+                              <small class="mb-0 text-muted">Nigeria</small>
+                            </td>
+                            <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
+                            <td class="text-muted">13/09/2020</td>
+                            <td><button class="addTD btn btn-secondary"> hủy chọn món </button>
+                            </td>
+                          </tr>
+                          }
+                          else{
+                                                        <tr>
+                                                            <td>
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input">
+                                                                    <label class="custom-control-label"></label>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="avatar avatar-md">
+                                                                    <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
+                                                                <small class="mb-0 text-muted">2474</small>
+                                                            </td>
+                                                            <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text ></td>
+                                                            <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text ></td>
+                                                            <td>
+                                                                <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
+                                                                <small class="mb-0 text-muted">Ap #331-7123 Lobortis Avenue</small>
+                                                            </td>
+                                                            <td>
+                                                                <p class="mb-0 text-muted"><a href="#" class="text-muted">@item.Gia1</a></p>
+                                                                <small class="mb-0 text-muted">Nigeria</small>
+                                                            </td>
+                                                            <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
+                                                            <td class="text-muted">13/09/2020</td>
+                                                            <td>
+                                                                <button class="addTD btn btn-secondary"> Thêm món </button>
+                                                            </td>
+                                                        </tr>
+                          }
+                          }
+ 
+                        </tbody>
+                      </table>
+                      <nav aria-label="Table Paging" class="mb-0 text-muted">
+                        <ul class="pagination justify-content-center mb-0">
+                          <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                          <li class="page-item"><a class="page-link" href="#">1</a></li>
+                          <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                          <li class="page-item"><a class="page-link" href="#">3</a></li>
+                          <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                      </nav>
+                    </div>
+                  </div>
+                </div> <!-- customized table -->
+              </div> <!-- end section -->
+             
+              </div> <!-- end section -->
+              
+              </div> <!-- end section -->
+            </div> <!-- .col-12 -->
+          </div> <!-- .row -->
+        </div> <!-- .container-fluid -->
+        <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="list-group list-group-flush my-n3">
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <span class="fe fe-box fe-24"></span>
+                      </div>
+                      <div class="col">
+                        <small><strong>Package has uploaded successfull</strong></small>
+                        <div class="my-0 text-muted small">Package is zipped and uploaded</div>
+                        <small class="badge badge-pill badge-light text-muted">1m ago</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <span class="fe fe-download fe-24"></span>
+                      </div>
+                      <div class="col">
+                        <small><strong>Widgets are updated successfull</strong></small>
+                        <div class="my-0 text-muted small">Just create new layout Index, form, table</div>
+                        <small class="badge badge-pill badge-light text-muted">2m ago</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <span class="fe fe-inbox fe-24"></span>
+                      </div>
+                      <div class="col">
+                        <small><strong>Notifications have been sent</strong></small>
+                        <div class="my-0 text-muted small">Fusce dapibus, tellus ac cursus commodo</div>
+                        <small class="badge badge-pill badge-light text-muted">30m ago</small>
+                      </div>
+                    </div> <!-- / .row -->
+                  </div>
+                  <div class="list-group-item bg-transparent">
+                    <div class="row align-items-center">
+                      <div class="col-auto">
+                        <span class="fe fe-link fe-24"></span>
+                      </div>
+                      <div class="col">
+                        <small><strong>Link was attached to menu</strong></small>
+                        <div class="my-0 text-muted small">New layout has been attached to the menu</div>
+                        <small class="badge badge-pill badge-light text-muted">1h ago</small>
+                      </div>
+                    </div>
+                  </div> <!-- / .row -->
+                </div> <!-- / .list-group -->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body px-5">
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-success justify-content-center">
+                      <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Control area</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Activity</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-droplet fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Droplet</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-upload-cloud fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Upload</p>
+                  </div>
+                </div>
+                <div class="row align-items-center">
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-users fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Users</p>
+                  </div>
+                  <div class="col-6 text-center">
+                    <div class="squircle bg-primary justify-content-center">
+                      <i class="fe fe-settings fe-32 align-self-center text-white"></i>
+                    </div>
+                    <p>Settings</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main> <!-- main -->
+    </div> <!-- .wrapper -->
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/popper.min.js"></script>
+    <script src="~/js/moment.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/simplebar.min.js"></script>
+    <script src="~/js/daterangepicker.js"></script>
+    <script src="~/js/jquery.stickOnScroll.js"></script>
+    <script src="~/js/tinycolor-min.js"></script>
+    <script src="~/js/config.js"></script>
+    <script src="~/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+      $('#dataTable-1').DataTable(
+      {
+        autoWidth: true,
+        "lengthMenu": [
+          [16, 32, 64, -1],
+          [16, 32, 64, "All"]
+        ]
+      });
+    </script>
+    <script src="~/js/apps.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag()
+      {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-56159088-1');
+
+       function loadNhomThucAn(){
+         var idnta = $('#nhomTA').val();
+           $.ajax({
+              type: "post",
+              url: "/loadNhomThucAn",
+              data: "&idnta=" + idnta  ,
+              success: function (result) {
+                                                       
+               $('#tbodyNTA').replaceWith(result);
+              
+
+                   },
+                  error: function () {
+                  alert("Fail");
+                }
+            });
+         }
+        $(function () {
+            $("#myTable").on("click", ".addTD", function () {
+                var ipmac = $('#IDMAC').val();
+                var idtd = $(this).parents('tr').find("td:eq(3) input[type='text']").val(); 
+                var DonGia = $(this).parents('tr').find("td:eq(4) input[type='text']").val(); 
+                var thiss = $(this);
+
+                $.ajax({
+                    type: "post",
+                    url: "/addHoaDon",
+                    data: "IPMAC=" + ipmac + "&IDTD=" + idtd + "&DonGia=" + DonGia,
+                    success: function (result) {
+                    $("#myTable").load(location.href + " #myTable>*", function() {
+        // callback function
+                     });
+                    },
+                    error: function () {
+                        alert(ipmac);
+                        alert("Fail");
+                    }
+                });
+            });
+        })
+    </script>
+  </body>
+</html>
