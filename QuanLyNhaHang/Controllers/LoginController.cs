@@ -46,6 +46,8 @@ namespace QuanLyNhaHang.Controllers
             TaiKhoan a = context.TaiKhoan
                 .Include(x => x.IdvtNavigation)
                 .FirstOrDefault(x => x.TenTk == taiKhoan.TenTk);
+            
+
             if (a == null)
             {
                 return Redirect("/login");
@@ -65,6 +67,12 @@ namespace QuanLyNhaHang.Controllers
                 TempData["LoginFailed"] = true;
                 return RedirectToAction("Index");
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index");
         }
         private async Task SignInUser(TaiKhoan accounts)
         {

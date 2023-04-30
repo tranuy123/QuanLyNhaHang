@@ -1,0 +1,156 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<ThucDon> getListTD()
+    {
+        return context.ThucDon.Where(x => x.Active == true).ToList();
+    }
+    List<NhomThucAn> getListNTA()
+    {
+        return context.NhomThucAn.Where(x => x.Active == true).ToList();
+    }
+    NhomThucAn getNhomHH(int? id)
+    {
+        return context.NhomThucAn.Find(id);
+    }
+}
+@if (TempData["ThongBao"] != null)
+{
+    <script type="text/javascript" charset="utf-8">
+        window.onload = function () {
+            alert("@Html.Raw(@TempData["ThongBao"])");
+        };
+    </script>
+}
+<section class="section">
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between">
+      
+        
+    <a href="/QuanLy/ViewInsertThucDon" class="btn btn-secondary" style="margin-left:2rem;"><span>Thêm Thực Đơn</span></a>
+        
+        <div style="display:flex;justify-content:space-around;">
+            <div style="display: flex">
+                <div class="search-bar" style="margin-right:10px">
+                    <div class="search-form d-flex align-items-center">
+                        <input id="search" type="text" name="query" placeholder="Search" title="Enter search keyword">
+                        <button type="submit" title="Search">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="dropdown" style="margin-right:10px">
+                    <select id="active" onchange="changeHH()" class="form-select">
+                        <option value="true" selected>Hiện tại</option>
+                        <option value="false">Tất cả</option>
+                    </select>
+                </div>
+                <div class="dropdown"> 
+                    <select id="nhomHH" onchange="changeHH()"
+                            class="form-select2" style="width:50%;"
+                            aria-label="Default select example">
+                        <option selected disabled value="">Nhóm hàng hoá</option>
+                        <option  value="0">Tất cả</option>
+
+                        @foreach (NhomThucAn item in getListNTA())
+                       {
+                        <option value="@item.Idnta">@item.TenNta</option>
+
+                       }
+                       
+                        
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="product" id="divTD" style="display: flex; flex-wrap: wrap">
+        <input type="hidden" id="SL" value="9" />
+        @foreach (ThucDon hh in getListTD())
+        {
+            <ul>
+                <li class="card">
+                    <div class="profile-card pt-4 d-flex flex-column"
+                     style="padding: 0 10px 0 10px">
+                        <div style="text-align: center;">
+    @if (hh.Image == null)
+    {
+         <img class="modal-image" style="width: 250px; height: 250px;object-fit: cover;"
+         src="~/ImagesTD/camon.png" />
+    }
+    else
+    {
+        <img class="modal-image" style="width: 250px; height: 250px;object-fit: cover;"
+         src="~/ImagesTD/@hh.Image" />
+    }
+</div>
+
+
+                        <h5 style="margin-top: 10px; width: 300px; height: 45px;">
+                            <b>@hh.Ten</b>
+                        </h5>
+                        <h6>Nhóm: @getNhomHH(hh.Idnta).TenNta</h6>
+
+                        <div class="social-links"
+                         style="display: flex; justify-content: space-between">
+                            <div>
+                                <!---->
+
+                                <a class="chinhsua" href="/QuanLy/ViewUpdateTD/@hh.Idtd">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+
+                                <a href="/QuanLy/XoaTD/@hh.Idtd" onclick="return confirm('Bạn có muốn xóa món ăn này?')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            </div>
+                            <a href="CTLap.html" class="chitiet"><i class="=">Chi tiết</i></a>
+                        </div>
+                    </div>
+
+                </li>
+            </ul>
+        }
+
+    </div>
+    <div>
+        <p title="Xem thêm" style="
+          display: block;
+          margin: 5px auto 15px;
+          padding: 15px 20px;
+          text-align: center;
+          cursor:pointer;"
+           onclick="loadMore()"><i>Xem thêm</i></p>
+    </div>
+</section>
+<script>
+    function changeHH() {
+        var active = $('#active').val();
+        var nhomHH = $('#nhomHH').val();
+        $.ajax({
+            type: "post",
+            url: "/loadDivTD",
+            data: "active=" + active + "&idnta=" + nhomHH,
+            success: function (result) {
+                $('#divTD').replaceWith(result);
+            },
+            error: function () {
+                alert("Fail to delete");
+            }
+        });
+    }
+    $('#search').keyup(function (e) {
+        var key = $(this).val();
+        $.ajax({
+            type: "post",
+            url: "/searchTD",
+            data: "key=" + key,
+            success: function (result) {
+                $('#divTD').replaceWith(result);
+            },
+            error: function () {
+                alert("Fail");
+            }
+        });
+    });
+</script>

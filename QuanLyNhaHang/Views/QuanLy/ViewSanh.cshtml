@@ -1,0 +1,80 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<Sanh> listBan()
+    {
+        return context.Sanh.Where(x => x.Active == true).ToList();
+    }
+   
+}
+<a href="/QuanLy/ViewInsertSanh" class="btn btn-secondary"><span>Thêm sảnh</span></a>
+<div class="dropdown" style="margin-right:10px">
+    <select id="active" onchange="changeHH()" class="form-select">
+        <option value="true" selected>Hiện tại</option>
+        <option value="false">Tất cả</option>
+    </select>
+</div>
+<div id="divSanh" class="d-flex align-content-around flex-wrap" style="width:100%;-webkit-justify-content: space-around;
+  justify-content:space-around;">
+
+    @foreach (Sanh item in listBan())
+    {
+        
+            <div class="card my-4 flex-row">
+               
+                <div class="card-body">
+                    <div>
+                        <h3></h3>
+                        <section>
+                            <p>Mã sảnh :</p>
+                        </section>
+                        <h3>@item.MaSanh</h3>
+                        <section>
+                            <p>Tên sảnh: </p>
+                        </section>
+                        <h3>@item.TenSanh</h3>
+                        
+                    <div class="social-links"
+                     style="display: flex; justify-content: space-between">
+                        <div>
+                            <!---->
+
+                            <a class="chinhsua" href="/QuanLy/ViewUpdateSanh/@item.Idsanh">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                            </a>
+
+                            <a href="/QuanLy/deleteSanh/@item.Idsanh" onclick="return confirm('Bạn có muốn xóa sảnh này?')">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    </div>
+                </div> <!-- .card-body -->
+
+
+            </div> <!-- .card -->
+        
+        
+    }
+</div>
+<script>
+    function changeHH() {
+        var active = $('#active').val();
+        $.ajax({
+            type: "post",
+            url: "/loadViewSanh",
+            data: "active=" + active,
+            success: function (result) {
+                $('#divSanh').replaceWith(result);
+            },
+            error: function () {
+                alert("Fail to delete");
+            }
+        });
+    }
+</script>
+
+
+
+
+

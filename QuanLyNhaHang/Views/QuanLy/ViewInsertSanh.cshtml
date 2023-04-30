@@ -1,0 +1,31 @@
+﻿@model QuanLyNhaHang.Models.Sanh
+@{
+
+}
+
+<div class="card">
+    <div class="card-body">
+        <form action="/QuanLy/InsertSanh" method="post">
+            <div class="forms-header text-center">
+                <h4 class="forms-title "><b>Thêm sảnh</b></h4>
+            </div>
+            <div class="forms-body">
+                <div class="form-group">
+                    <label style="margin:7px 0;">Mã sảnh</label>
+                    <input asp-for="@Model.MaSanh" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Tên sảnh</label>
+                    <input asp-for="@Model.TenSanh" type="text" class="form-control" required>
+                </div>
+            </div>
+            <div class="forms-footer" style="justify-content:space-between">
+                
+                <input type="submit" class="btn btn-primary" value="Thêm">
+            </div>
+        </form>
+        <button class="btn btn-secondary" onclick="window.history.go(-1);">
+            Quay lại
+        </button>
+    </div>
+</div>

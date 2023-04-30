@@ -1,0 +1,177 @@
+﻿@using System.Net.NetworkInformation
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
+    ThucDon getTD(int? id)
+    {
+        ThucDon nv = context.ThucDon.Find(id);
+        if (nv != null) return nv;
+        else return new ThucDon();
+    }
+    int idban = ViewBag.idb;
+    var ipmac = context.Ban.FirstOrDefault(x => x.Idban == idban).Ipmac;
+
+    List<ChiTietHoaDonTam> getListCTHDT()
+    {
+        return context.ChiTietHoaDonTam.Where(x => x.Ipmac == ipmac).ToList();
+    }
+
+
+}
+<div class="row">
+    <!-- Small table -->
+    <div class="col-md-12 my-4">
+        <h2 class="h4 mb-1">Chọn số lượng món ăn</h2>
+
+        <p class="mb-3">Additional table rendering with vertical border, rich content formatting for cell</p>
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="toolbar">
+                    <form class="form">
+                        <div class="form-row">
+                            <div class="form-group col-auto mr-auto">
+                                <label class="my-1 mr-2 sr-only" for="inlineFormCustomSelectPref1">Show</label>
+
+                            </div>
+                            <div class="form-group col-auto">
+                                <label for="search" class="sr-only">Search</label>
+                                <input type="text" class="form-control" id="search1" value="" placeholder="Search">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- table -->
+                <input type="hidden" name="ipmac" id="IDMAC" value="@ipmac" />
+                <input type="hidden" name="idban" value="@idban" />
+                <table class="table table-borderless table-hover" id="tableGoiMon">
+                    <thead>
+                        <tr>
+
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Company</th>
+                            <th>Contact</th>
+                            <th class="w-25">Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyNTAPV">
+                        @foreach (ChiTietHoaDonTam item in getListCTHDT())
+                        {
+
+
+
+
+                            <tr>
+
+                                <td>
+                                    <div class="avatar avatar-md">
+                                        <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="hidden" id="IDCTHDT" value="@item.Idcthdt" />
+                                    <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
+
+                                </td>
+                                <td style="display:none"><input class='inputDisabled text-center' name="Idtd" value=@item.Idtd type=text></td>
+                                <td style="display:none"><input class='inputDisabled text-center' name="DonGia" value=@item.DonGia type=text></td>
+                                <td>
+                                    <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
+                                </td>
+                                <td>
+                                    <p class="dongia mb-0 text-muted" id="tdDonGia"><a>@item.DonGia</a></p>
+                                </td>
+                                <td class="w-25"><input type="number" min="0" id="SL" value="@item.Sl" /></td>
+                                <td class="text-muted" id="tdThanhTien"> @(item.Sl * item.DonGia) </td>
+                                <td>
+                                    <button class="btn btn-secondary"> hủy chọn món </button>
+                                </td>
+                            </tr>
+
+
+                        }
+                        <tr>
+                            <td>Tổng</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><input name="tongtien" id="total" /></td>
+                            <td><button class="btn-addcthd btn btn-primary"> Xác nhận </button></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div> <!-- customized table -->
+</div>
+<script>
+    $(document).ready(function () {
+            // Tính tổng giá trị của các ô "Thành tiền"
+            var total = 0;
+            $('#tbodyNTAPV tr').each(function () {
+                var quantity = $(this).find('input[type="number"]').val();
+                var price = $(this).find('.dongia').text();
+                if (price != null && price != '') {
+                    var subtotal = parseInt(quantity) * parseFloat(price);
+                    total += subtotal;
+                    $(this).find('.subtotal').text(subtotal.toFixed(2));
+                }
+            });
+
+            // Gán giá trị tổng vào ô "Tổng"
+            $('#total').val(total.toFixed(2));
+        });
+    $(function () {
+        $('#tbodyNTAPV').on('change', 'input[type="number"]', function () {
+            // Lấy số lượng và đơn giá của món ăn
+            var $row = $(this).closest('tr');
+            var sl = parseInt($(this).val());
+            var donGia = parseInt($row.find('td:eq(3) input').val());
+
+            // Tính thành tiền
+            var thanhTien = sl * donGia;
+            $row.find('td:eq(7)').text(thanhTien);
+
+            // Tính tổng tiền
+            var tongTien = 0;
+            $('#tbodyNTAPV tr').each(function () {
+                var tt = parseInt($(this).find('td:eq(7)').text());
+                if (!isNaN(tt)) {
+                    tongTien += tt;
+                }
+            });
+            $('#tbodyNTAPV tr:last td:eq(5) input').val(tongTien);
+        });
+        $("#tbodyNTAPV").on("blur", "#SL", function () {
+            var sl = $(this).val(); // Lấy giá trị của ô input số lượng
+            var idcthdt = $(this).closest('tr').find('#IDCTHDT').val();
+            var dongia = $(this).parents('tr').find("td:eq(5)").text();
+            var thanhtien = $(this).parents('tr').find("td:eq(7)").text();
+
+
+            $.ajax({
+                type: "post",
+                url: "/UpdateSLPV",
+                data: "&IDCTHDT=" + idcthdt + "&SL=" + sl + "&DonGia=" + dongia + "&ThanhTien=" + thanhtien,
+                success: function (result) {
+
+                    // Xử lý khi thành công
+                },
+                error: function () {
+                    alert("Fail");
+                }
+            });
+        });
+    });
+    $(".btn-addcthd").on("click", function () {
+        // Hiển thị toast "Gọi món thành công"
+
+        // Chuyển hướng tới trang HoaDon
+        window.location.href = "/PhucVu/Order";
+    });
+</script>

@@ -1,6 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    NhanVien nv = context.NhanVien.Find(Int32.Parse(User.Identity.Name));
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - QuanLyNhaHang</title>
@@ -15,6 +20,8 @@
     <!-- Simple bar CSS -->
     <link rel="stylesheet" href="~/css/simplebar.css">
     <!-- Fonts CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <link href="https://fonts.googleapis.com/css2?family=Overpass:ital,wght@0,100;0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <!-- Icons CSS -->
 
@@ -29,8 +36,29 @@
     <link rel="stylesheet" href="~/css/daterangepicker.css">
     <!-- App CSS -->
     <link rel="stylesheet" href="~/css/app-light.css" id="lightTheme">
+    <link href="~/select/css/selectize.bootstrap4.css" rel="stylesheet" />
+    <link href="~/select/css/selectize.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/select/css/selectize.css" rel="stylesheet" />
+
     <link rel="stylesheet" href="~/css/app-dark.css" id="darkTheme" disabled>
     <script src="~/js/jquery-3.6.4.min.js"></script>
+    <script src="~/select/js/selectize.js"></script>
+    <script src="~/select/js/selectize.min.js"></script>
+    <style>
+        #example_filter {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+
+        .table thead th{
+            color:black !important;
+        }
+
+        .table{
+            color:black !important;
+        }
+
+    </style>
 
 </head>
 <body class="vertical  light  ">
@@ -59,6 +87,7 @@
                     <span class="dot dot-md bg-success"></span>
                 </a>
             </li>
+            
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="avatar avatar-sm mt-2">
@@ -154,29 +183,47 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item w-100">
-                    <a class="nav-link" href="NhaBep/Index">
-                        <i class="fe fe-layers fe-16"></i>
-                        <span class="ml-3 item-text">Nhà Bếp</span>
-                    </a>
-                </li>
+                @if (User.IsInRole("2"))
+                {
+                    <li class="nav-item w-100">
+                        <a class="nav-link" href="/NhaBep/Index">
+                            <i class="fe fe-layers fe-16"></i>
+                            <span class="ml-3 item-text">Nhà Bếp</span>
+                        </a>
+                    </li>
+                }
+                 @if (User.IsInRole("1"))
+                {
+                    <li class="nav-item w-100">
+                        <a class="nav-link" href="/PhucVu/Index">
+                            <i class="fe fe-calendar fe-16"></i>
+                            <span class="ml-3 item-text">Phục Vụ</span>
+                        </a>
+                    </li>
+                    <li class="nav-item w-100">
+                        <a class="nav-link" href="/PhucVu/Order">
+                            <i class="fe fe-credit-card fe-16"></i>
+                            <span class="ml-3 item-text">Order</span>
+                        </a>
+                    </li>
+                }
                 <li class="nav-item dropdown">
                     <a href="#forms" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
                         <i class="fe fe-credit-card fe-16"></i>
-                        <span class="ml-3 item-text">Forms</span>
+                        <span class="ml-3 item-text">Danh mục</span>
                     </a>
                     <ul class="collapse list-unstyled pl-4 w-100" id="forms">
                         <li class="nav-item">
-                            <a class="nav-link pl-3" href="./form_elements.html"><span class="ml-1 item-text">Basic Elements</span></a>
+                            <a class="nav-link pl-3" href="/QuanLy/Index"><span class="ml-1 item-text"> Thực đơn</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link pl-3" href="./form_advanced.html"><span class="ml-1 item-text">Advanced Elements</span></a>
+                            <a class="nav-link pl-3" href="/QuanLy/ViewSanh"><span class="ml-1 item-text">Sảnh</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link pl-3" href="./form_validation.html"><span class="ml-1 item-text">Validation</span></a>
+                            <a class="nav-link pl-3" href="/QuanLy/ViewKhu"><span class="ml-1 item-text">Khu</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link pl-3" href="./form_wizard.html"><span class="ml-1 item-text">Wizard</span></a>
+                            <a class="nav-link pl-3" href="/QuanLy/ViewBan"><span class="ml-1 item-text">Bàn</span></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link pl-3" href="./form_layouts.html"><span class="ml-1 item-text">Layouts</span></a>
@@ -358,23 +405,23 @@
             </p>
             <ul class="navbar-nav flex-fill w-100 mb-2">
                 <li class="nav-item w-100">
-                    <a class="nav-link" href="../docs/index.html">
+                    <a class="nav-link" href="/Login/Logout">
                         <i class="fe fe-help-circle fe-16"></i>
-                        <span class="ml-3 item-text">Getting Start</span>
+                        <span class="ml-3 item-text">Đăng xuất</span>
                     </a>
                 </li>
             </ul>
-            <div class="btn-box w-100 mt-4 mb-1">
-                <a href="https://themeforest.net/item/tinydash-bootstrap-html-admin-dashboard-template/27511269" target="_blank" class="btn mb-2 btn-primary btn-lg btn-block">
-                    <i class="fe fe-shopping-cart fe-12 mx-2"></i><span class="small">Buy now</span>
-                </a>
-            </div>
+          
         </nav>
     </aside>
         <main role="main" class="main-content">
             @RenderBody()
         </main>
-
+        <div id="myModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="img01">
+  <div id="caption"></div>
+</div>
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2023 - QuanLyNhaHang - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -385,6 +432,108 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/popper.min.js"></script>
+    <script src="~/js/bootstrap.min.js"></script>
+    <script src="~/js/simplebar.min.js"></script>
+    <script src="~/js/tinycolor-min.js"></script>
+    <script src="~/js/config.js"></script>
+    <script src='~/js/jquery.dataTables.min.js'></script>
+    <script src='~/js/dataTables.bootstrap4.min.js'></script>
+    <script src="~/js/gauge.min.js"></script>
+    <script src="~/js/jquery.sparkline.min.js"></script>
+    <script src="~/js/apexcharts.min.js"></script>
+    <script src="~/js/apexcharts.custom.js"></script>
+    <script src='~/js/jquery.mask.min.js'></script>
+    <script src='~/js/select2.min.js'></script>
+    <script src='~/js/jquery.steps.min.js'></script>
+    <script src='~/js/jquery.validate.min.js'></script>
+    <script src='~/js/jquery.timepicker.js'></script>
+    <script src='~/js/dropzone.min.js'></script>
+    <script src='~/js/uppy.min.js'></script>
+    <script src='~/js/quill.min.js'></script>
+    <script src="~/js/moment.min.js"></script>
+    <script src='~/js/daterangepicker.js'></script>
+    <script src='~/js/jquery.stickOnScroll.js'></script>
+    <script src="~/js/tinycolor-min.js"></script>
+    <script src="~/js/config.js"></script>
+    <script src="~/js/d3.min.js"></script>
+    <script src="~/js/topojson.min.js"></script>
+    <script src="~/js/datamaps.all.min.js"></script>
+    <script src="~/js/datamaps-zoomto.js"></script>
+    <script src="~/js/datamaps.custom.js"></script>
+    <script src="~/js/Chart.min.js"></script>
+    <script>
+        $('#dataTable-1').DataTable(
+            {
+                autoWidth: true,
+                "lengthMenu": [
+                    [16, 32, 64, -1],
+                    [16, 32, 64, "All"]
+                ]
+            });
+        // Get all images with class="modal-image"
+        var modal = document.getElementById("myModal");
+        var modalImg = modal.querySelector(".modal-content");
+
+        // Get all images with class "modal-image"
+        var images = document.querySelectorAll(".modal-image");
+
+        // Loop through all images and add onclick event listener
+        for (var i = 0; i < images.length; i++) {
+            images[i].onclick = function () {
+                modal.style.display = "block";
+                modalImg.src = this.src;
+                captionText.innerHTML = this.alt;
+            }
+        }
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+        
+
+    </script>
+    <script>
+        $(function () {
+            
+        $('.mySelect').selectize({
+            dataAttr: 'data-extra',
+            searchField: ['value', 'text', 'label']
+        });
+         });
+    </script>
+    <script>
+        $(document).ready(function () {
+           
+
+            $.fn.DataTable.ext.pager.numbers_length = 5;
+            $("#example").dataTable({
+                "scrollY": "400px",
+                "scrollCollapse": true,
+                bLengthChange: false,
+                bInfo: false,
+                scrollX: true,
+                fixedHeader: true,
+                language: {
+                    paginate: {
+                        previous: "Trước",
+                        next: "Sau",
+                    },
+                    search: "Tìm kiếm",
+
+                },
+            });
+        });
+    </script>
+
+    <script src="~/js/apps.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

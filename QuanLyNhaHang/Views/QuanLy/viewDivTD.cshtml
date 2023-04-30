@@ -1,0 +1,75 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    NhomThucAn getNhomHH(int? id)
+    {
+        return context.NhomThucAn.Find(id);
+    }
+}
+<div class="product" id="divTD" style="display: flex; flex-wrap: wrap">
+    @foreach (ThucDon hh in ViewBag.HangHoas)
+    {
+        <ul>
+            <li class="card">
+                <div class="profile-card pt-4 d-flex flex-column"
+                 style="padding: 0 10px 0 10px">
+                    <div style="text-align: center;">
+
+                    @if (hh.Image == null)
+                    {
+                            <img style="width: 250px; height: 250px;object-fit: cover;"
+                         src="~/ImagesTD/camon.png" />
+                    }
+                    else
+                    {
+                            <img style="width: 250px; height: 250px;object-fit: cover;"
+                     src="~/ImagesTD/@hh.Image" />
+                    }
+                    </div>
+                    @if (hh.Active == true)
+                    {
+                        <h5 style="margin-top: 10px; width: 300px; height: 45px;">
+                            <b>@hh.Ten</b>
+                        </h5>
+                    }
+                    else
+                    {
+                        <h5 style="margin-top: 10px; width: 300px; height: 45px;color:red;">
+                            <b>@hh.Ten</b>
+                        </h5>
+                    }
+                    <h6>Nhóm: @getNhomHH(hh.Idnta).TenNta</h6>
+                    
+                    <div class="social-links"
+                     style="display: flex; justify-content: space-between">
+                        <div>
+                            @if (hh.Active == false)
+                            {
+
+                                <a class="chinhsua" href="/QuanLy/ViewUpdateTD/@hh.Idtd">
+
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                <a href="/QuanLy/khoiphucTD/@hh.Idtd" onclick="return confirm('Bạn có muốn khôi phục món ăn này?')"><i class="fa-solid fa-arrow-rotate-left"></i></a>
+                                
+                                
+                            }
+                            else
+                            {
+                                <a class="chinhsua" href="/QuanLy/ViewUpdateTD/@hh.Idtd">
+
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+
+                                <a href="/QuanLy/XoaTD/@hh.Idtd" onclick="return confirm('Bạn có muốn xóa món ăn này?')"><i class="fa-solid fa-trash-can"></i></a>
+
+
+                            }
+                        </div>
+                        <a href="CTLap.html" class="chitiet"><i class="=">Chi tiết</i></a>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    }
+
+</div>

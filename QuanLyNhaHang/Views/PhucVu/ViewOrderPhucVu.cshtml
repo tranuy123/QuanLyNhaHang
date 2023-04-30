@@ -1,0 +1,84 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<Ban> listBan()
+    {
+        return context.Ban.Where(x => x.Active == true).ToList();
+    }
+    bool count(int id)
+    {
+        if (context.HoaDon.Where(x => x.TinhTrang == false && x.Idban == id).ToList().Count() == 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    }
+<div class="d-flex align-content-around flex-wrap" style="width:100%;-webkit-justify-content: space-around;
+  justify-content:space-around;">
+    @foreach (Ban item in listBan())
+{
+    if(count(item.Idban)){
+            <div class="card my-4 flex-row">
+                <div class="card-header">
+                    <strong>@item.TenBan</strong>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <h3></h3>
+                        <section>
+                            <p>Try the keyboard navigation by clicking arrow left or right!</p>
+                        </section>
+                        <h3>Effects</h3>
+                        <section>
+                            <p>Wonderful transition effects.</p>
+                        </section>
+                        <h3>Pager</h3>
+                        <section>
+                            <a class="nav-link" href="/PhucVu/MenuPV/@item.Idban">
+                                <i class="fe fe-credit-card fe-16"></i>
+                                <span class="ml-3 item-text">Order</span>
+                            </a>
+                        </section>
+                        
+                    </div>
+                </div> <!-- .card-body -->
+               
+
+            </div> <!-- .card -->
+    }
+    else{
+            <div class="card my-4 flex-row  bg-info">
+                                <div class="card-header">
+                                    <strong>@item.TenBan</strong>
+                                </div>
+                <div class="card-body">
+                                    <div>
+                                        <h3></h3>
+                                        <section>
+                                            <p>Try the keyboard navigation by clicking arrow left or right!</p>
+                                        </section>
+                                        <h3>Effects</h3>
+                                        <section>
+                                            <p>Wonderful transition effects.</p>
+                                        </section>
+                                        <h3>Pager</h3>
+                                        <section>
+                            <a class="nav-link" href="/PhucVu/MenuPV/@item.Idban">
+                                <i class="fe fe-credit-card fe-16"></i>
+                                <span class="ml-3 item-text">Order</span>
+                            </a>
+                        </section>
+               
+                                    </div>
+                                </div> <!-- .card-body -->
+
+                            </div> <!-- .card -->
+                            }
+    }
+    </div>
+
+                     
+          
+    
+   
+    

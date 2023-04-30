@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyNhaHang.Models;
+using SelectPdf;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -68,12 +69,25 @@ namespace QuanLyNhaHang.Controllers
             ct.Ipmac = IPMAC;
             ct.Idtd = IDTD;
             ct.DonGia = DonGia;
-            ct.Sl = 1;
+            ct.Sl = 1;           
             context.ChiTietHoaDonTam.Add(ct);
             context.SaveChanges();
 
 
             return "Thêm món thành công";
+        }
+        [HttpPost("/HuyHoaDonTam")]
+        public string HuyHoaDonTam(string IPMAC, int IDTD)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            ChiTietHoaDonTam ct = context.ChiTietHoaDonTam.FirstOrDefault(x =>x.Ipmac == IPMAC && x.Idtd==IDTD);
+
+           
+            context.ChiTietHoaDonTam.Remove(ct);
+            context.SaveChanges();
+
+
+            return "Hủy món thành công";
         }
         [HttpPost("/UpdateSL")]
         public string UpdateSL(int IDCTHDT, int SL, string DonGia, string ThanhTien)
@@ -138,6 +152,58 @@ namespace QuanLyNhaHang.Controllers
                 throw ex;
             }
             return RedirectToAction("Index");
+        }
+        [Route("/download/hoadon/{id:int}")]
+        public IActionResult downloadHoaDon(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            var tinhtranghoadon = context.ChiTietHoaDon.FirstOrDefault(x => x.Idhd == id && x.TghoanThanh == null);
+            if (tinhtranghoadon != null)
+            {
+                TempData["ThongBao"] = "Có món ăn trong danh sách vẫn chưa hoàn thành!, chưa thể thanh toán";
+
+                return RedirectToAction("HoaDon");
+            }
+            else
+            {
+                HoaDon hd = context.HoaDon.Find(id);
+                hd.TinhTrang = true;
+                hd.Tgxuat = DateTime.Now;
+                context.HoaDon.Update(hd);
+                context.SaveChanges();
+
+
+                var fullView = new HtmlToPdf();
+                fullView.Options.WebPageWidth = 700;
+                fullView.Options.PdfPageSize = PdfPageSize.A7;
+                fullView.Options.MarginTop = 20;
+                fullView.Options.MarginBottom = 20;
+                fullView.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+
+                var currentUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+
+                var pdf = fullView.ConvertUrl(currentUrl + "/HoaDonPDF/" + id);
+
+                var pdfBytes = pdf.Save();
+                var fileResult = File(pdfBytes, "application/pdf", "HoaDon.pdf");
+
+                return fileResult;
+
+
+
+            }
+        }
+        [Route("/HoaDonPDF/{id:int}")]
+        public IActionResult viewPDF(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+           
+                var hoadon = context.HoaDon
+                    .Include(x => x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation)
+                    .Include(x => x.ChiTietHoaDon)
+                    .Where(x => x.Idhd == id).FirstOrDefault();
+                return View("HoaDonPDF", hoadon);
+            
         }
 
     }

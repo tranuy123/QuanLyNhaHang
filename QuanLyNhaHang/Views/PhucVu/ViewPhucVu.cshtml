@@ -1,0 +1,162 @@
+﻿@using System.Security.Claims
+@{
+
+
+    DateTime now = DateTime.Now;
+    DayOfWeek dayOfWeek = now.DayOfWeek;
+    string dayOfWeekString = dayOfWeek.ToString();
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    var ca = context.Ca.FirstOrDefault(x => x.Thu == dayOfWeekString && now.TimeOfDay >= x.TgbatDau && now.TimeOfDay <= x.TgketThuc).Idca;
+    int idnv = int.Parse(User.FindFirstValue(ClaimTypes.Name));
+    var idkhu = context.LichLamViec.FirstOrDefault(x => x.Idca == ca && x.Idnv== idnv && x.Active==true).Idkhu;
+    List<ChiTietHoaDon> listCTHDPV(){
+        return  context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation)
+                    .Include(x => x.IdtdNavigation)
+                    .Where(x => x.IdhdNavigation.IdbanNavigation.Idkhu == idkhu && x.TghoanThanh != null).ToList();
+    } 
+
+}
+                        <div class="row" style="width:100%" >
+                            <!-- simple table -->
+                            <div class="col-md-6 my-4">
+                                <div class="card shadow">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Simple Table</h5>
+                                        <input id="IDKHU" value="@idkhu"/>
+                                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>Company</th>
+                                                    <th>Address</th>
+                                                    <th>Date</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbodyTGNM" >
+                        @{
+                            int i = 0;
+                        }
+                        @foreach (ChiTietHoaDon item in listCTHDPV())
+                        {
+                            i++;
+
+                                                <tr>
+                                                    <td>@i</td>
+                                                    <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
+                                                    <td>@item.IdtdNavigation.Ten</td>
+                                                    <td>@item.Sl</td>
+                                                    <td>901-6206 Cras Av.</td>
+                                                    <td><button class="btn btn-primary">Xác nhận</button></td>
+                                                </tr>
+                                               
+                                               
+                                               
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> <!-- simple table -->
+                            <!-- Bordered table -->
+                            <div class="col-md-6 my-4">
+                                <div class="card shadow">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Bordered table</h5>
+                                        <p class="card-text">Add .table-bordered for borders on all sides of the table and cells.</p>
+                                        <table class="table table-bordered table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>Company</th>
+                                                    <th>Address</th>
+                                                    <th>Date</th>
+                                                    <th>Activate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>3224</td>
+                                                    <td>Keith Baird</td>
+                                                    <td>Enim Limited</td>
+                                                    <td>901-6206 Cras Av.</td>
+                                                    <td>Apr 24, 2019</td>
+                                                    <td>
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input" id="c1" checked>
+                                                            <label class="custom-control-label" for="c1"></label>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>3218</td>
+                                                    <td>Graham Price</td>
+                                                    <td>Nunc Lectus Incorporated</td>
+                                                    <td>Ap #705-5389 Id St.</td>
+                                                    <td>May 23, 2020</td>
+                                                    <td>
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input" id="c2">
+                                                            <label class="custom-control-label" for="c2"></label>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2651</td>
+                                                    <td>Reuben Orr</td>
+                                                    <td>Nisi Aenean Eget Limited</td>
+                                                    <td>7425 Malesuada Rd.</td>
+                                                    <td>Nov 4, 2019</td>
+                                                    <td>
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input" id="c3" checked>
+                                                            <label class="custom-control-label" for="c3"></label>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2636</td>
+                                                    <td>Akeem Holder</td>
+                                                    <td>Pellentesque Associates</td>
+                                                    <td>896 Sodales St.</td>
+                                                    <td>Mar 27, 2020</td>
+                                                    <td>
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input" id="c4">
+                                                            <label class="custom-control-label" for="c4"></label>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2757</td>
+                                                    <td>Beau Barrera</td>
+                                                    <td>Augue Incorporated</td>
+                                                    <td>4583 Id St.</td>
+                                                    <td>Jan 13, 2020</td>
+                                                    <td>
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input" id="c5">
+                                                            <label class="custom-control-label" for="c5"></label>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div> <!-- Bordered table -->
+                        </div> <!-- end section -->
+                        
+    
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-56159088-1');
+    </script>

@@ -20,7 +20,7 @@ namespace QuanLyNhaHang.Models
         public string TenCa { get; set; }
         public TimeSpan? TgbatDau { get; set; }
         public TimeSpan? TgketThuc { get; set; }
-        public DateTime? Thu { get; set; }
+        public string Thu { get; set; }
         public bool? Active { get; set; }
 
         public virtual ICollection<ChiTietHoaDon> ChiTietHoaDon { get; set; }

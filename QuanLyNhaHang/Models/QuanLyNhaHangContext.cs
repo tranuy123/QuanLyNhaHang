@@ -82,7 +82,7 @@ namespace QuanLyNhaHang.Models
 
                 entity.Property(e => e.TgketThuc).HasColumnName("TGKetThuc");
 
-                entity.Property(e => e.Thu).HasColumnType("datetime");
+                entity.Property(e => e.Thu).HasMaxLength(27);
             });
 
             modelBuilder.Entity<ChiTietHoaDon>(entity =>
@@ -349,6 +349,8 @@ namespace QuanLyNhaHang.Models
                 entity.Property(e => e.Detail).HasMaxLength(800);
 
                 entity.Property(e => e.Idnta).HasColumnName("IDNTA");
+
+                entity.Property(e => e.Image).HasMaxLength(250);
 
                 entity.Property(e => e.MaTd)
                     .HasColumnName("MaTD")

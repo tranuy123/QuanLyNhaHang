@@ -1,0 +1,50 @@
+﻿@model QuanLyNhaHang.Models.Khu
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<Sanh> getListSanh()
+    {
+        return context.Sanh.Where(x => x.Active == true).OrderByDescending(x => x.Idsanh).ToList();
+    }
+  
+}
+
+<div class="card">
+    <div class="card-body">
+        <form action="/QuanLy/UpdateKhu" method="post">
+            <div class="forms-header text-center">
+                <h4 class="forms-title "><b>@ViewData["Title"]</b></h4>
+            </div>
+            <div class="forms-body">
+                <div class="form-group">
+                    <label style="margin:7px 0;">Mã sảnh</label>
+                    <input asp-for="@Model.MaKhu" type="text" class="form-control" required>
+                    <input asp-for="@Model.Idkhu" type="hidden" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Tên sảnh</label>
+                    <input asp-for="@Model.TenKhu" type="text" class="form-control" required>
+                </div>
+            </div>
+            <div>
+                <label style="margin:7px 0;">Sảnh</label>
+                <select required class="custom-select" asp-for="@Model.Idsanh" aria-label="Default select example">
+                    <option value="" disabled> --Sảnh--</option>
+
+                    @foreach (Sanh item in getListSanh())
+                    {
+
+                        <option value="@item.Idsanh">@item.TenSanh</option>
+                    }
+                </select>
+            </div>
+            <div class="forms-footer" style="justify-content:space-between">
+
+                <input type="submit" class="btn btn-primary" value="Sửa">
+            </div>
+        </form>
+        <button class="btn btn-secondary" onclick="window.history.go(-1);">
+            Quay lại
+        </button>
+
+    </div>
+</div>

@@ -29,7 +29,7 @@ connection.on("HienThiCTHD", function (chitiethoadon, ipmac, tongtien, idban) {
         tr.append('<td class="idcthdNB">' + item.idcthd + '</td>');
         tr.append("<td>" + item.ten + "</td>");
         tr.append('<td><strong>' + item.tenBan + '</strong></td>')
-        tr.append("<td>" + "</td>");
+        tr.append("<td>" + item.sl + "</td>");
         if (item.trangThaiOrder) {
             tr.append('<td class="trangthaicthd">Khách hàng đang sửa yêu cầu</td>');
         } else {
@@ -45,7 +45,9 @@ connection.on("HienThiCTHD", function (chitiethoadon, ipmac, tongtien, idban) {
         tbody.append(tr);
     });
     $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
-     });
+    });
+    $(".tableHD").load(location.href + " .tableHD>*", function () {
+    });
     
 
 });
@@ -76,8 +78,8 @@ connection.on("ReceiveMessage", function (id) {
         return $(this).text() === id;
     }).closest("tr").find(".trangthaicthd").text("Khách đang sửa yêu cầu");
     $("td.idcthdNB").filter(function () {
-        return $(this).text() === id;
-    }).closest("tr").find(".xacnhan").prop("disabled", true);
+        return $(this).text() == id;
+    }).find("#xacnhan1").prop("disabled", true);
 });
 
 
@@ -110,10 +112,11 @@ connection.on("ReceiveMessageNB", function (id) {
     $("td.td-idcthd").filter(function () {
         return $(this).text() === id;
     }).closest("tr").find(".btn-sua").prop("disabled", true);
+    $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
+    });
     $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
      });
-     $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
-     });
+     
 });
 
 $(document).ready(function () {
@@ -121,6 +124,48 @@ $(document).ready(function () {
 
         var id = $(this).find('#xacnhan1').val();
         connection.invoke("SendMessageNB", id).catch(function (err) {
+            return console.error(err.toString());
+        });
+    });
+});
+
+//-----------------------------------------------------------------------
+connection.on("ReceviPhucVu", function (listCTHDPV) {
+
+    var idkhu = $("#IDKHU").val();
+
+    var tbody = $("#tbodyTGNM");
+
+    tbody.empty(); // Xóa bỏ các hàng hiện tại trong bảng
+
+    for (var i = 0; i < listCTHDPV.length; i++) {
+        var item = listCTHDPV[i];
+
+        console.log(item.idcthd)
+        if (item.idkhu == idkhu) {
+            var tr = $(`<tr>
+                        <td>${(i + 1)}</td>
+                        <td>${item.tenBan}</td>
+                        <td>${item.ten}</td>
+                        <td>${item.sl}</td>
+                        <td>901-6206 Cras Av.</td>
+                        <td><button class="btn btn-primary">Xác nhận</button></td>
+                    </tr>`);
+            tbody.append(tr);
+        }
+    }
+    $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
+    });
+});
+
+
+
+$(document).ready(function () {
+    $(document).on('click', '.tdtght', function () {
+
+        var id = $(this).find('#btntght').val();
+
+        connection.invoke("SendPhucVu", id).catch(function (err) {
             return console.error(err.toString());
         });
     });

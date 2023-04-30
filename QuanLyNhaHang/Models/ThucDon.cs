@@ -18,7 +18,7 @@ namespace QuanLyNhaHang.Models
         public int Idtd { get; set; }
         public string MaTd { get; set; }
         public string Ten { get; set; }
-        public byte[] Image { get; set; }
+        public string Image { get; set; }
         public string Detail { get; set; }
         public bool? TinhTrang { get; set; }
         public bool? Active { get; set; }
