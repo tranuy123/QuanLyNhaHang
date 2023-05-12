@@ -1,0 +1,78 @@
+﻿<div class="table-responsive" style="white-space:nowrap;overflow-y: auto;">
+
+
+    <table id="example" class="table table-striped  table-hover text-center display nowrap" style="width:100%;">
+        <thead>
+            <tr>
+
+                <th class="text-center">Mã NTA</th>
+                <th class="text-center">Tên NTA</th>
+
+
+                <th class="text-center">Tùy chọn</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (NhomThucAn item in ViewBag.NSX)
+            {
+
+
+                <tr>
+
+                    <td>@item.MaNta</td>
+                    <td>@item.TenNta</td>
+
+                    @if(item.Active ==true){
+                        <td>
+
+                            <a class="chinhsua" href="/QuanLy/ViewUpdateNTA/@item.Idnta">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                            </a>
+
+                            <a href="/QuanLy/deleteNTA/@item.Idnta" onclick="return confirm('Bạn có muốn xóa nhóm thức ăn này?')">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </a>
+
+                        </td>
+                    }else{
+                        <td>
+
+                            <a class="chinhsua" href="/QuanLy/ViewUpdateNTA/@item.Idnta">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                            </a>
+
+                            <a href="/QuanLy/KhoiPhucNTA/@item.Idnta" onclick="return confirm('Bạn có muốn khôi phục nhóm thức ăn này?')">
+                                <i class="fa-solid fa-arrow-rotate-left"></i>
+                            </a>
+
+                        </td>
+                    }
+
+                </tr>
+            }
+
+
+
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function () {
+        $.fn.DataTable.ext.pager.numbers_length = 5;
+        $("#example").dataTable({
+
+            bLengthChange: false,
+            bInfo: false,
+            scrollX: true,
+            language: {
+                paginate: {
+                    previous: "Trước",
+                    next: "Sau",
+                },
+                search: "Tìm kiếm",
+
+            },
+        });
+
+    });
+</script>

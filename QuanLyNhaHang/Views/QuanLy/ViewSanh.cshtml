@@ -7,54 +7,82 @@
    
 }
 <a href="/QuanLy/ViewInsertSanh" class="btn btn-secondary"><span>Thêm sảnh</span></a>
+<div style="display:flex;justify-content:space-around;">
+    <div style="display: flex">
+        <div class="search-bar" style="margin-right:10px">
+            <div class="search-form d-flex align-items-center">
 <div class="dropdown" style="margin-right:10px">
-    <select id="active" onchange="changeHH()" class="form-select">
+    <select id="active" onchange="changeHH()" class="custom-select">
         <option value="true" selected>Hiện tại</option>
         <option value="false">Tất cả</option>
     </select>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="divSanh" class="d-flex align-content-around flex-wrap" style="width:100%;-webkit-justify-content: space-around;
   justify-content:space-around;">
 
     @foreach (Sanh item in listBan())
     {
-        
-            <div class="card my-4 flex-row">
-               
-                <div class="card-body">
-                    <div>
-                        <h3></h3>
-                        <section>
-                            <p>Mã sảnh :</p>
-                        </section>
-                        <h3>@item.MaSanh</h3>
-                        <section>
-                            <p>Tên sảnh: </p>
-                        </section>
-                        <h3>@item.TenSanh</h3>
-                        
+
+        <div class="card my-4 flex-row">
+
+            <div class="card-body">
+                <div>
+                    <h3></h3>
+                    <section>
+                        <p>Mã sảnh :</p>
+                    </section>
+                    <h3>@item.MaSanh</h3>
+                    <section>
+                        <p>Tên sảnh: </p>
+                    </section>
+                    @if (item.Active == true)
+                    {
+                        <h3 style="margin-top: 10px; width: 300px; height: 45px;">
+                            <b>@item.TenSanh</b>
+                        </h3>
+                    }
+                    else
+                    {
+                        <h3 style="margin-top: 10px; width: 300px; height: 45px;color:red;">
+                            <b>@item.TenSanh</b>
+                        </h3>
+                    }
+
                     <div class="social-links"
                      style="display: flex; justify-content: space-between">
                         <div>
                             <!---->
+                            @if (item.Active == true)
+                            {
+                                <a class="chinhsua" href="/QuanLy/ViewUpdateSanh/@item.Idsanh">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
 
-                            <a class="chinhsua" href="/QuanLy/ViewUpdateSanh/@item.Idsanh">
-                                <i class="fa-regular fa-pen-to-square"></i>
-                            </a>
+                                <a href="/QuanLy/deleteSanh/@item.Idsanh" onclick="return confirm('Bạn có muốn xóa sảnh này?')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="chinhsua" href="/QuanLy/ViewUpdateSanh/@item.Idsanh">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
 
-                            <a href="/QuanLy/deleteSanh/@item.Idsanh" onclick="return confirm('Bạn có muốn xóa sảnh này?')">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </a>
+                                <a href="/QuanLy/khoiphucSanh/@item.Idsanh" onclick="return confirm('Bạn có muốn khôi phục sảnh này?')"><i class="fa-solid fa-arrow-rotate-left"></i></a>
+
+                            }
                         </div>
                     </div>
 
-                    </div>
-                </div> <!-- .card-body -->
+                </div>
+            </div> <!-- .card-body -->
 
 
-            </div> <!-- .card -->
-        
-        
+        </div> <!-- .card -->
     }
 </div>
 <script>

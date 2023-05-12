@@ -189,6 +189,8 @@ namespace QuanLyNhaHang.Models
                     .HasColumnName("TGXuat")
                     .HasColumnType("datetime");
 
+                entity.Property(e => e.TinhTrangTt).HasColumnName("TinhTrangTT");
+
                 entity.HasOne(d => d.IdbanNavigation)
                     .WithMany(p => p.HoaDon)
                     .HasForeignKey(d => d.Idban)

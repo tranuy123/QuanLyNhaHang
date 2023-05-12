@@ -1,4 +1,6 @@
-﻿@{
+﻿@using System.Net.NetworkInformation
+
+@{
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
     ThucDon getTD(int? id)
     {
@@ -6,49 +8,99 @@
         if (nv != null) return nv;
         else return new ThucDon();
     }
+    string macAddress = "";
+    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+    {
+        // Only consider Ethernet network interfaces
+        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+            nic.OperationalStatus == OperationalStatus.Up)
+        {
+            macAddress = nic.GetPhysicalAddress().ToString();
+            break;
+        }
+    }
+    ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd)
+    {
+        return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd);
+    }
+
 }
 <tbody id="tbodyNTA">
     @foreach (Gia item in ViewBag.NTA)
     {
 
 
-        <tr>
-            <td>
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="2474">
-                    <label class="custom-control-label" for="2474"></label>
-                </div>
-            </td>
-            <td>
-                <div class="avatar avatar-md">
-                    <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
-                </div>
-            </td>
-            <td>
-                <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
-                <small class="mb-0 text-muted">2474</small>
-            </td>
-            <td>
-                <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
-                <small class="mb-0 text-muted">Ap #331-7123 Lobortis Avenue</small>
-            </td>
-            <td>
-                <p class="mb-0 text-muted"><a href="#" class="text-muted">@item.Gia1</a></p>
-                <small class="mb-0 text-muted">Nigeria</small>
-            </td>
-            <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
-            <td class="text-muted">13/09/2020</td>
-            <td>
-                <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="text-muted sr-only">Action</span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="#">Edit</a>
-                    <a class="dropdown-item" href="#">Remove</a>
-                    <a class="dropdown-item" href="#">Assign</a>
-                </div>
-            </td>
-        </tr>
+        if (getCTHDT(macAddress, item.Idtd) != null)
+        {
+
+
+
+            <tr>
+
+                <td>
+                    <div class="avatar avatar-md">
+
+                        @if (item.IdtdNavigation.Image == null)
+                        {
+                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                     src="~/ImagesTD/camon.png" />
+                        }
+                        else
+                        {
+                            <img class="modal-image" style="width : auto; height: 200px;object-fit: contain;"
+                     src="~/ImagesTD/@item.IdtdNavigation.Image" />
+                        }
+                    </div>
+                </td>
+                <td>
+                    <p><strong>@getTD(@item.Idtd).Ten</strong></p>
+
+                </td>
+                <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text></td>
+                <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text></td>
+
+                <td>
+                    <p class="fw-bold">@item.Gia1</p>
+                </td>
+                <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
+                <td>
+                    <button class="HuyaddTD btn btn-secondary"> hủy chọn món </button>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+
+                <td>
+                    <div class="avatar avatar-md">
+                        @if (item.IdtdNavigation.Image == null)
+                        {
+                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                     src="~/ImagesTD/camon.png" />
+                        }
+                        else
+                        {
+                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                     src="~/ImagesTD/@item.IdtdNavigation.Image" />
+                        }
+                    </div>
+                </td>
+                <td>
+                    <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
+                </td>
+                <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text></td>
+                <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text></td>
+
+                <td>
+                    <p class="fw-bold"><a href="#" class="text-muted">@item.Gia1</a></p>
+                </td>
+                <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
+                <td>
+                    <button class="addTD btn btn-info"> Thêm món </button>
+                </td>
+            </tr>
+        }
     }
 
 </tbody>

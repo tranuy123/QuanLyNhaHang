@@ -14,9 +14,26 @@
         }
     }
     var idb = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress).Idban;
+    var TinhTrangXNHD = context.HoaDon.Where(x => x.TinhTrang == false && x.Idban == idb && x.TinhTrangTt == null);
+    var TinhTrangXNHD1 = context.HoaDon.Where(x => x.TinhTrang == true && x.Idban == idb && x.TinhTrangTt == false);
     List<ChiTietHoaDon> getListCTHD()
     {
-        return context.ChiTietHoaDon.Include(x =>x.IdhdNavigation.IdbanNavigation).Where(x => x.IdhdNavigation.Idban == idb && x.IdhdNavigation.TinhTrang == false).ToList();
+        return context.ChiTietHoaDon.Include(x =>x.IdhdNavigation.IdbanNavigation).Where(x => x.IdhdNavigation.Idban == idb && x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null).ToList();
+    }
+    var cthd = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).FirstOrDefault(x => x.IdhdNavigation.Idban == idb && x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null);
+
+    var idhd = cthd != null ? cthd.Idhd : 0;
+    var tongtien = cthd != null ? cthd.IdhdNavigation.TongTien : 0;
+
+    ThucDon getTD(int? id)
+    {
+        ThucDon nv = context.ThucDon.Find(id);
+        if (nv != null) return nv;
+        else return new ThucDon();
+    }
+    string toDecimal(double? d)
+    {
+        return d.Value.ToString("#,##0.00");
     }
 
 }
@@ -29,6 +46,7 @@
     </script>
 }
 
+
               <div class="row" style="width:100%">
                 <div class="col-md-12 my-4">
                   <h2 class="h4 mb-1">Hóa đơn của bạn</h2>
@@ -36,15 +54,17 @@
                   <div class="card shadow">
                     <div class="card-body">
                       <!-- table -->
+                <input type="hidden" name="ipmac" id="IDMAC" value="@macAddress" />
+
                       <table class="table table-hover table-borderless border-v tableHD">
                         <thead class="thead-dark">
                           <tr>
-                            <th>Invoice No</th>
-                            <th>Invoice Date</th>
-                            <th>Order #</th>
-                            <th>Bill To</th>
-                            <th>Status</th>
-                            <th>Grand Total</th>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>Đơn Giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th>Trạng thái</th>
                             <th>Total</th>
                             <th>Action</th>
                           </tr>
@@ -59,10 +79,12 @@
 
                                             <tr class="accordion-toggle collapsed" id="trxacnhan" data-toggle="collapse" data-parent="#c-2474" href="#collap-2474">
                                                 <td>@i</td>
-                                                <td class="td-idcthd">@item.Idcthd</td>
-                                                <td>@item.DonGia</td>
+                                                <td>@getTD(item.Idtd).Ten</td>
+
+                                                <td style="display : none" class="td-idcthd">@item.Idcthd</td>
+                                                <td class="text-end">@toDecimal(@item.DonGia)</td>
                                                 <td>@item.Sl</td>
-                                                <td>@item.ThanhTien</td>
+                                                <td class="text-end">@toDecimal(@item.ThanhTien)</td>
                                                 @if (item.Tgbep == null)
                                                 {
                                                     <td class="tdxacnhan1"></td>
@@ -75,25 +97,39 @@
                                                     <input type="hidden" class="input-idcthd" value="@item.Idcthd" />
                                                     @if (item.Tgbep == null)
                                                     {
-                                                        <button class="btn btn-primary btn-sua"> sửa </button>
+                                                        <button class="btn btn-primary btn-huy" value="@item.Idcthd" > Hủy </button>
                                                     }
                                                     else
                                                     {
-                                                        <button class="btn btn-primary btn-sua" disabled> sửa </button>
+                                                        <button class="btn btn-primary btn-huy" disabled> Hủy </button>
                                                     }
-                                                    <div class="row p-1">
-                                                        <div class="col-6">
-                                                            <ul id="messagesList"></ul>
-                                                        </div>
-                                                    </div>
+                                                    
                                                 </td>
                                                 <td>
-                                                    <a href="/download/hoadon/@item.Idhd" class="btn btn-outline-success">In</a>
 
                                                 </td>
                                             </tr>
 
                           }
+                        <tr>
+                            <td>Tổng tiền</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-end">@toDecimal(@tongtien)</td>
+                            <td></td>
+                            <td></td>
+                            @if (@TinhTrangXNHD.Count() > 0 || @TinhTrangXNHD1.Count()>0 || @cthd == null)
+                            {
+                            <td>                                                    
+                                <button class="btn btn-outline-success btn-sendYCTT" value="@idhd" disabled> Gửi yêu cầu thanh toán</button>
+                            </td>
+                            }else{
+                                <td>
+                            <button class="btn btn-outline-success btn-sendYCTT" value="@idhd" > Gửi yêu cầu thanh toán</button>
+                                </td>
+                            }
+                        </tr>
 
                         </tbody>
                       </table>
@@ -101,6 +137,8 @@
                   </div>
                 </div>
               </div> <!-- end section -->
+
+
             
 
 
@@ -114,6 +152,9 @@
       }
       gtag('js', new Date());
       gtag('config', 'UA-56159088-1');
-        
+    $(".closetoast").on("click", function () {
+
+        $('.toastHD').toast('hide');
+    });
 
     </script>

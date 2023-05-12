@@ -1,0 +1,54 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<Sanh> getListSanh()
+    {
+        return context.Sanh.Where(x => x.Active == true).OrderByDescending(x => x.Idsanh).ToList();
+    }
+}
+<div id="divSanh" class="d-flex align-content-around flex-wrap" style="width:100%;-webkit-justify-content: space-around;
+  justify-content:space-around;">
+
+    @foreach (Sanh item in getListSanh())
+    {
+
+        <div class="card my-4 flex-row">
+
+            <div class="card-body">
+                <div>
+                    <h3></h3>
+                    <section>
+                        <p>Mã sảnh :</p>
+                    </section>
+                    <h3>@item.MaSanh</h3>
+                    <section>
+                        <p>Tên sảnh: </p>
+                    </section>
+                    @if (item.Active == true)
+                    {
+                        <h3 style="margin-top: 10px; width: 300px; height: 45px;">
+                            <b>@item.TenSanh</b>
+                        </h3>
+                    }
+                    else
+                    {
+                        <h3 style="margin-top: 10px; width: 300px; height: 45px;color:red;">
+                            <b>@item.TenSanh</b>
+                        </h3>
+                    }
+
+                    <div class="social-links"
+                     style="display: flex; justify-content: space-between">
+                       
+                        <div>
+                            <a class="btn btn-primary" href="/QuanLy/ViewGiaSanh/@item.Idsanh" style="color:white">Giá @item.TenSanh</a>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div> <!-- .card-body -->
+
+
+        </div> <!-- .card -->
+    }
+</div>

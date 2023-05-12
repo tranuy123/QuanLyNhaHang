@@ -93,5 +93,10 @@ namespace QuanLyNhaHang.Controllers
                 new ClaimsPrincipal(claimsIdentity));
         }
 
+        public IActionResult test()
+        {
+            return View();
+        }
+
     }
 }

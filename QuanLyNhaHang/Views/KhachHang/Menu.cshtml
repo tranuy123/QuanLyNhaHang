@@ -28,7 +28,7 @@
     var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
     List<Gia> getListGia()
     {
-        return context.Gia.Include(x => x.IdtdNavigation).Where(x => x.Idsanh == IDSanh.Idsanh).ToList();
+        return context.Gia.Include(x => x.IdtdNavigation.Active==true).Where(x => x.Idsanh == IDSanh.Idsanh &&x.Active==true).ToList();
     }
     ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd)
     {
@@ -43,8 +43,8 @@
             <div class="row" style="width:100%">
                 <!-- Small table -->
                 <div class="col-md-12 my-4">
-                  <h2 class="h4 mb-1">Customize table rendering</h2>
-                  <p class="mb-3">Additional table rendering with vertical border, rich content formatting for cell</p>
+                  <h2 class="h4 mb-1">Nhà hàng Trần Uy kính chào quý khách</h2>
+                  <p class="mb-3">Chọn món ăn yêu thích sau đó chọn vào mục gọi món để chọn số lượng</p>
                   <div class="card shadow">
                     <div class="card-body">
                       <div class="toolbar">
@@ -76,12 +76,11 @@
                         <thead>
                           <tr>
 
-                            <th class="fw-bold">ID</th>
-                            <th class="fw-bold">User</th>
-                            <th class="fw-bold">Company</th>
-                            <th class="fw-bold">Contact</th>
-                            <th  class="w-25">Bio</th>
-                            <th class="fw-bold"> Date</th>
+                            <th class="fw-bold">Ảnh</th>
+                            <th class="fw-bold">Tên món</th>
+                            <th class="fw-bold">Giá</th>
+                            <th class="fw-bold">Miêu tả</th>
+                            
                             <th class="fw-bold">Action</th>
                           </tr>
                         </thead>
@@ -97,14 +96,15 @@
                          
                             <td>
                               <div class="avatar avatar-md">
+
                                                         @if (item.IdtdNavigation.Image == null)
                                                         {
-                                                            <img class="modal-image" style="width: auto; height: 250px;object-fit: contain;"
+                                                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
                                                      src="~/ImagesTD/camon.png" />
                                                         }
                                                         else
                                                         {
-                                                            <img class="modal-image" style="width: auto; height: 250px;object-fit: contain;"
+                                                            <img class="modal-image" style="width : auto; height: 200px;object-fit: contain;"
                                                      src="~/ImagesTD/@item.IdtdNavigation.Image" />
                                                         }
                                                     </div>
@@ -115,14 +115,11 @@
                             </td>
                             <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text ></td>
                             <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text ></td>
-                            <td>
-                                                    <p class="fw-bold">@ViewBag.IDMAC</p>
-                            </td>
+                           
                             <td>
                                                     <p class="fw-bold">@item.Gia1</p>
                             </td>
                             <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
-                            <td>13/09/2020</td>
                             <td><button class="HuyaddTD btn btn-secondary"> hủy chọn món </button>
                             </td>
                           </tr>
@@ -134,30 +131,26 @@
                                                                 <div class="avatar avatar-md">
                                                         @if (item.IdtdNavigation.Image == null)
                                                         {
-                                                            <img class="modal-image" style="width: auto; height: 250px;object-fit: contain;"
+                                                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
                                                      src="~/ImagesTD/camon.png" />
                                                         }
                                                         else
                                                         {
-                                                            <img class="modal-image" style="width: auto; height: 250px;object-fit: contain;"
+                                                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
                                                      src="~/ImagesTD/@item.IdtdNavigation.Image" />
                                                         }
                                                     </div>
                                                             </td>
                                                             <td>
                                                                 <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
-                                                                <small class="mb-0 text-muted">2474</small>
                                                             </td>
                                                             <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text ></td>
                                                             <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text ></td>
-                                                            <td>
-                                                               <p class="fw-bold">@ViewBag.IDMAC</p>
-                                                            </td>
+                                                            
                                                             <td>
                                                                <p class="fw-bold"><a href="#" class="text-muted">@item.Gia1</a></p>
                                                             </td>
                                                             <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
-                                                                <td class="fw-bold">13/09/2020</td>
                                                             <td>
                                                                 <button class="addTD btn btn-info"> Thêm món </button>
                                                             </td>

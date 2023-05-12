@@ -1,0 +1,99 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<Ca> getListCa()
+    {
+        return context.Ca.Where(x => x.Active == true).OrderBy(x =>x.Thu).ToList();
+    }
+    Sanh getSanh(int? id)
+    {
+        return context.Sanh.Find(id);
+    }
+}
+
+
+<div id="divKhu" class="card pt-3">
+    <div class="card-body">
+        <div style="margin-bottom: -40px; position:absolute; z-index:1; display:flex;">
+            <div class="" style="width: auto;">
+
+                <a href="/QuanLy/ViewInsertCa" class="btn btn-primary">
+                    <span>Thêm ca mới</span>
+                </a>
+
+            </div>
+            <div class="dropdown" style="margin-left: 20px">
+                <select id="active" onchange="changeHH()" class="custom-select" style="width:180px">
+                    <option value="true" selected>Hiện tại</option>
+                    <option value="false">Tất cả</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-responsive" style="white-space:nowrap;overflow-y: auto;">
+
+
+            <table id="example" class="table table-striped  table-hover text-center display nowrap" style="width:100%;">
+                <thead>
+                    <tr>
+
+                        <th class="text-center">Mã ca</th>
+                        <th class="text-center">Tên ca</th>
+                        <th class="text-center">Thứ</th>
+                        <th class="text-center">Thời gian bắt đầu</th>
+                        <th class="text-center">Thời gian kết thúc</th>
+
+
+                        <th class="text-center">Tùy chọn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Ca item in getListCa())
+                    {
+
+
+                        <tr>
+
+                            <td>@item.MaCa</td>
+                            <td>@item.TenCa</td>
+                            <td>@item.Thu</td>
+                            <td>@item.TgbatDau</td>
+                            <td>@item.TgketThuc</td>
+
+
+                            <td>
+
+                                <a class="chinhsua" href="/QuanLy/ViewUpdateCa/@item.Idca">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+
+                                <a href="/QuanLy/deleteCa/@item.Idca" onclick="return confirm('Bạn có muốn xóa bàn này?')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+
+                            </td>
+                        </tr>
+                    }
+
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<script>
+    function changeHH() {
+        var active = $('#active').val();
+        $.ajax({
+            type: "post",
+            url: "/loadViewCa",
+            data: "active=" + active,
+            success: function (result) {
+                $('.table-responsive').replaceWith(result);
+            },
+            error: function () {
+                alert("Fail to delete");
+            }
+        });
+    }
+</script>

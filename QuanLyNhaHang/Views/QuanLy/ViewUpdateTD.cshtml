@@ -75,3 +75,20 @@
         </button>
     </div>
 </div>
+<script>
+    function readURL(input, previewId) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $(previewId).attr('src', e.target.result);
+                $(previewId).hide();
+                $(previewId).fadeIn(650);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    $("#Fileimage").change(function () {
+        readURL(this, '#image1');
+    });
+
+</script>

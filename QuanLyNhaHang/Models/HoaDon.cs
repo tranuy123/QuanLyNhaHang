@@ -19,6 +19,7 @@ namespace QuanLyNhaHang.Models
         public DateTime? Tgxuat { get; set; }
         public double? TongTien { get; set; }
         public bool? TinhTrang { get; set; }
+        public bool? TinhTrangTt { get; set; }
         public bool? Active { get; set; }
         public int? Idban { get; set; }
         public int? Idnv { get; set; }

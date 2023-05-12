@@ -1,0 +1,64 @@
+﻿
+<div class="table-responsive" style="white-space:nowrap;overflow-y: auto;">
+
+    @{
+        QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+        Gia getGia(int ids, int idtd)
+        {
+            return context.Gia.FirstOrDefault(x => x.Idsanh == ids && x.Idtd == idtd);
+        }
+    }
+    <table id="example" class="table table-striped  table-hover text-center display nowrap" style="width:100%;">
+        <thead>
+            <tr>
+
+                <th class="text-center">Mã TD</th>
+                <th class="text-center">Tên</th>
+                <th class="text-center">Giá</th>
+
+
+
+                <th class="text-center">Tùy chọn</th>
+            </tr>
+        </thead>
+        <tbody id="tbodygia">
+            @foreach (ThucDon item in ViewBag.NSX)
+            {
+                <tr>
+                    <td>
+                        @item.MaTd
+                        <input type="hidden" id="IDTD" value="@item.Idtd" />
+                    </td>
+                    <td>@item.Ten</td>
+                    @if (@getGia(ViewBag.Idsanh, item.Idtd) != null)
+                    {
+                        <td class="giacell" data-idsanh="@ViewBag.Idsanh" data-idtd="@item.Idtd">@getGia(ViewBag.Idsanh,item.Idtd).Gia1</td>
+                    }
+                    else
+                    {
+                        <td class="giacell" data-idsanh="@ViewBag.Idsanh" data-idtd="@item.Idtd"></td>
+                    }
+                    @if (@getGia(ViewBag.Idsanh, item.Idtd) != null)
+                    {
+                        <td>
+                            <button class="btn btn-primary btnsua">Sửa</button>
+                            <button class="btn btn-danger btnxoa">Xóa</button>
+                            <button class="btn btn-success btnLuu d-none">Lưu</button>
+                            <button class="btn btn-danger btnHuy d-none">Hủy</button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <button class="btn btn-primary btnthem">Thêm</button>
+                            <button class="btn btn-success btnLuu d-none">Lưu</button>
+                            <button class="btn btn-danger btnHuy1 d-none">Hủy</button>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+
+    </table>
+    <input id="IDS" type="hidden" value="@ViewBag.Idsanh" />
+</div>

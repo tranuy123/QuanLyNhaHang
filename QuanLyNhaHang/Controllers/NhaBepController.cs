@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuanLyNhaHang.Models;
 using System;
 
 namespace QuanLyNhaHang.Controllers
 {
+
+    [Authorize(Roles = "2")]
+
     public class NhaBepController : Controller
     {
         public IActionResult Index()

@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using QuanLyNhaHang.Models;
+using System;
 using System.Linq;
 using System.Net.NetworkInformation;
 
 namespace QuanLyNhaHang.Controllers
 {
+    [Authorize(Roles = "1")]
+    
+
     public class PhucVuController : Controller
     {
         public IActionResult Index()
@@ -23,7 +29,7 @@ namespace QuanLyNhaHang.Controllers
             ViewBag.idb = idb;
             var IDkhu = context.Ban.FirstOrDefault(x => x.Idban == idb);
             var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
-            ViewBag.menuPV = context.Gia.Where(x => x.Idsanh == IDSanh.Idsanh).ToList(); ;
+            ViewBag.menuPV = context.Gia.Include(x => x.IdtdNavigation).Where(x => x.Idsanh == IDSanh.Idsanh && x.Active==true).ToList(); ;
             return View("MenuPV");
         }
         [HttpPost("/loadNhomThucAnPV")]
@@ -64,6 +70,19 @@ namespace QuanLyNhaHang.Controllers
 
             return "Thêm món thành công";
         }
+        [HttpPost("/HuyHoaDonTamPV")]
+        public string HuyHoaDonTamPV(string IPMAC, int IDTD)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            ChiTietHoaDonTam ct = context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == IPMAC && x.Idtd == IDTD);
+
+
+            context.ChiTietHoaDonTam.Remove(ct);
+            context.SaveChanges();
+
+
+            return "Hủy món thành công";
+        }
         [Route("/PhucVu/GoiMonPV/{idb}")]
         public IActionResult GoiMonPV(int idb)
         {
@@ -84,6 +103,19 @@ namespace QuanLyNhaHang.Controllers
 
 
             return "Thay doi so luong thanh cong";
+        }
+        [HttpPost("/UpdateTGPV")]
+        public string UpdateTGPV(int IDCTHDT)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            ChiTietHoaDon ct = context.ChiTietHoaDon.Find(IDCTHDT);
+
+            ct.TgphucVu = DateTime.Now;
+            context.ChiTietHoaDon.Update(ct);
+            context.SaveChanges();
+
+
+            return "Cap nhap thanh cong";
         }
     }
 }

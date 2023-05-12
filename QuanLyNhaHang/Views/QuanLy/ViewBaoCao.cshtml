@@ -1,0 +1,276 @@
+﻿@using System.Globalization
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<Sanh> getListSanh()
+    {
+        return context.Sanh.Where(x => x.Active == true).ToList();
+    }
+    List<Khu> getListKhu()
+    {
+        return context.Khu.Where(x => x.Active == true).ToList();
+    }
+    List<Ban> getListBan()
+    {
+        return context.Ban.Where(x => x.Active == true).ToList();
+    }
+    List<ThucDon> getListTD()
+    {
+        return context.ThucDon.Where(x => x.Active == true).ToList();
+    }
+
+
+}
+<div class="card">
+    <div class="card-body">
+        
+        <div class="tab-content pt-2">
+            <div class="d-lg-none" id="tabXemPhieu">
+            </div>
+            <div class="tab-pane fade show active"
+                 id="bordered-justified-detail"
+                 role="tabpanel"
+                 aria-labelledby="detail-tab">
+                <form action="/download/BaoCaoHoaDon" method="post">
+
+                    <div class="form-group p-2 mb-2"
+                         id="groupTTSearchLichSu"
+                         style="border-radius: 5px; border: 1px solid black">
+                        <div class="row">
+                            
+                            <label class="col-sm-1 col-lg-1 col-form-label">Từ ngày</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="fromDay"
+                                       id="fromDay"
+                                       value="@DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)"
+                                       placeholder="Từ ngày" />
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Đến ngày</label>
+                            <div class="col-lg-2 col-sm-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="toDay"
+                                       id="toDay"
+                                       value="@DateTime.Now.ToString("dd-MM-yyyy")"
+                                       placeholder="Tới ngày" />
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Số HD</label>
+                            <div class="col-lg-3 col-sm-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="MaHD"
+                                       id="MaHD"
+                                       value=""
+                                       placeholder="Số hóa đơn" />
+                            </div>
+                            <div class="col-md-1 mb-2 col-lg-1 d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary" onclick="loadTableBCNK()">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-1 col-lg-1 col-form-label">Sảnh</label>
+                            <div class="col-sm-4 col-lg-2">
+                                <select name="IdSanh" id="IdSanh" class="custom-select">
+                                    <option selected value="0">Tất cả</option>
+                                    @foreach (Sanh n in getListSanh())
+                                    {
+                                        <option value="@n.Idsanh">@n.TenSanh</option>
+                                    }
+                                </select>
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Tiểu khu</label>
+                            <div class="col-sm-4 col-lg-2">
+                                <select name="IdTieuKhu" id="IdTieuKhu" class="custom-select">
+                                    <option selected value="0">Tất cả</option>
+                                    @foreach (Khu n in getListKhu())
+                                    {
+                                        <option value="@n.Idkhu">@n.TenKhu</option>
+                                    }
+                                </select>
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Bàn</label>
+                            <div class="col-sm-4 col-lg-2">
+                                <select name="IdBan" id="IdBan" class="custom-select">
+                                    <option selected value="0">Tất cả</option>
+                                    @foreach (Ban n in getListBan())
+                                    {
+                                        <option value="@n.Idban">@n.TenBan</option>
+                                    }
+                                </select>
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Thực đơn</label>
+
+                            <div class="col-sm-4 col-lg-2">
+                                <select name="IdTD" id="IdTD" class="custom-select">
+                                    <option selected value="0">Tất cả</option>
+                                    @foreach (ThucDon n in getListTD())
+                                    {
+                                        <option value="@n.Idtd">@n.Ten</option>
+                                    }
+                                </select>
+                            </div>
+
+
+
+
+
+                        </div>
+                    </div>
+                   
+                    <div id="tableLichSuHD" class="table-responsive" style="white-space:nowrap;overflow-y: auto;">
+
+                        <table id="CTNhapHang"
+                               class="table table-striped table-hover text-center display nowrap"
+                               style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Mã hóa đơn</th>
+                                    <th class="text-center">Tên bàn</th>
+                                    <th class="text-center">Tên khu</th>
+                                    <th class="text-center">Tên sảnh</th>
+                                    <th class="text-center">Thời gian xuất</th>
+                                    <th class="text-center">tổng tiền</th>
+
+                                    <th class="text-center">Tùy chọn</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center"></td>
+                                    <td class="text-center"></td>
+                                    <td class="text-center"></td>
+                                    <td class="text-end"></td>
+                                    <td class="text-end"></td>
+                                    <td class="text-end"></td>
+                                    <td class="text-end"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row" >
+                        
+                            <button class="btn btn-info col-lg-2 col-sm-2"
+                                    style="margin-left: 20px"
+                                    type="submit">
+                                Xuất tất cả
+                            </button>
+                    </div>
+                </form>
+            </div>
+
+          
+
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $.fn.DataTable.ext.pager.numbers_length = 5;
+        $("#CTNhapHang").dataTable({
+            "pageLength": 15,
+            "scrollCollapse": true,
+            bLengthChange: false,
+            bInfo: false,
+            scrollX: true,
+            fixedHeader: true,
+            searching: false,
+            language: {
+                paginate: {
+                    previous: "Trước",
+                    next: "Sau",
+                },
+                search: "Tìm kiếm",
+
+            },
+        });
+        $("#THNhapHang").dataTable({
+            "pageLength": 15,
+            "scrollCollapse": true,
+            bLengthChange: false,
+            bInfo: false,
+            scrollX: true,
+            fixedHeader: true,
+            searching: false,
+            language: {
+                paginate: {
+                    previous: "Trước",
+                    next: "Sau",
+                },
+                search: "Tìm kiếm",
+
+            },
+        });
+    });
+    function loadTableBCNK() {
+        var toDay = $('#toDay').val();
+        var fromDay = $('#fromDay').val();
+        var fromDay = $('#fromDay').val();
+        var MaHD = $('#MaHD').val();
+        var IdSanh = $('#IdSanh').val();
+        var IdTieuKhu = $('#IdTieuKhu').val();
+        var IdBan = $('#IdBan').val();
+        var IdTD = $('#IdTD').val();
+
+
+
+
+
+
+      
+        $.ajax({
+            type: "post",
+            url: "/loadTableLichSuHD",
+            data: "toDay=" + toDay + "&fromDay=" + fromDay +"&MaHD=" + MaHD +"&IdSanh=" +IdSanh+ "&IdTieuKhu=" +IdTieuKhu + "&IdBan=" +IdBan +"&IdTD=" + IdTD,
+            success: function (result) {
+                $('#tableLichSuHD').replaceWith(result);
+            },
+            error: function () {
+                alert("Fail");
+            }
+        });
+    }
+    function loadTableBCNKTH() {
+        var toDay = $('#toDayTH').val();
+        var fromDay = $('#fromDayTH').val();
+        var nHH = $('#nHH').val();
+
+        $.ajax({
+            type: "post",
+            url: "/loadTableBaoCaoNhapKhoTH",
+            data: "toDay=" + toDay + "&fromDay=" + fromDay + "&nHH="
+                + nHH,
+            success: function (result) {
+                $('#TableBCNK').replaceWith(result);
+            },
+            error: function () {
+                alert("Fail");
+            }
+        });
+    }
+    function ViewPhieuNhap(idPhieuNhap) {
+        $('#bordered-justified-detail').removeClass('active');
+        $('#bordered-justified-detail').removeClass('show');
+        $('#tabXemPhieu').removeClass('d-lg-none');
+
+
+        $.ajax({
+            type: "post",
+            url: "/ViewThongTinHD",
+            data: "idPN=" + idPhieuNhap,
+            success: function (result) {
+                $('#tabXemPhieu').replaceWith(result);
+            },
+            error: function () {
+                alert("Fail");
+            }
+        });
+    }
+    function cancelXemPhieu() {
+        $('#tabXemPhieu').addClass('d-lg-none');
+        $('#bordered-justified-detail').addClass('active');
+        $('#bordered-justified-detail').addClass('show');
+    }
+</script>

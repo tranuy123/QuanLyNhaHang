@@ -13,6 +13,7 @@ namespace QuanLyNhaHang.Models
         public int? Idsanh { get; set; }
         public int? Idtd { get; set; }
         public double? Gia1 { get; set; }
+        public bool? Active { get; set; }
 
         public virtual Sanh IdsanhNavigation { get; set; }
         public virtual ThucDon IdtdNavigation { get; set; }

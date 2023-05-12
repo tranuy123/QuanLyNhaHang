@@ -30,13 +30,17 @@
     {
         return context.ChiTietHoaDonTam.Where(x => x.Ipmac == macAddress).ToList();
     }
+    var KiemTraTT = context.ChiTietHoaDonTam.Where(x => x.Ipmac == macAddress).ToList();
+    string toDecimal(double? d)
+    {
+        return d.Value.ToString("#,##0.00");
+    }
    
 
 }
 
         
               <div class="row" style="width:100%">
-                  <a href="/KhachHang/Index"> Trở về </a>
                 <!-- Small table -->
                 <div class="col-md-12 my-4">
                   <h2 class="h4 mb-1">Chọn số lượng món ăn</h2>
@@ -65,10 +69,10 @@
                           <tr>
                             
                             <th>ID</th>
-                            <th>User</th>
-                            <th>Company</th>
-                            <th>Contact</th>
+                            <th>Tên</th>
+                            <th>Đơn Giá</th>
                             <th class="w-25">Số lượng</th>
+                            <th>ĐVT</th>
                             <th>Thành tiền</th>
                             <th>Action</th>
                           </tr>
@@ -80,39 +84,58 @@
                                   <tr>
                                     
                                     <td>
-                                      <div class="avatar avatar-md">
-                                        <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
-                                      </div>
+                                    <div class="avatar avatar-md">
+
+                                        @if (@getTD(item.Idtd).Image == null)
+                                        {
+                                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                                         src="~/ImagesTD/camon.png" />
+                                        }
+                                        else
+                                        {
+                                            <img class="modal-image" style="width : auto; height: 200px;object-fit: contain;"
+                                         src="~/ImagesTD/@getTD(item.Idtd).Image" />
+                                        }
+                                    </div>
                                     </td>
                                     <td>
                                        <input type="hidden" id="IDCTHDT" value="@item.Idcthdt" />
                                       <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
 
                                     </td>
-                                    <td style="display:none"><input class='inputDisabled text-center' name="Idtd" value=@item.Idtd type=text></td>
+                                <td style="display:none"><input class='inputDisabled text-center' name="Idtd" data-groupid= "@getTD(item.Idtd).Idnta" value=@item.Idtd type=text></td>
                                     <td style="display:none"><input class='inputDisabled text-center' name="DonGia" value=@item.DonGia type=text></td>
-                                    <td>
+                                <td style="display:none">
                                        <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
                                     </td>
                                     <td>
-                                      <p class="dongia mb-0 text-muted" id="tdDonGia" ><a >@item.DonGia</a></p>
+                                    <p class="dongia mb-0 text-muted" id="tdDonGia"><strong>@toDecimal(@item.DonGia)</strong></p>
                                     </td>
-                                    <td class="w-25"><input type="number" min="0" id="SL" value="@item.Sl"/></td>
-                                    <td class="text-muted" id="tdThanhTien" > @(item.Sl*item.DonGia) </td>
-                                    <td><button class="HuyHoaDonTam btn btn-secondary"> hủy chọn món </button>
+                                    <td class="w-15"><input class="form-control" type="number" min="0" id="SL" value="@item.Sl"/></td>
+                                    <td>Dĩa</td>
+                                <td class="text-muted" id="tdThanhTien"><strong>@toDecimal((item.Sl * item.DonGia))</strong></td>
+                                    <td><button class="HuyHoaDonTam btn btn-secondary"> Hủy chọn món </button>
                                     </td>
+                                <td style="display:none" class="NTA"><input type="text" value="@getTD(item.Idtd).Idnta" /></td>
                                   </tr>
                                                     
                                                    
                                                 }
                                 <tr>
-                                    <td>Tổng</td>
+                                    <td><h5>Tổng</h5></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td><input name="tongtien" id="total"/></td>
-                                    <td><button class="btn-addcthd btn btn-primary"> Xác nhận </button></td>
+                                    <td><input class="form-control" name="tongtien" id="total"/></td>
+                                    @if(KiemTraTT.Count()> 0 ){
+                                        <td><button class="btn-addcthd btn btn-primary"> Xác nhận </button></td>
+
+                                    }else{
+                                          <td><button class="btn-addcthd btn btn-primary" disabled> Xác nhận </button></td>
+
+                                    }
+
                                 </tr>
 
                         </tbody>
@@ -132,22 +155,48 @@
       }
       gtag('js', new Date());
       gtag('config', 'UA-56159088-1');
-        $(document).ready(function () {
-            // Tính tổng giá trị của các ô "Thành tiền"
-            var total = 0;
-            $('#tbodyNTA tr').each(function () {
-                var quantity = $(this).find('input[type="number"]').val();
-                var price = $(this).find('.dongia').text();
-                if (price != null && price != '') {
-                    var subtotal = parseInt(quantity) * parseFloat(price);
-                    total += subtotal;
-                    $(this).find('.subtotal').text(subtotal.toFixed(2));
-                }
-            });
 
-            // Gán giá trị tổng vào ô "Tổng"
-            $('#total').val(total.toFixed(2));
-        });
+
+    $('input[type="number"]').on('change', function () {
+        var quantity = $(this).val();
+        var groupId = $(this).parents('tr').find("td:eq(10) input[type='text']").val();
+
+
+        // kiểm tra xem số lượng vượt quá giới hạn số lượng định mức chưa
+        if (quantity == 5 && groupId == 1) {
+            alert('Số lượng món khá lớn, bạn có chắc muốn tiếp tục');
+        } else if (quantity == 7 && groupId == 2) {
+            alert('Số lượng món khá lớn, bạn có chắc muốn tiếp tục');
+        }
+        else if (quantity == 15 && groupId == 3) {
+            alert('Số lượng món khá lớn, bạn có chắc muốn tiếp tục');
+        }
+    });
+
+        $(document).ready(function () {
+    // Tính tổng giá trị của các ô "Thành tiền"
+    var total = 0;
+    $('#tbodyNTA tr').each(function () {
+        var quantity = $(this).find('input[type="number"]').val();
+        var price = $(this).find('.dongia').text();
+        if (price != null && price != '') {
+            var subtotal = parseInt(quantity) * parseFloat(price.replace(',', ''));
+            total += subtotal;
+            $(this).find('.subtotal').text(toDecimal(subtotal));
+        }
+    });
+
+    // Gán giá trị tổng vào ô "Tổng"
+   // $('#total').val(toDecimal(total));
+        $('#total').val(total.toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }));
+    });
+    function toDecimal(d) {
+        return d.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
 
 
@@ -169,7 +218,7 @@
             });
          }
 
-         
+            
         $(function () {
             $("#tableGoiMon").on("click", ".btnaddcthd", function () {
                 var tongtien = $('#total').val();
@@ -193,60 +242,92 @@
                     }
                 });
             });
-            $("#tableGoiMon").on("click", ".HuyHoaDonTam", function () {
-                var ipmac = $('#IDMAC').val();
-                var idtd = $(this).parents('tr').find("td:eq(2) input[type='text']").val();
-                var thiss = $(this);
+        $("#tableGoiMon").on("click", ".HuyHoaDonTam", function () {
+            var ipmac = $('#IDMAC').val();
+            var idtd = $(this).parents('tr').find("td:eq(2) input[type='text']").val();
+            var thiss = $(this);
 
-                $.ajax({
-                    type: "post",
-                    url: "/HuyHoaDonTam",
-                    data: "IPMAC=" + ipmac + "&IDTD=" + idtd,
-                    success: function (result) {
-                        $("#tableGoiMon").load(location.href + " #tableGoiMon>*", function () {
+            $.ajax({
+                type: "post",
+                url: "/HuyHoaDonTam",
+                data: "IPMAC=" + ipmac + "&IDTD=" + idtd,
+                success: function (result) {
+                    $("#tableGoiMon").load(location.href + " #tableGoiMon>*", function () {
+                        // Tính lại tổng tiền
+                        var total = 0;
+                        $('#tbodyNTA tr').each(function () {
+                            var quantity = $(this).find('input[type="number"]').val();
+                            var price = $(this).find('.dongia').text();
+                            if (price != null && price != '') {
+                                var subtotal = parseInt(quantity) * parseFloat(price.replace(',', ''));
+                                total += subtotal;
+                                $(this).find('.subtotal').text(toDecimal(subtotal));
+                            }
                         });
-                    },
-                    error: function () {
-                    
 
-                        alert("Fail");
-                    }
-                });
+                        // Gán giá trị tổng vào ô "Tổng"
+                        $('#total').val(total.toLocaleString('en-US', {
+                            style: 'decimal',
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        }));
+                    });
+                },
+                error: function () {
+                    alert("Fail");
+                }
             });
-           
+        });
+
             // Bắt sự kiện khi giá trị ô số lượng thay đổi
             $('#tbodyNTA').on('change', 'input[type="number"]', function () {
                 // Lấy số lượng và đơn giá của món ăn
                 var $row = $(this).closest('tr');
                 var sl = parseInt($(this).val());
-                var donGia = parseInt($row.find('td:eq(3) input').val());
+                var donGia = parseFloat($row.find('td:eq(3) input').val());
 
                 // Tính thành tiền
                 var thanhTien = sl * donGia;
-                $row.find('td:eq(7)').text(thanhTien);
+               // $row.find('td:eq(8)').text(thanhTien);
+             $row.find('td:eq(8)').text(
+                parseFloat(thanhTien).toLocaleString('en-US', {
+                    style: 'decimal',
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2
+                })
+            );
 
                 // Tính tổng tiền
+                // Tính lại tổng tiền
                 var tongTien = 0;
                 $('#tbodyNTA tr').each(function () {
-                    var tt = parseInt($(this).find('td:eq(7)').text());
-                    if (!isNaN(tt)) {
-                        tongTien += tt;
+                    var tt = $(this).find('td:eq(8)').text().replace(/,/g, '');
+                    var ttt = parseFloat(tt);
+                    if (!isNaN(ttt)) {
+                        tongTien += parseFloat(ttt);
                     }
                 });
-                $('#tbodyNTA tr:last td:eq(5) input').val(tongTien);
+
+// Hiển thị tổng tiền
+$('#tbodyNTA tr:last td:eq(5) input').val(tongTien.toLocaleString('en-US', {
+    style: 'decimal',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2
+}));
+
+
             });
 
              $("#tbodyNTA").on("blur", "#SL", function () {
                 var sl = $(this).val(); // Lấy giá trị của ô input số lượng
                 var idcthdt = $(this).closest('tr').find('#IDCTHDT').val();
                 var dongia = $(this).parents('tr').find("td:eq(5)").text();
-                var thanhtien =$(this).parents('tr').find("td:eq(7)").text();
-
+                var thanhtien =$(this).parents('tr').find("td:eq(8)").text();
 
                 $.ajax({
                     type: "post",
                     url: "/UpdateSL",
-                    data: "&IDCTHDT=" + idcthdt + "&SL=" + sl +"&DonGia=" + dongia +"&ThanhTien=" + thanhtien,
+                data: "&IDCTHDT=" + idcthdt + "&SL=" + sl + "&DonGia=" + dongia + "&ThanhTien=" +thanhtien,
                     success: function (result) {
                         
                         // Xử lý khi thành công
@@ -260,13 +341,17 @@
 
         });
         // Thêm sự kiện click vào nút "Gọi món"
-        $(".btn-addcthd").on("click", function () {
-            // Hiển thị toast "Gọi món thành công"
+    //    $(".btn-addcthd").on("click", function () {
+    //        // Hiển thị toast "Gọi món thành công"
 
-            // Chuyển hướng tới trang HoaDon
-            window.location.href = "/KhachHang/HoaDon";
-        });
-
+    //        // Chuyển hướng tới trang HoaDon
+    //        window.location.href = "/KhachHang/HoaDon";
+    //    });
+    //$(".btn-addcthd1").on("click", function () {
+    //    // Hiển thị toast "Gọi món thành công"
+    //    alert(30);
+    //    // Chuyển hướng tới trang HoaDon
+    //});
     </script>
     
  

@@ -1,0 +1,40 @@
+﻿
+@{
+    Layout = null;
+}
+<html>
+<head>
+    <title>Thống kê</title>
+    <meta charset="utf-8">
+    <script src="~/jquery-3.6.1.min.js"></script>
+    <script src="~/datetimepicker/moment.js/moment.min.js"></script>
+    <script src="~/datetimepicker/umd/popper.min.js"></script>
+    <link href="~/datetimepicker/bootstrap-datetimepicker.css" rel="stylesheet" />
+    <script src="~/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+
+</head> 
+
+<body>
+   <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+  <div class="toast-header">
+    <strong class="mr-auto">Thông báo</strong>
+    <small>1 phút trước</small>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+    Thông báo của bạn
+  </div>
+</div>
+
+    <script>
+        $('.toast').toast('show'); // Hiển thị toast
+        $('.toast').toast('hide'); // Ẩn toast
+
+
+    </script>
+
+</body>
+
+</html>

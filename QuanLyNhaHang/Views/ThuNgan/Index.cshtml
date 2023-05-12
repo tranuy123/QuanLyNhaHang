@@ -1,0 +1,178 @@
+﻿@using System.Net.NetworkInformation
+@using System.Security.Claims
+
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<HoaDon> getListHD()
+    {
+        return context.HoaDon.Include(x => x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation).Where(x => x.TinhTrang == false && x.TinhTrangTt == null && x.Tgxuat == null).ToList();
+    }
+    List<HoaDon> getListHDTT()
+    {
+        return context.HoaDon.Include(x => x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation).Where(x =>x.TinhTrang ==true && x.TinhTrangTt == false).ToList();
+    }
+ string toDecimal(double? d)
+    {
+        return d.Value.ToString("#,##0.00");
+    }
+
+}
+
+<div class="row" style="width:100%">
+    <!-- simple table -->
+    <div class="col-md-6 my-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title">Xác nhận thanh toán</h5>
+                <p class="card-text"></p>
+                <table class="table table-hover table-bordered text-center display nowrapr" id="" width="100%">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên bàn</th>
+                            <th>Tên sảnh</th>
+                            <th>Tên Khu</th>
+                            <th>Tổng tiền</th>
+                            <th>action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyXNTT">
+                        @{
+                            int i = 0 ; 
+                        }
+                        @foreach (HoaDon item in getListHD())
+                        {
+
+                            i++;
+                            <tr>
+                                <td>@i</td>
+                                <td style="display:none" class="" id="IDBAN">@item.Idban</td>
+                                <td>@item.IdbanNavigation.TenBan</td>
+                                <td>@item.IdbanNavigation.IdkhuNavigation.TenKhu</td>
+                                
+                                    <td >@item.IdbanNavigation.IdkhuNavigation.IdsanhNavigation.TenSanh</td>
+
+                                
+                                    <td >@toDecimal(@item.TongTien)</td>
+
+                                    <td class="xacnhanTT">
+                                    <input type="hidden" id="inputIDHDTT" value="@item.Idhd" />
+                                    <a id="IDHDTT" href="/download/hoadon/@item.Idhd" class="btn btn-primary" value="@item.Idhd">Xác nhận</a>
+                                    </td>
+                                
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 my-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title">xác nhận nhận tiền</h5>
+                <p class="card-text"></p>
+                <table class="table table-bordered table-hover mb-0" id="" width="100%">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên bàn</th>
+                            <th>Tên sảnh</th>
+                            <th>Tên Khu</th>
+                            <th>Tổng tiền</th>
+                            <th>action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyXNNT">
+
+                        @{
+                            int j = 0;
+                        }
+                        @foreach (HoaDon item in getListHDTT())
+                        {
+
+                            j++;
+                            <tr>
+                                <td>@j</td>
+                                <td style="display:none" class=""></td>
+                                <td>@item.IdbanNavigation.TenBan</td>
+                                <td>@item.IdbanNavigation.IdkhuNavigation.TenKhu</td>
+
+                                <td>@item.IdbanNavigation.IdkhuNavigation.IdsanhNavigation.TenSanh</td>
+
+
+                                <td>@toDecimal(@item.TongTien)</td>
+
+
+                                <td class="xacnhanNT">
+                                    <input type="hidden" id="inputIDHDNT" value="@item.Idhd" />
+
+                                    <button id="IDHDNT" class="btn btn-primary" value="@item.Idhd">Xác nhận</button>
+                                </td>
+
+                            </tr>
+                        }
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> <!-- Bordered table -->
+</div> <!-- end section -->
+
+
+<script>
+
+
+
+
+
+
+    $('#dataTable-1').DataTable(
+        {
+            autoWidth: true,
+            "lengthMenu": [
+                [16, 32, 64, -1],
+                [16, 32, 64, "All"]
+            ]
+        });
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+
+
+
+        //    $(function () {
+        //        $("#TableTGBEP").on("click", ".xacnhan2", function () {
+        //            var ipmac = $('#IDMAC').val();
+        //        var id = $(this).find('#xacnhan1').val();
+
+        //            var thiss = $(this);
+
+        //            $.ajax({
+        //                type: "post",
+        //                url: "/XacNhanMon",
+        //                data: "id=" + id,
+        //                success: function (result) {
+        //                $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
+        //                 });
+        //                $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
+        //                });
+        //                },
+        //                error: function () {
+        //                    alert("Fail");
+        //                }
+        //            });
+        //        });
+        //})
+
+</script>
+
+
+
+
+

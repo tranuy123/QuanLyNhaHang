@@ -46,25 +46,19 @@
                       </div>
                       <!-- table -->
 
-                      <table class="table table-borderless table-hover" id="myTablePV">
-                        <thead>
-                          <tr>
-                            <td>
-                              <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="all2">
-                                <label class="custom-control-label" for="all2"></label>
-                              </div>
-                            </td>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Company</th>
-                            <th>Contact</th>
-                            <th class="w-25">Bio</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody id="tbodyNTAPV" >
+    <table class="table table-hover text-center display nowrap" id="myTablePV">
+        <thead>
+            <tr>
+
+                <th class="fw-bold">Ảnh</th>
+                <th class="fw-bold">Tên món</th>
+                <th class="fw-bold">Giá</th>
+                <th class="fw-bold">Miêu tả</th>
+
+                <th class="fw-bold">Action</th>
+            </tr>
+        </thead>
+        <tbody id="tbodyNTA">
             @foreach (Gia item in ViewBag.menuPV)
             {
                 if (getCTHDT(ipmac, item.Idtd) != null)
@@ -72,78 +66,76 @@
 
 
 
-                                  <tr>
-                                    <td>
-                                      <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input">
-                                        <label class="custom-control-label"></label>
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <div class="avatar avatar-md">
-                                        <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
+                    <tr>
 
-                                      <small class="mb-0 text-muted">2474</small>
-                                    </td>
-                                    <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text ></td>
-                                    <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text ></td>
-                                    <td>
-                                                                    <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
-                                      <small class="mb-0 text-muted">Ap #331-7123 Lobortis Avenue</small>
-                                    </td>
-                                    <td>
-                                      <p class="mb-0 text-muted"><a href="#" class="text-muted">@item.Gia1</a></p>
-                                      <small class="mb-0 text-muted">Nigeria</small>
-                                    </td>
-                                    <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
-                                    <td class="text-muted">13/09/2020</td>
-                                    <td><button class="addTDPV btn btn-secondary"> hủy chọn món </button>
-                                    </td>
-                                  </tr>
+                        <td>
+                            <div class="avatar avatar-md">
+
+                                @if (item.IdtdNavigation.Image == null)
+                                {
+                                    <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                             src="~/ImagesTD/camon.png" />
+                                }
+                                else
+                                {
+                                    <img class="modal-image" style="width : auto; height: 200px;object-fit: contain;"
+                             src="~/ImagesTD/@item.IdtdNavigation.Image" />
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <p><strong>@getTD(@item.Idtd).Ten</strong></p>
+
+                        </td>
+                        <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text></td>
+                        <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text></td>
+
+                        <td>
+                            <p class="fw-bold">@item.Gia1</p>
+                        </td>
+                        <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
+                        <td>
+                            <button class="HuyaddTDPV btn btn-secondary"> hủy chọn món </button>
+                        </td>
+                    </tr>
                 }
                 else
                 {
-                                                                <tr>
-                                                                    <td>
-                                                                        <div class="custom-control custom-checkbox">
-                                                                            <input type="checkbox" class="custom-control-input">
-                                                                            <label class="custom-control-label"></label>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="avatar avatar-md">
-                                                                            <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
-                                                                        </div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
-                                                                        <small class="mb-0 text-muted">2474</small>
-                                                                    </td>
-                                                                    <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text ></td>
-                                                                    <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text ></td>
-                                                                    <td>
-                                                                        <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
-                                                                        <small class="mb-0 text-muted">Ap #331-7123 Lobortis Avenue</small>
-                                                                    </td>
-                                                                    <td>
-                                                                        <p class="mb-0 text-muted"><a href="#" class="text-muted">@item.Gia1</a></p>
-                                                                        <small class="mb-0 text-muted">Nigeria</small>
-                                                                    </td>
-                                                                    <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
-                                                                    <td class="text-muted">13/09/2020</td>
-                                                                    <td>
-                                                                        <button class="addTDPV btn btn-secondary"> Thêm món </button>
-                                                                    </td>
-                                                                </tr>
+                    <tr>
+
+                        <td>
+                            <div class="avatar avatar-md">
+                                @if (item.IdtdNavigation.Image == null)
+                                {
+                                    <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                             src="~/ImagesTD/camon.png" />
+                                }
+                                else
+                                {
+                                    <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                             src="~/ImagesTD/@item.IdtdNavigation.Image" />
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
+                        </td>
+                        <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text></td>
+                        <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text></td>
+
+                        <td>
+                            <p class="fw-bold"><a href="#" class="text-muted">@item.Gia1</a></p>
+                        </td>
+                        <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
+                        <td>
+                            <button class="addTDPV btn btn-info"> Thêm món </button>
+                        </td>
+                    </tr>
                 }
             }
-           
-                        </tbody>
-                      </table>
+
+        </tbody>
+    </table>
                  <input type="hidden" id="IDB" value="@ViewBag.idb" />
                  <input  id="IPMAC" value="@ipmac"/>
                       <nav aria-label="Table Paging" class="mb-0 text-muted">
@@ -179,8 +171,8 @@
     $(function () {
         $("#myTablePV").on("click", ".addTDPV", function () {
             var ipmac = $('#IPMAC').val();
-            var idtd = $(this).parents('tr').find("td:eq(3) input[type='text']").val();
-            var DonGia = $(this).parents('tr').find("td:eq(4) input[type='text']").val();
+            var idtd = $(this).parents('tr').find("td:eq(2) input[type='text']").val();
+            var DonGia = $(this).parents('tr').find("td:eq(3) input[type='text']").val();
             var thiss = $(this);
 
             $.ajax({
@@ -194,6 +186,26 @@
                 },
                 error: function () {
                     alert(ipmac);
+                    alert("Fail");
+                }
+            });
+        });
+        $("#myTablePV").on("click", ".HuyaddTDPV", function () {
+            var ipmac = $('#IPMAC').val();
+            var idtd = $(this).parents('tr').find("td:eq(2) input[type='text']").val();
+            var thiss = $(this);
+
+            $.ajax({
+                type: "post",
+                url: "/HuyHoaDonTamPV",
+                data: "IPMAC=" + ipmac + "&IDTD=" + idtd,
+                success: function (result) {
+                    $("#myTablePV").load(location.href + " #myTablePV>*", function () {
+                    });
+                },
+                error: function () {
+                    alert(ipmac);
+                    alert(idtd);
                     alert("Fail");
                 }
             });

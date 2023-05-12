@@ -61,11 +61,11 @@
 
                             <td>
 
-                                <a class="chinhsua" href="/QuanLy/ViewUpdateKhu/@item.Idkhu">
+                                <a class="chinhsua" href="/QuanLy/ViewUpdateBan/@item.Idban">
                                     <i class="fa-regular fa-pen-to-square"></i>
                                 </a>
 
-                                <a href="/QuanLy/deleteKhu/@item.Idkhu" onclick="return confirm('Bạn có muốn xóa khu này?')">
+                                <a href="/QuanLy/deleteBan/@item.Idban" onclick="return confirm('Bạn có muốn xóa bàn này?')">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </a>
 
@@ -86,7 +86,7 @@
         var active = $('#active').val();
         $.ajax({
             type: "post",
-            url: "/loadViewKhu",
+            url: "/loadViewBan",
             data: "active=" + active,
             success: function (result) {
                 $('.table-responsive').replaceWith(result);

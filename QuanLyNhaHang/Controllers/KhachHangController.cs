@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Security.Claims;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -18,12 +19,16 @@ namespace QuanLyNhaHang.Controllers
         {
             return View("Menu");
         }
+        public IActionResult menu1()
+        {
+            return View("menu1");
+        }
         [Route("/KhachHang/GoiMon")]
         public IActionResult GoiMon()
         {
             return View("GoiMon");
         }
-        [Route("/KhachHang/HoaDon")]
+        [HttpGet("/KhachHang/HoaDon")]
         public IActionResult HoaDon()
         {
             return View("HoaDonKhachHang");
@@ -48,12 +53,12 @@ namespace QuanLyNhaHang.Controllers
             var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
             if(idnta == 0)
             {
-                ViewBag.NTA = context.Gia.Where(x => x.Idsanh == IDSanh.Idsanh).ToList();
+                ViewBag.NTA = context.Gia.Include(x => x.IdtdNavigation).Where(x => x.Idsanh == IDSanh.Idsanh).ToList();
 
             }
             else
             {
-                ViewBag.NTA = context.Gia.Where(x => x.Idsanh == IDSanh.Idsanh && x.IdtdNavigation.Idnta == idnta).ToList();
+                ViewBag.NTA = context.Gia.Include(x =>x.IdtdNavigation).Where(x => x.Idsanh == IDSanh.Idsanh && x.IdtdNavigation.Idnta == idnta).ToList();
 
             }
 
@@ -69,7 +74,8 @@ namespace QuanLyNhaHang.Controllers
             ct.Ipmac = IPMAC;
             ct.Idtd = IDTD;
             ct.DonGia = DonGia;
-            ct.Sl = 1;           
+            ct.Sl = 1;
+            ct.ThanhTien = DonGia;
             context.ChiTietHoaDonTam.Add(ct);
             context.SaveChanges();
 
@@ -166,8 +172,10 @@ namespace QuanLyNhaHang.Controllers
             }
             else
             {
+                int idnv = int.Parse(User.FindFirstValue(ClaimTypes.Name));
+
                 HoaDon hd = context.HoaDon.Find(id);
-                hd.TinhTrang = true;
+                hd.Idnv = idnv;
                 hd.Tgxuat = DateTime.Now;
                 context.HoaDon.Update(hd);
                 context.SaveChanges();

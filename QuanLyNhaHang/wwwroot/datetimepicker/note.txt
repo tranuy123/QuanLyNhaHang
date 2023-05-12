@@ -1,0 +1,4 @@
+  <script src="~/admin/moment.js/moment.min.js"></script>
+  <script src="~/admin/umd/popper.min.js"></script>
+  <link href="~/admin/bootstrap-datetimepicker.css" rel="stylesheet" />
+  <script src="~/admin/bootstrap-datetimepicker.min.js"></script>

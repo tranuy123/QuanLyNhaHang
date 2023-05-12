@@ -28,17 +28,17 @@
     <div class="col-md-6 my-4">
         <div class="card shadow">
             <div class="card-body">
-                <h5 class="card-title">Simple Table</h5>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                <h5 class="card-title">Xác nhận món</h5>
+                <p class="card-text"></p>
                 <table class="table table-hover table-bordered text-center display nowrapr TableTGBEP" id="TableTGBEP">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Company</th>
-                            <th>Address</th>
-                            <th>Date</th>
-                            <th>Status</th>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>Bàn</th>
+                            <th>Ghi chú</th>
+                            <th>số lượng</th>
+                            <th>action</th>
                         </tr>
                     </thead>
                     <tbody id="tbodyNB">
@@ -50,36 +50,15 @@
                             i++;
                             <tr>
                                 <td>@i</td>
-                                <td class="idcthdNB">@item.Idcthd</td>
+                                <td style="display:none" class="idcthdNB">@item.Idcthd</td>
                                 <td><strong>@getTD(@item.Idtd).Ten</strong></td>
-                                <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
-                                @if (item.TrangThaiOrder == true)
-                                {
-                                    <td class="trangthaicthd">Khách đang sửa yêu cầu</td>
-
-                                }
-                                else
-                                {
-                                    <td class="trangthaicthd"></td>
-
-                                }
+                                <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>                               
+                                <td class="trangthaicthd"></td>                              
                                 <td>@item.Sl</td>
-                                @if (item.TrangThaiOrder == true)
-                                {
-
-                                    <td>
-                                        <button class="xacnhan btn btn-primary" disabled>Xác nhận</button>
-                                    </td>
-                                }
-                                else
-                                {
-                                    <td class="xacnhan2">
-                                        <button id="xacnhan1" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
-                                    </td>
-
-
-                                });
-                                }
+                                <td class="xacnhan2">
+                                   <button id="xacnhan1" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
+                                </td>
+                                
                             </tr>
                         }
 
@@ -91,17 +70,17 @@
     <div class="col-md-6 my-4">
         <div class="card shadow">
             <div class="card-body">
-                <h5 class="card-title">Bordered table</h5>
-                <p class="card-text">Add .table-bordered for borders on all sides of the table and cells.</p>
+                <h5 class="card-title">xác nhận hoàn thành món</h5>
+                <p class="card-text"></p>
                 <table class="table table-bordered table-hover mb-0" id="TableTGHoanThanh">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Company</th>
-                            <th>Address</th>
-                            <th>Date</th>
-                            <th>Activate</th>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>bàn</th>
+                            <th>ghi chú</th>
+                            <th>số lượng</th>
+                            <th>action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -116,8 +95,8 @@
                                 <td>@j</td>
                                 <td><strong>@getTD(@item.Idtd).Ten</strong></td>
                                 <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
-                                <td>901-6206 Cras Av.</td>
-                                <td>Apr 24, 2019</td>
+                                <td></td>
+                                <td>@item.Sl</td>
                                 <td class="tdtght">
                                     <button id="btntght" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
                                 </td>

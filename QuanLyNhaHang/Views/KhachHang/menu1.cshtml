@@ -1,0 +1,385 @@
+﻿@using System.Net.NetworkInformation
+
+@{
+    Layout = null;
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<NhomThucAn> getListNTA()
+    {
+        return context.NhomThucAn
+        .Include(x=>x.ThucDon)
+        .Where(x => x.Active == true).ToList();
+    }
+    string macAddress = "";
+    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+    {
+        // Only consider Ethernet network interfaces
+        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+            nic.OperationalStatus == OperationalStatus.Up)
+        {
+            macAddress = nic.GetPhysicalAddress().ToString();
+            break;
+        }
+    }
+    ViewBag.IDMAC = macAddress;
+    var IDkhu = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress);
+    var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
+    List<Gia> getListGia()
+    {
+        return context.Gia.Include(x => x.IdtdNavigation).Where(x => x.Idsanh == IDSanh.Idsanh && x.Active == true).ToList();
+    }
+    ThucDon getTD(int? id)
+    {
+        ThucDon nv = context.ThucDon.Find(id);
+        if (nv != null) return nv;
+        else return new ThucDon();
+    }
+    Gia getGia(int idtd, int ids)
+    {
+        Gia nv = context.Gia.FirstOrDefault(x =>x.Idtd==idtd && x.Idsanh == ids && x.Active.Value);
+        if (nv != null) return nv;
+        else return null;
+    }
+    ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd)
+    {
+        return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd);
+    }
+
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Yummy Bootstrap Template - Index</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="~/Menu/assets/img/favicon.png" rel="icon">
+    <link href="~/Menu/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Amatic+SC:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <link href="~/Menu/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Menu/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/Menu/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/Menu/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/Menu/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="~/Menu/assets/css/main.css" rel="stylesheet">
+    <script src="~/js/jquery-3.6.4.min.js"></script>
+
+
+    <!-- =======================================================
+    * Template Name: Yummy
+    * Updated: Mar 10 2023 with Bootstrap v5.2.3
+    * Template URL: https://bootstrapmade.com/yummy-bootstrap-restaurant-website-template/
+    * Author: BootstrapMade.com
+    * License: https://bootstrapmade.com/license/
+    ======================================================== -->
+</head>
+
+<body>
+
+    <header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="container d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-lg-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <h1>Yummy<span>.</span></h1>
+      </a>
+            <div class="toast toastMN bg-success" style="position: absolute; top: 5rem; right: 0;z-index: 99999;">
+                <div class="toast-header" style="justify-content: space-between;">
+                    <strong class="mr-auto">Thông báo</strong>
+                    <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoastMN" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" style="color : #fff">
+                    Thêm món thành công
+                </div>
+            </div>
+            <div class="toast toastHMN bg-success" style="position: absolute; top: 5rem; right: 0;z-index: 99999;">
+
+            <div class="toast-header" style="justify-content: space-between;">
+                <strong class="mr-auto">Thông báo</strong>
+                <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoastHMN" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                Hủy món thành công
+            </div>
+        </div>
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li class="nav-item nav-notif">
+                        <a class="nav-link text-muted my-2" href="/KhachHang/menu1">
+                            Menu
+                        <span class="dot dot-md bg-success"></span>
+                    </a>
+                </li>
+            <li class="nav-item nav-notif">
+                        <a class="nav-link text-muted my-2" href="/KhachHang/GoiMon">
+                            Gọi Món
+                <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item nav-notif">
+                        <a class="nav-link text-muted my-2" href="/KhachHang/HoaDon">
+                            Hóa Đơn
+                        <span class="dot dot-md bg-success"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+              <i class="fe fe-sun fe-16"></i>
+            </a>
+          </li>
+          
+        </ul>
+      </nav><!-- .navbar -->
+
+      <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+      <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+
+    </div>
+  </header><!-- End Header -->
+
+    <main id="main">
+
+        <input id="IPMAC" type="hidden" value="@macAddress"/>
+        <section id="menu" class="menu">
+            <div class="container" data-aos="fade-up">
+
+                <div class="section-header">
+                    <p>Nhà Hàng <span>Trần Uy</span></p>
+                </div>
+
+                <ul class="nav nav-tabs d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
+                    @{
+                        int i = 0;
+                    }
+                    @foreach (var item in getListNTA())
+                   {
+                        if(i==0){
+                            <li class="nav-item">
+                                <a class="nav-link active show" data-bs-toggle="tab" data-bs-target="#@item.MaNta">
+                                    <h4>@item.TenNta</h4>
+                                </a>
+                            </li>
+                        }else{
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#@item.MaNta">
+                                <h4>@item.TenNta</h4>
+                            </a>
+                        </li> 
+                        }
+                        i++;
+                    }
+                </ul>
+
+                <div class="tab-content" data-aos="fade-up" data-aos-delay="300">
+                    @{
+                        int j = 0;
+                    }
+                    @foreach(var mn in getListNTA()){
+                        <div class="tab-pane fade @(j==0 ? "active show" : "")" id="@mn.MaNta">
+
+                            <div class="tab-header text-center">
+                                <p>Menu</p>
+                                <h3>@mn.TenNta</h3>
+                            </div>
+
+                            <div class="row gy-5">
+                                @foreach (var item in mn.ThucDon.Where(x => x.Active == true))
+                                {
+                                    var t = getGia(item.Idtd, IDSanh.Idsanh.Value);
+                                    if (t != null)
+                                    {
+                                        <div class="col-lg-4 menu-item">
+                                            @if(getCTHDT(macAddress,item.Idtd) == null){
+                                                <a class="add-to-cart" data-idtd="@item.Idtd" data-price="@t.Gia1.Value.ToString("#,###")" data-ipmac="@macAddress"><i class="fa-solid fa-circle-plus fa-2x" style="color:darkblue;float:right;"></i></a>
+                                                <a class="remove-from-cart d-none"><i class="fa-solid fa-xmark fa-2x" style="color:red;float:right;"></i></a>
+                                            }else{
+                                                <a class="add-to-cart d-none"><i class="fa-solid fa-circle-plus fa-2x" style="color:darkblue;float:right;"></i></a>
+                                                <a class="remove-from-cart" data-idtd="@item.Idtd" data-price="@t.Gia1.Value.ToString("#,###")" data-ipmac="@macAddress"><i class="fa-solid fa-xmark fa-2x" style="color:red;float:right;"></i></a>
+                                            }
+                                            
+                                            <input type="hidden" class="IDTD" value="@item.Idtd" />
+                                            <a href="~/ImagesTD/@item.Image" class="glightbox"><img src="~/ImagesTD/@item.Image" class="menu-img img-fluid" alt=""></a>
+                                            <h4>@item.Ten</h4>
+                                            <p class="ingredients">@item.Detail</p>
+                                            <p class="price">@t.Gia1.Value.ToString("#,###") VNĐ</p>
+                                        </div>
+                                    }
+                                }
+
+
+                            </div>
+                        </div>
+                        j++;
+                    }
+                </div>
+
+            </div>
+        </section>
+
+    </main><!-- End #main -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+
+        <div class="container">
+            <div class="row gy-3">
+                <div class="col-lg-3 col-md-6 d-flex">
+                    <i class="bi bi-geo-alt icon"></i>
+                    <div>
+                        <h4>Address</h4>
+                        <p>
+                            A108 Adam Street <br>
+                            New York, NY 535022 - US<br>
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-links d-flex">
+                    <i class="bi bi-telephone icon"></i>
+                    <div>
+                        <h4>Reservations</h4>
+                        <p>
+                            <strong>Phone:</strong> +1 5589 55488 55<br>
+                            <strong>Email:</strong> info@example.com<br>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-links d-flex">
+                    <i class="bi bi-clock icon"></i>
+                    <div>
+                        <h4>Opening Hours</h4>
+                        <p>
+                            <strong>Mon-Sat: 11AM</strong> - 23PM<br>
+                            Sunday: Closed
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 footer-links">
+                    <h4>Follow Us</h4>
+                    <div class="social-links d-flex">
+                        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong><span>Yummy</span></strong>. All Rights Reserved
+            </div>
+            <div class="credits">
+                <!-- All the links in the footer should remain intact. -->
+                <!-- You can delete the links only if you purchased the pro version. -->
+                <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/yummy-bootstrap-restaurant-website-template/ -->
+                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+            </div>
+        </div>
+
+    </footer><!-- End Footer -->
+    <!-- End Footer -->
+
+    <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+    <div id="preloader"></div>
+
+    <!-- Vendor JS Files -->
+    <script src="~/Menu/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Menu/assets/vendor/aos/aos.js"></script>
+    <script src="~/Menu/assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="~/Menu/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+    <script src="~/Menu/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="~/Menu/assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="~/Menu/assets/js/main.js"></script>
+    <script>
+        $(".closetoastMN").on("click", function () {
+
+            $('.toastMN').toast('hide');
+        });
+         $(".closetoastHMN").on("click", function () {
+
+            $('.toastHMN').toast('hide');
+        });
+       
+        $(function () {
+            $('.add-to-cart').click(function () {
+    var button = $(this); // lưu lại context
+    var idtd = button.data('idtd');
+    var price = button.data('price');
+    var ipmac = button.data('ipmac');
+    $.ajax({
+        type: "post",
+        url: "/addHoaDon",
+        data: "IPMAC=" + ipmac + "&IDTD=" + idtd + "&DonGia=" + price,
+        success: function (result) {
+            button.addClass('d-none'); // sử dụng biến lưu lại context
+
+            button.siblings('.remove-from-cart').removeClass('d-none'); // sử dụng biến lưu lại context
+            $('.toastMN').toast('show');
+
+        },
+        error: function () {
+            alert(ipmac);
+            alert("Fail");
+        }
+    });
+});
+
+
+            $('.remove-from-cart').click(function () {
+                var button = $(this); // lưu lại context
+                var idtd = button.data('idtd');
+                var ipmac = button.data('ipmac');
+
+
+                $.ajax({
+                    type: "post",
+                    url: "/HuyHoaDonTam",
+                    data: "IPMAC=" + ipmac + "&IDTD=" + idtd,
+                    success: function (result) {
+                        button.addClass('d-none'); // sử dụng biến lưu lại context
+                        button.siblings('.add-to-cart').removeClass('d-none');
+                        $('.toastHMN').toast('show');
+
+                    },
+                    error: function () {
+                        alert(ipmac);
+                        alert(idtd);
+                        alert("Fail");
+                    }
+                });
+                
+            });
+        });
+    </script>
+
+</body>
+
+</html>

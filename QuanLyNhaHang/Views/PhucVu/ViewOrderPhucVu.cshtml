@@ -1,8 +1,17 @@
-﻿@{
+﻿@using System.Security.Claims
+
+@{
+    DateTime now = DateTime.Now;
+    DayOfWeek dayOfWeek = now.DayOfWeek;
+    string dayOfWeekString = dayOfWeek.ToString();
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    var ca = context.Ca.FirstOrDefault(x => x.Thu == dayOfWeekString && now.TimeOfDay >= x.TgbatDau && now.TimeOfDay <= x.TgketThuc &&x.Active==true).Idca;
+    int idnv = int.Parse(User.FindFirstValue(ClaimTypes.Name));
+    var idkhu = context.LichLamViec.FirstOrDefault(x => x.Idca == ca && x.Idnv == idnv && x.Active == true).Idkhu;
+
     List<Ban> listBan()
     {
-        return context.Ban.Where(x => x.Active == true).ToList();
+        return context.Ban.Where(x => x.Active == true && x.Idkhu==idkhu).ToList();
     }
     bool count(int id)
     {
@@ -24,17 +33,11 @@
                 </div>
                 <div class="card-body">
                     <div>
-                        <h3></h3>
+                        
+                      
+                        
                         <section>
-                            <p>Try the keyboard navigation by clicking arrow left or right!</p>
-                        </section>
-                        <h3>Effects</h3>
-                        <section>
-                            <p>Wonderful transition effects.</p>
-                        </section>
-                        <h3>Pager</h3>
-                        <section>
-                            <a class="nav-link" href="/PhucVu/MenuPV/@item.Idban">
+                            <a class="nav-link btn btn-primary" href="/PhucVu/MenuPV/@item.Idban">
                                 <i class="fe fe-credit-card fe-16"></i>
                                 <span class="ml-3 item-text">Order</span>
                             </a>
@@ -53,17 +56,10 @@
                                 </div>
                 <div class="card-body">
                                     <div>
-                                        <h3></h3>
+                                       
+                                       
                                         <section>
-                                            <p>Try the keyboard navigation by clicking arrow left or right!</p>
-                                        </section>
-                                        <h3>Effects</h3>
-                                        <section>
-                                            <p>Wonderful transition effects.</p>
-                                        </section>
-                                        <h3>Pager</h3>
-                                        <section>
-                            <a class="nav-link" href="/PhucVu/MenuPV/@item.Idban">
+                            <a class="nav-link btn btn-primary" href="/PhucVu/MenuPV/@item.Idban">
                                 <i class="fe fe-credit-card fe-16"></i>
                                 <span class="ml-3 item-text">Order</span>
                             </a>

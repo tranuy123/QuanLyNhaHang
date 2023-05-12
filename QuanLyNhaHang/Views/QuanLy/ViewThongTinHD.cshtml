@@ -1,0 +1,134 @@
+﻿@model HoaDon
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    var ListCTPNT = Model.ChiTietHoaDon.ToList();
+    var TienHang = ListCTPNT.Sum(x => x.Sl * x.DonGia);
+    string dayToString(DateTime? a)
+    {
+        if (a == null)
+        {
+            return "";
+        }
+        return a.Value.ToString("dd-MM-yyyy");
+    }
+    ThucDon getTD(int? id)
+    {
+        ThucDon nv = context.ThucDon.Find(id);
+        if (nv != null) return nv;
+        else return new ThucDon();
+    }
+
+
+    string format(Double? a)
+    {
+        return a?.ToString("N", System.Globalization.CultureInfo.InvariantCulture);
+    }
+    string formatDay(DateTime? date)
+    {
+        if (date != null)
+        {
+            return date.Value.ToString("dd-MM-yyyy");
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    LichLamViec getIDNhanVien(int? idca, int idkhu)
+    {
+        idca ??= 0;
+        LichLamViec nv = context.LichLamViec.FirstOrDefault(x => x.Idca ==idca && x.Idkhu==idkhu);
+        if (nv != null) return nv;
+        else return new LichLamViec();
+    }
+    NhanVien getNhanVien(int? idnv){
+        NhanVien nv = context.NhanVien.FirstOrDefault(x => x.Idnnv == idnv );
+        if (nv != null) return nv;
+        else return new NhanVien();
+    }
+}
+<div id="tabXemPhieu">
+    <div id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="form-group  p-2 mb-2" style="border-radius: 5px; border: 1px solid black; background-color: lightgrey;">
+            <div class="row mb-2">
+                <label class="col-sm-1 col-lg-1 col-form-label">Mã hóa đơn</label>
+                <div class="col-sm-3 col-lg-3">
+                    <input type="text" value="@Model.MaHd" readonly class="form-control">
+                </div>
+               
+                <label class="col-sm-1 col-lg-1 col-form-label">Ngày HĐ</label>
+                <div class="col-sm-3 col-lg-3">
+                    <input type="text" value="@dayToString(Model.Tgxuat)" readonly class="form-control">
+                </div>
+            </div>
+            <div class="row mb-2">
+                
+               
+                
+
+            </div>
+           
+        </div>
+    </div>
+    <div class="table-responsive" style="max-height: 400px;overflow-x: auto;white-space:nowrap;">
+        <table class="table table-bordered table-hover table-striped text-center" id="tableChiTietPhieuNhap">
+            <thead style="position: sticky; top: 0;">
+                <tr>
+                    <th>Tên Món ăn</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
+                    <th>Thời gian order</th>
+                    <th>thời gian xác nhận</th>
+                    <th>Thời gian hoàn thành</th>
+
+                  
+                    <th>Thời gian phục vụ</th>
+                    <th>Nhân viên phục vụ</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (ChiTietHoaDon c in Model.ChiTietHoaDon)
+                {
+                    <tr>
+                        <td class="text-start">@getTD(c.Idtd).Ten</td>
+                        <td class="text-center">@c.Sl</td>
+                        <td class="text-center">@format(@c.DonGia)</td>
+
+                        <td class="text-end">@format(c.Sl * c.DonGia)</td>
+                        <td class="text-end">@c.Tgorder</td>
+                        <td class="text-end">@c.Tgbep</td>
+                        <td class="text-end">@c.TghoanThanh</td>
+                        <td class="text-end">@c.TgphucVu</td>
+                        <td class="text-end">@getNhanVien(@getIDNhanVien(c.Idca,c.IdhdNavigation.IdbanNavigation.IdkhuNavigation.Idkhu).Idnv).Ten</td>
+
+
+
+
+
+
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group p-2 mb-2" style="border-radius: 5px; border: 1px solid black;">
+        <div class="row">
+            <label class="col-sm-1 col-lg-1 col-form-label">Tổng tiền</label>
+            <div class="col-md-2 col-lg-2">
+                <input type="text" class="form-control" value="@format(TienHang)" readonly placeholder="Tiền hàng">
+            </div>
+            
+        </div>
+    </div>
+    <div class="row">
+        <div class="d-flex justify-content-between">
+            <button class="btn btn btn-secondary" onclick="cancelXemPhieu()" type="button">Quay lại</button>
+            <a class="btn btn btn-success" href="/download/ChiTietHoaDon/@Model.Idhd">In</a>
+        </div>
+    </div>
+    
+</div>

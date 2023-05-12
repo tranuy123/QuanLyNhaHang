@@ -9,6 +9,11 @@
 
         return context.ThucDon.Find(id);
     }
+    NhanVien getNV(int? id)
+    {
+
+        return context.NhanVien.Find(id);
+    }
    
 
     string toDecimal(double? d)
@@ -69,8 +74,8 @@
         <div class="card p-0" style="box-shadow:none">
             <div class="card-body">
                 <header class="d-flex justify-content-between mb-2" style="border-bottom:double;font-size:larger">
-                    <div class="infor-DN d-flex col-sm-9 col-lg-9">
-                        <img src="/assets/img/apple-touch-icon.png"
+                    <div class="infor-DN d-flex col-sm-9 col-lg-7">
+                        <img src="/assets/img/logo.png"
                              alt=""
                              style="height: 120px; width: 120px" />
 
@@ -84,45 +89,33 @@
                             </div>
                             <div class="row justify-content-between">
                                 <label class="col-lg-5 col-form-label p-0">SĐT:09090909</label>
-                                <label class="col-lg-6 col-form-label p-0">Email: Votranuy2001@gmai.com</label>
                             </div>
-                            <div class="row justify-content-between">
-                                <label class="col-lg-5 col-form-label p-0">MST: MST0909090909</label>
-                                <label class="col-lg-6 col-form-label p-0">Số TK: 057100067168</label>
+                            <div class="row">
+                                <label class="col-sm-5 col-lg-2 col-form-label p-0">Số hóa đơn:</label>
+                                <div class="col-sm-6 col-lg-8">
+                                    <label for="" class="col-form-label p-0">@Model.MaHd</label>
+                                </div>
                             </div>
-                            <div class="row justify-content-between">
-                                <label class="col-lg-5 col-form-label p-0">Ngân hàng: Vietcombank</label>
-                                <label class="col-lg-6 col-form-label p-0">Chủ TK: Võ Trần Uy</label>
+                            <div class="row mb-1">
+                                <label class="col-sm-5 col-lg-6 col-form-label p-0">Ngày tạo:</label>
+                                <div class="col-sm-6 col-lg-6">
+                                    <label for="" class="col-form-label p-0">@Model.Tgxuat.Value.ToString("dd-MM-yyyy")</label>
+                                </div>
                             </div>
+                            <div class="row mb-1">
+                                <label class="col-sm-5 col-lg-6 col-form-label p-0">Nhân viên thu ngân:</label>
+                                <div class="col-sm-6 col-lg-6">
+                                    <label for="" class="col-form-label p-0">@getNV(Model.Idnv).Ten</label>
+                                </div>
+                            </div>
+                           
                         </div>
                     </div>
-                    <div class="thongtinphieu col-sm-3 col-lg-3">
+                    <div class="thongtinphieu col-sm-3 col-lg-6">
                         <div class="row mb-4">
                         </div>
-                        <div class="row">
-                            <label class="col-sm-5 col-lg-5 col-form-label p-0">Số phiếu:</label>
-                            <div class="col-sm-6 col-lg-6">
-                                <label for="" class="col-form-label p-0">@Model.MaHd</label>
-                            </div>
-                        </div>
-                        <div class="row mb-1">
-                            <label class="col-sm-5 col-lg-5 col-form-label p-0">Ngày tạo:</label>
-                            <div class="col-sm-6 col-lg-6">
-                                <label for="" class="col-form-label p-0">@Model.Tgxuat.Value.ToString("dd-MM-yyyy")</label>
-                           </div>
-                        </div>
-                        <div class="row mb-1">
-                            <label class="col-sm-5 col-lg-5 col-form-label p-0">Số HĐ:</label>
-                            <div class="col-sm-6 col-lg-6">
-                                <label for="" class="col-form-label p-0">@Model.MaHd</label>
-                            </div>
-                        </div>
-                        <div class="row mb-1">
-                            <label class="col-sm-5 col-lg-5 col-form-label p-0">Ngày HĐ:</label>
-                            <div class="col-sm-6 col-lg-6">
-                                <label for="" class="col-form-label p-0">@Model.Tgxuat.Value.ToString("dd-MM-yyyy")</label>
-                            </div>
-                        </div>
+                       
+                        
                     </div>
                 </header>
                 <article>
@@ -140,8 +133,8 @@
                             <thead>
                                 <tr>
                                     <th class="text-center">TT</th>
-                                    <th class="text-center">Mã hàng</th>
                                     <th class="text-center">Tên hàng</th>
+                                    <th class="text-center">ĐVT</th>
                                     <th class="text-center">S.LG</th>
                                     <th class="text-center">Đơn giá</th>
                                    
@@ -158,59 +151,28 @@
                                     var hh = getHH(ct.Idtd);
                                     <tr>
                                         <td class="text-center">@index</td>
-                                        <td class="text-center">@hh.Idtd</td>
                                         <td class="text-start">@hh.Ten</td>
+                                        <td>phần</td>
                                         <td class="text-end">@toDecimal(ct.Sl)</td>
                                         <td class="text-end">@toDecimal(ct.DonGia)</td>
                                        
-                                        <td class="text-end">@toDecimal2(ct.DonGia*ct.Sl)</td>
+                                        <td class="text-end">@toDecimal2(ct.DonGia*ct.Sl) VNĐ</td>
                                     </tr>
                                 }
+                                <tr>
+                                    <th class="text-center">Tổng</th>
+                                    <th class="text-center"></th>
+                                    <th class="text-center"></th>
+                                    <th class="text-center"></th>
+                                    <th class="text-center"></th>
+
+                                    <th class="text-end"> @toDecimal2(TienHang) VNĐ</th>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="form-group p-2 mb-2"
-                         style="border-radius: 5px; border: 1px solid black">
-                        <div class="row">
-                            <label class="col-sm-3 col-lg-3 col-form-label"><b>Tiền hàng: @toDecimal2(TienHang)</b></label>
-
-                           
-                        </div>
-                    </div>
-                    <div class="sign">
-                        <div class="row" style="font-size:larger">
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%">
-                                <b>Thủ trưởng đơn vị</b>
-                            </label>
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%">
-                                <b>Kế toán</b>
-                            </label>
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%"><b>Người nhận hàng</b></label>
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%"><b>Người giao hàng</b></label>
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%"><b>Người lập phiếu</b></label>
-                        </div>
-                        <div class="row">
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%;padding-bottom: 120px;">
-                                <i>(ký,họ tên, đóng dấu)</i>
-                            </label>
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%">
-                                <i>(ký,họ tên)</i>
-                            </label>
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%"><i>(ký,họ tên)</i></label>
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="width:20%"><i>(ký,họ tên)</i></label>
-                            <label class="col-sm-2 col-2 text-center text-dark"
-                                   style="padding-bottom: 120px;width:20%"><i>(ký,họ tên)</i></label>
-                        </div>
-                    </div>
+                   
+                    
                 </article>
             </div>
         </div>

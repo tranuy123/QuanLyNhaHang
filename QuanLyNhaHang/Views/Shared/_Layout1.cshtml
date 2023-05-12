@@ -2,6 +2,30 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Favicons -->
+    <link href="~/Menu/assets/img/favicon.png" rel="icon">
+    <link href="~/Menu/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Amatic+SC:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <link href="~/Menu/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Menu/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/Menu/assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="~/Menu/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="~/Menu/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="~/Menu/assets/css/main.css" rel="stylesheet">
+
+
+
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - QuanLyNhaHang</title>
@@ -35,61 +59,123 @@
 
   </head>
 <body class="vertical narrow light  ">
-    <div class="wrapper">
-      <nav class="topnav navbar navbar-light">
-        
-        <form class="form-inline mr-auto searchform text-muted">
-          <input class="form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted" type="search" placeholder="Type something..." aria-label="Search">
-        </form>
-        <ul class="nav">
-                <li class="nav-item nav-notif">Menu
-                    <a class="nav-link text-muted my-2" href="/KhachHang/Index">
-                        <i class="fe fe-menu navbar-toggler-icon fa-2x"></i>
-                        <span class="dot dot-md bg-success"></span>
-                    </a>
-                </li>
-            <li class="nav-item nav-notif">Gọi Món
-                    <a class="nav-link text-muted my-2" href="/KhachHang/GoiMon">
-                <i class="fa-solid fa-bag-shopping fa-2x"></i>              
-                <span class="dot dot-md bg-success"></span>
-            </a>
-          </li>
-          <li class="nav-item nav-notif">Hóa Đơn
-                    <a class="nav-link text-muted my-2" href="/KhachHang/HoaDon">
-                        <i class="fa-solid fa-file-invoice fa-2x"></i>
-                        <span class="dot dot-md bg-success"></span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
-              <i class="fe fe-sun fe-16"></i>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
-              <span class="fe fe-grid fe-16"></span>
-            </a>
-          </li>
-          <li class="nav-item nav-notif">
-            <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
-              <span class="fe fe-bell fe-16"></span>
-              <span class="dot dot-md bg-success"></span>
-            </a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="avatar avatar-sm mt-2">
-                <img src="./assets/avatars/face-1.jpg" alt="..." class="avatar-img rounded-circle">
-              </span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="#">Profile</a>
-              <a class="dropdown-item" href="#">Settings</a>
-              <a class="dropdown-item" href="#">Activities</a>
+        <header id="header" class="header fixed-top d-flex align-items-center">
+            <div class="container d-flex align-items-center justify-content-between">
+
+                <a href="index.html" class="logo d-flex align-items-center me-auto me-lg-0">
+                    <!-- Uncomment the line below if you also wish to use an image logo -->
+                    <!-- <img src="assets/img/logo.png" alt=""> -->
+                    <h1>Yummy<span>.</span></h1>
+                </a>
+            <div class="toast toastHD bg-success" style="position: absolute; top: 0; right: 0;z-index: 99999;">
+                <div class="toast-header">
+                    <strong class="mr-auto">Thông báo</strong>
+                    <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoast" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" style="color : #fff">
+                    Hủy món thành công
+                </div>
             </div>
-          </li>
-        </ul>
-      </nav>
+            <div class="toast toastGM bg-success" style="position: absolute; top: 0; right: 0;z-index: 99999;">
+                <div class="toast-header">
+                    <strong class="mr-auto">Thông báo</strong>
+                    <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoastGM" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" style="color : #fff">
+                    Gọi món thành công
+                </div>
+            </div>
+            <div class="toast toastTT bg-success" style="position: absolute; top: 0; right: 0;z-index: 99999;">
+                <div class="toast-header">
+                    <strong class="mr-auto">Thông báo</strong>
+                    <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoastTT" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" style="color : #fff">
+                    Gửi yêu cầu thanh toán thành công
+                </div>
+            </div>
+            <div class="toast toastTTTB bg-danger" style="position: absolute; top: 0; right: 0;z-index: 99999;">
+                <div class="toast-header">
+                    <strong class="mr-auto" style="color : #000000">Thông báo</strong>
+                    <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoastTTTB" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" style="color : #fff">
+                    Chưa thể thanh toán, có món trong hóa đơn chưa được hoàn thành
+                </div>
+            </div>
+            <div class="toast toastXNTT bg-success" style="position: absolute; top: 0; right: 0;z-index: 99999;">
+                <div class="toast-header">
+                    <strong class="mr-auto">Thông báo</strong>
+                    <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoastXNTT" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" style="color : #fff">
+                        Hóa đơn của bạn đã được xác nhận và đang được mang đến.
+                </div>
+            </div>
+            <div class="toast toastGMTB bg-danger" style="position: absolute; top: 0; right: 0;z-index: 99999;">
+                <div class="toast-header">
+                    <strong class="mr-auto">Thông báo</strong>
+                    <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoastGMTB" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" style="color : #fff">
+                    Vui lòng thanh toán hóa đơn hiện tại để có thể tiếp tục gọi món.
+                </div>
+            </div>
+            <div class="toast toastXNNT bg-success" style="position: absolute; top: 0; right: 0;z-index: 99999;">
+                <div class="toast-header">
+                    <strong class="mr-auto">Thông báo</strong>
+                    <button style="border: none !important; background: transparent;font-size: 1.5rem;" type="button" class="ml-2 mb-1 closetoastXNNT" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body" style="color : #fff">
+                    Thanh toán thành công.
+                </div>
+            </div>
+                <nav id="navbar" class="navbar">
+                    <ul>
+                        <li class="nav-item nav-notif">
+                            <a class="nav-link text-muted my-2" href="/KhachHang/menu1">
+                                Menu
+                            </a>
+                        </li>
+                        <li class="nav-item nav-notif">
+                            <a class="nav-link text-muted my-2" href="/KhachHang/GoiMon">
+                                Gọi Món
+                            </a>
+                        </li>
+                        <li class="nav-item nav-notif">
+                            <a class="nav-link text-muted my-2" href="/KhachHang/HoaDon">
+                                Hóa Đơn
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+                                <i class="fe fe-sun fe-16"></i>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav><!-- .navbar -->
+
+                <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+                <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+
+            </div>
+        </header><!-- End Header -->
+
         <main role="main" class="main-content">
             <div class="container-fluid">
                 <div class="row justify-content-center">
@@ -122,6 +208,18 @@
     <script src="~/js/config.js"></script>
     <script src="~/js/jquery.dataTables.min.js"></script>
     <script src="~/js/dataTables.bootstrap4.min.js"></script>
+
+
+        <!-- Vendor JS Files -->
+        <script src="~/Menu/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="~/Menu/assets/vendor/aos/aos.js"></script>
+        <script src="~/Menu/assets/vendor/glightbox/js/glightbox.min.js"></script>
+        <script src="~/Menu/assets/vendor/purecounter/purecounter_vanilla.js"></script>
+        <script src="~/Menu/assets/vendor/swiper/swiper-bundle.min.js"></script>
+        <script src="~/Menu/assets/vendor/php-email-form/validate.js"></script>
+
+        <!-- Template Main JS File -->
+        <script src="~/Menu/assets/js/main.js"></script>
     <script>
       $('#dataTable-1').DataTable(
       {
@@ -170,6 +268,26 @@
 
 
         </script>
+        <script>
+       $(document).ready(function () {
+            $.fn.DataTable.ext.pager.numbers_length = 5;
+            $("#example").dataTable({
+
+                bLengthChange: false,
+                bInfo: false,
+                scrollX: true,
+                language: {
+                    paginate: {
+                        previous: "Trước",
+                        next: "Sau",
+                    },
+                    search: "Tìm kiếm",
+
+                },
+            });
+
+        });
+   </script>
     @RenderSection("Scripts", required: false)
 
   </body>
