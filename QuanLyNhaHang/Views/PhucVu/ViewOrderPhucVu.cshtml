@@ -15,14 +15,14 @@
     }
     bool count(int id)
     {
-        if (context.HoaDon.Where(x => x.TinhTrang == false && x.Idban == id).ToList().Count() == 0)
+        if (context.HoaDon.Where(x => x.TinhTrangTt == false ||  x.TinhTrangTt == null && x.Idban == id).ToList().Count() == 0)
         {
             return true;
         }
         return false;
     }
     }
-<div class="d-flex align-content-around flex-wrap" style="width:100%;-webkit-justify-content: space-around;
+<div class="d-flex align-content-around flex-wrap DivViewOrderPhucVu" style="width:100%;-webkit-justify-content: space-around;
   justify-content:space-around;">
     @foreach (Ban item in listBan())
 {
@@ -40,6 +40,10 @@
                             <a class="nav-link btn btn-primary" href="/PhucVu/MenuPV/@item.Idban">
                                 <i class="fe fe-credit-card fe-16"></i>
                                 <span class="ml-3 item-text">Order</span>
+                            </a>
+                            <a class="nav-link btn btn-primary" href="/PhucVu/HoaDonPV/@item.Idban">
+                                <i class="fe fe-credit-card fe-16"></i>
+                                <span class="ml-3 item-text">Hóa đơn</span>
                             </a>
                         </section>
                         
@@ -62,6 +66,10 @@
                             <a class="nav-link btn btn-primary" href="/PhucVu/MenuPV/@item.Idban">
                                 <i class="fe fe-credit-card fe-16"></i>
                                 <span class="ml-3 item-text">Order</span>
+                            </a>
+                            <a class="nav-link btn btn-primary" href="/PhucVu/HoaDonPV/@item.Idban">
+                                <i class="fe fe-credit-card fe-16"></i>
+                                <span class="ml-3 item-text">Hóa đơn</span>
                             </a>
                         </section>
                

@@ -32,6 +32,16 @@ namespace QuanLyNhaHang.Controllers
             ViewBag.menuPV = context.Gia.Include(x => x.IdtdNavigation).Where(x => x.Idsanh == IDSanh.Idsanh && x.Active==true).ToList(); ;
             return View("MenuPV");
         }
+        [Route("/PhucVu/HoaDonPV/{idb}")]
+
+        public IActionResult HoaDonPV(int idb)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            ViewBag.idb = idb;
+            ViewBag.IPMAC = context.Ban.FirstOrDefault(x => x.Idban == idb).Ipmac;
+            ViewBag.HoaDonPV = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null)).ToList();
+            return View("HoaDonPV");
+        }
         [HttpPost("/loadNhomThucAnPV")]
 
         public IActionResult loadNhomThucAnPV(int idnta, int idb)
@@ -42,16 +52,16 @@ namespace QuanLyNhaHang.Controllers
             var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
             if (idnta == 0)
             {
-                ViewBag.NTA = context.Gia.Where(x => x.Idsanh == IDSanh.Idsanh).ToList();
+                ViewBag.NTA = context.Gia.Include(x => x.IdtdNavigation).Where(x => x.Idsanh == IDSanh.Idsanh && x.Active == true).ToList();
 
             }
             else
             {
-                ViewBag.NTA = context.Gia.Where(x => x.Idsanh == IDSanh.Idsanh && x.IdtdNavigation.Idnta == idnta).ToList();
+                ViewBag.NTA = context.Gia.Include(x => x.IdtdNavigation).Where(x => x.Idsanh == IDSanh.Idsanh && x.IdtdNavigation.Idnta == idnta && x.Active == true).ToList();
 
             }
 
-
+            ViewBag.IPMAC = context.Ban.FirstOrDefault(x => x.Idban == idb).Ipmac;
             return PartialView();
         }
         [HttpPost("/addHoaDonPV")]
@@ -117,5 +127,6 @@ namespace QuanLyNhaHang.Controllers
 
             return "Cap nhap thanh cong";
         }
+        
     }
 }

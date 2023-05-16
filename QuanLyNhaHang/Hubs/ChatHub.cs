@@ -275,7 +275,8 @@ namespace SignalRChat.Hubs
                 })
                 .ToList();
                 int tt = 0;
-                await Clients.All.SendAsync("GiveHD", HD, tt);
+                var ipmac = context.HoaDon.Include(x => x.IdbanNavigation).FirstOrDefault(x => x.Idhd == int.Parse(IDHD)).IdbanNavigation.Ipmac;
+                await Clients.All.SendAsync("GiveHD", HD, tt, ipmac);
             }
             else
             {
@@ -296,8 +297,9 @@ namespace SignalRChat.Hubs
                 .ToList();
                 int tt = 1;
 
+                var ipmac = context.HoaDon.Include(x => x.IdbanNavigation).FirstOrDefault(x => x.Idhd == int.Parse(IDHD)).IdbanNavigation.Ipmac;
 
-                await Clients.All.SendAsync("GiveHD", HD, tt);
+                await Clients.All.SendAsync("GiveHD", HD, tt, ipmac);
             }
         }
         public async Task SendXNTT(string id)

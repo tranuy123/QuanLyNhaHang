@@ -20,6 +20,13 @@
 
 
 }
+<style>
+        .red-header {
+      background-color: red;
+      color: white;
+    }
+
+</style>
 <div class="card">
     <div class="card-body">
         
@@ -31,12 +38,11 @@
                  role="tabpanel"
                  aria-labelledby="detail-tab">
                 <form action="/download/BaoCaoHoaDon" method="post">
-
+                   
                     <div class="form-group p-2 mb-2"
                          id="groupTTSearchLichSu"
                          style="border-radius: 5px; border: 1px solid black">
                         <div class="row">
-                            
                             <label class="col-sm-1 col-lg-1 col-form-label">Từ ngày</label>
                             <div class="col-md-2 mb-2 col-lg-2">
                                 <input class="form-control"
@@ -121,7 +127,7 @@
                     </div>
                    
                     <div id="tableLichSuHD" class="table-responsive" style="white-space:nowrap;overflow-y: auto;">
-
+                        
                         <table id="CTNhapHang"
                                class="table table-striped table-hover text-center display nowrap"
                                style="width: 100%">
@@ -157,8 +163,15 @@
                                     type="submit">
                                 Xuất tất cả
                             </button>
+                        
                     </div>
+                    <button class="btn btn-info col-lg-2 col-sm-2"
+                        style="margin-left: 20px"
+                        onclick="exportToExcel()">
+                    Xuất exel
+                </button>
                 </form>
+                
             </div>
 
           
@@ -167,6 +180,44 @@
     </div>
 </div>
 <script>
+   
+    function exportToExcel() {
+        var table = $('#tableexcel').clone();
+        table.find('th:last-child').remove();
+        table.find('td:last-child').remove();
+
+        var wb = XLSX.utils.table_to_book(table[0]);
+
+        // Lấy sheet đầu tiên từ workbook
+        var sheet = wb.Sheets[wb.SheetNames[0]];
+
+        // Lấy danh sách tất cả các ô trong bảng
+        var range = XLSX.utils.decode_range(sheet['!ref']);
+
+        // Đổi màu nền cho các ô từ A6 đến G6 và đổi cỡ chữ thành 30
+        for (var col = range.s.c; col <= range.e.c; col++) {
+            for (var row = 5; row <= 6; row++) {
+                var cell = sheet[XLSX.utils.encode_cell({ r: row, c: col })];
+                if (!cell) {
+                    continue;
+                }
+                cell.s = {
+                    fill: { bgColor: { rgb: "FFFF0000" } }, // Đổi màu nền thành màu đỏ
+                    font: { size: 30 } // Đổi cỡ chữ thành 30
+                };
+            }
+        }
+
+        XLSX.writeFile(wb, 'HoaDon.xlsx');
+    }
+
+
+
+
+
+
+
+
     $(document).ready(function () {
         $.fn.DataTable.ext.pager.numbers_length = 5;
         $("#CTNhapHang").dataTable({

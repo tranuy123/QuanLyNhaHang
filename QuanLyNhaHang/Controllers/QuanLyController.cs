@@ -660,7 +660,8 @@ namespace QuanLyNhaHang.Controllers
                 && (IdBan == 0 ? true : x.IdbanNavigation.Idban == IdBan)
                 && (MaHD == null ? true : x.MaHd.Contains(MaHD.ToUpper())));
             }
-
+            ViewBag.TuNgay = fromDay;
+            ViewBag.DenNgay = toDay;
             return PartialView("TableLichSuHD");
         }
         [HttpPost("/ViewThongTinHD")]
@@ -670,7 +671,134 @@ namespace QuanLyNhaHang.Controllers
             var hd = context.HoaDon.Include(x => x.ChiTietHoaDon).Include(x => x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation).Include(x => x.IdnvNavigation).FirstOrDefault(x => x.Idhd == idPN);
             return PartialView(hd);
         }
-       
+        //-------------------------------------------------------------------------
+        public IActionResult ViewNNV()
+        {
+            return View("ViewNNV");
+        }
+        public IActionResult ViewInsertNNV()
+        {
+            return View("ViewInsertNNV");
+        }
+        [HttpPost]
+        public IActionResult InsertNNV(NhomNhanVien nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
+            nsx.Active = true;
+            context.NhomNhanVien.Add(nsx);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Thêm thành công!";
+            return RedirectToAction("ViewNNV");
+
+        }
+        [Route("/QuanLy/ViewUpdateNNV/{id}")]
+        public IActionResult ViewUpdateNNV(int id)
+
+        {
+            ViewData["Title"] = "Cập nhập thông tin nhóm nhân viên";
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhomNhanVien nsx = context.NhomNhanVien.Find(id);
+            return View(nsx);
+        }
+        public IActionResult UpdateNNV(NhomNhanVien nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhomNhanVien n = context.NhomNhanVien.Find(nsx.Idnnv);
+            n.MaNnv = nsx.MaNnv;
+            n.TenNnv = nsx.TenNnv;
+
+
+
+            context.NhomNhanVien.Update(n);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Sửa thành công!";
+            return RedirectToAction("ViewNNV");
+        }
+        [Route("/QuanLy/deleteNNV/{id}")]
+        public IActionResult DeleteNNV(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhomNhanVien nsx = context.NhomNhanVien.Find(id);
+            nsx.Active = false;
+
+            context.NhomNhanVien.Update(nsx);
+            context.SaveChanges();
+            return RedirectToAction("ViewNNV");
+        }
+        [HttpPost("/loadViewNNV")]
+        public IActionResult loadViewNNV(bool active)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            if (active)
+            {
+                ViewBag.NSX = context.NhomNhanVien.Where(x => x.Active == true).ToList();
+            }
+            else
+            {
+                ViewBag.NSX = context.NhomNhanVien.ToList();
+            }
+            return PartialView("ViewDivNNV");
+        }
+        public IActionResult khoiphucNNV(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhomNhanVien dvt = context.NhomNhanVien.Find(id);
+
+            dvt.Active = true;
+
+            context.NhomNhanVien.Update(dvt);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Khôi phục thành công!";
+            return RedirectToAction("ViewNNV");
+        }
+        //------------------------------------------------
+        public IActionResult ViewLLV()
+        {
+            return View("ViewLLV");
+        }
+        public IActionResult ViewInsertLLV()
+        {
+            return View("ViewInsertLLV");
+        }
+        [HttpPost]
+        public IActionResult InsertLLV(LichLamViec nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
+            nsx.Active = true;
+            context.LichLamViec.Add(nsx);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Thêm thành công!";
+            return RedirectToAction("ViewLLV");
+
+        }
+        [Route("/QuanLy/ViewUpdateLLV/{id}")]
+        public IActionResult ViewUpdateLLV(int id)
+
+        {
+            ViewData["Title"] = "Cập nhập thông tin lịch làm việc";
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            LichLamViec n = context.LichLamViec.Include(x => x.IdcaNavigation).Include(x => x.IdkhuNavigation).Include(x => x.IdnvNavigation).FirstOrDefault(x => x.Idllv == id);
+
+            return View(n);
+        }
+        public IActionResult UpdateLLV  (LichLamViec nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            LichLamViec n = context.LichLamViec.Find(nsx.Idllv);
+
+            n.Idkhu = nsx.Idkhu;
+            n.Idnv = nsx.Idnv;
+            n.Idca = nsx.Idca;
+
+
+
+            context.LichLamViec.Update(n);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Sửa thành công!";
+            return RedirectToAction("ViewLLV");
+        }
     }
 
 }

@@ -10,12 +10,16 @@
     }
     int idban = ViewBag.idb;
     var ipmac = context.Ban.FirstOrDefault(x => x.Idban == idban).Ipmac;
+    var KiemTraTT = context.ChiTietHoaDonTam.Where(x => x.Ipmac == ipmac).ToList();
 
     List<ChiTietHoaDonTam> getListCTHDT()
     {
         return context.ChiTietHoaDonTam.Where(x => x.Ipmac == ipmac).ToList();
     }
-
+    string toDecimal(double? d)
+    {
+        return d.Value.ToString("#,##0.00");
+    }
 
 }
 <div class="row">
@@ -43,15 +47,15 @@
                 <!-- table -->
                 <input type="hidden" name="ipmac" id="IDMAC" value="@ipmac" />
                 <input type="hidden" name="idban" value="@idban" />
-                <table class="table table-borderless table-hover" id="tableGoiMon">
+                <table class="table table-borderless table-hover" id="tableGoiMonPV">
                     <thead>
                         <tr>
 
                             <th>ID</th>
-                            <th>User</th>
-                            <th>Company</th>
-                            <th>Contact</th>
+                            <th>Tên</th>
+                            <th>Đơn Giá</th>
                             <th class="w-25">Số lượng</th>
+                            <th>ĐVT</th>
                             <th>Thành tiền</th>
                             <th>Action</th>
                         </tr>
@@ -67,7 +71,17 @@
 
                                 <td>
                                     <div class="avatar avatar-md">
-                                        <img src="./assets/avatars/face-3.jpg" alt="..." class="avatar-img rounded-circle">
+
+                                        @if (@getTD(item.Idtd).Image == null)
+                                        {
+                                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                                         src="~/ImagesTD/camon.png" />
+                                        }
+                                        else
+                                        {
+                                            <img class="modal-image" style="width : auto; height: 200px;object-fit: contain;"
+                                         src="~/ImagesTD/@getTD(item.Idtd).Image" />
+                                        }
                                     </div>
                                 </td>
                                 <td>
@@ -77,29 +91,41 @@
                                 </td>
                                 <td style="display:none"><input class='inputDisabled text-center' name="Idtd" value=@item.Idtd type=text></td>
                                 <td style="display:none"><input class='inputDisabled text-center' name="DonGia" value=@item.DonGia type=text></td>
-                                <td>
-                                    <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
+                                <td style="display:none">
+                                    <p class="mb-0 text-muted">@ipmac</p>
                                 </td>
                                 <td>
-                                    <p class="dongia mb-0 text-muted" id="tdDonGia"><a>@item.DonGia</a></p>
+                                    <p class="dongia mb-0 text-muted" id="tdDonGia"><strong>@toDecimal(@item.DonGia)</strong></p>
                                 </td>
-                                <td class="w-25"><input type="number" min="0" id="SL" value="@item.Sl" /></td>
-                                <td class="text-muted" id="tdThanhTien"> @(item.Sl * item.DonGia) </td>
+                                <td class="w-15"><input class="form-control" type="number" min="0" id="SL" value="@item.Sl"/></td>
+                                <td>Dĩa</td>
+                                <td class="text-muted" id="tdThanhTien"><strong>@toDecimal((item.Sl * item.DonGia))</strong></td>
                                 <td>
-                                    <button class="btn btn-secondary"> hủy chọn món </button>
+                                    <button class="HuyHoaDonTamPV btn btn-secondary"> Hủy chọn món </button>
                                 </td>
+                                <td style="display:none" class="NTA"><input type="text" value="@getTD(item.Idtd).Idnta" /></td>
+
                             </tr>
 
 
                         }
                         <tr>
-                            <td>Tổng</td>
+                            <td><h5>Tổng</h5></td>
                             <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td><input name="tongtien" id="total" /></td>
-                            <td><button class="btn-addcthd btn btn-primary"> Xác nhận </button></td>
+                            <td><input class="form-control" name="tongtien" id="total" /></td>
+                            @if (KiemTraTT.Count() > 0)
+                            {
+                                <td><button class="btn-addcthd btn btn-primary"> Xác nhận </button></td>
+
+                            }
+                            else
+                            {
+                                <td><button class="btn-addcthd btn btn-primary" disabled> Xác nhận </button></td>
+
+                            }
                         </tr>
 
                     </tbody>
@@ -111,47 +137,109 @@
 </div>
 <script>
     $(document).ready(function () {
-            // Tính tổng giá trị của các ô "Thành tiền"
-            var total = 0;
-            $('#tbodyNTAPV tr').each(function () {
-                var quantity = $(this).find('input[type="number"]').val();
-                var price = $(this).find('.dongia').text();
-                if (price != null && price != '') {
-                    var subtotal = parseInt(quantity) * parseFloat(price);
-                    total += subtotal;
-                    $(this).find('.subtotal').text(subtotal.toFixed(2));
-                }
-            });
-
-            // Gán giá trị tổng vào ô "Tổng"
-            $('#total').val(total.toFixed(2));
+        // Tính tổng giá trị của các ô "Thành tiền"
+        var total = 0;
+        $('#tbodyNTAPV tr').each(function () {
+            var quantity = $(this).find('input[type="number"]').val();
+            var price = $(this).find('.dongia').text();
+            if (price != null && price != '') {
+                var subtotal = parseInt(quantity) * parseFloat(price.replace(',', ''));
+                total += subtotal;
+                $(this).find('.subtotal').text(toDecimal(subtotal));
+            }
         });
+
+        // Gán giá trị tổng vào ô "Tổng"
+        // $('#total').val(toDecimal(total));
+        $('#total').val(total.toLocaleString('en-US', {
+            style: 'decimal',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        }));
+    });
+    function toDecimal(d) {
+        return d.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
     $(function () {
         $('#tbodyNTAPV').on('change', 'input[type="number"]', function () {
             // Lấy số lượng và đơn giá của món ăn
             var $row = $(this).closest('tr');
             var sl = parseInt($(this).val());
-            var donGia = parseInt($row.find('td:eq(3) input').val());
+            var donGia = parseFloat($row.find('td:eq(3) input').val());
 
             // Tính thành tiền
             var thanhTien = sl * donGia;
-            $row.find('td:eq(7)').text(thanhTien);
+            // $row.find('td:eq(8)').text(thanhTien);
+            $row.find('td:eq(8)').text(
+                parseFloat(thanhTien).toLocaleString('en-US', {
+                    style: 'decimal',
+                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 2
+                })
+            );
 
             // Tính tổng tiền
+            // Tính lại tổng tiền
             var tongTien = 0;
             $('#tbodyNTAPV tr').each(function () {
-                var tt = parseInt($(this).find('td:eq(7)').text());
-                if (!isNaN(tt)) {
-                    tongTien += tt;
+                var tt = $(this).find('td:eq(8)').text().replace(/,/g, '');
+                var ttt = parseFloat(tt);
+                if (!isNaN(ttt)) {
+                    tongTien += parseFloat(ttt);
                 }
             });
-            $('#tbodyNTAPV tr:last td:eq(5) input').val(tongTien);
+
+            // Hiển thị tổng tiền
+            $('#tbodyNTAPV tr:last td:eq(5) input').val(tongTien.toLocaleString('en-US', {
+                style: 'decimal',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            }));
+
+
+        });
+        $("#tableGoiMonPV").on("click", ".HuyHoaDonTamPV", function () {
+            var ipmac = $('#IDMAC').val();
+            var idtd = $(this).parents('tr').find("td:eq(2) input[type='text']").val();
+            var thiss = $(this);
+
+            $.ajax({
+                type: "post",
+                url: "/HuyHoaDonTamPV",
+                data: "IPMAC=" + ipmac + "&IDTD=" + idtd,
+                success: function (result) {
+                    $("#tableGoiMonPV").load(location.href + " #tableGoiMonPV>*", function () {
+                        // Tính lại tổng tiền
+                        var total = 0;
+                        $('#tbodyNTAPV tr').each(function () {
+                            var quantity = $(this).find('input[type="number"]').val();
+                            var price = $(this).find('.dongia').text();
+                            if (price != null && price != '') {
+                                var subtotal = parseInt(quantity) * parseFloat(price.replace(',', ''));
+                                total += subtotal;
+                                $(this).find('.subtotal').text(toDecimal(subtotal));
+                            }
+                        });
+
+                        // Gán giá trị tổng vào ô "Tổng"
+                        $('#total').val(total.toLocaleString('en-US', {
+                            style: 'decimal',
+                            maximumFractionDigits: 2,
+                            minimumFractionDigits: 2
+                        }));
+                    });
+                },
+                error: function () {
+                    alert("Fail");
+                }
+            });
         });
         $("#tbodyNTAPV").on("blur", "#SL", function () {
             var sl = $(this).val(); // Lấy giá trị của ô input số lượng
             var idcthdt = $(this).closest('tr').find('#IDCTHDT').val();
             var dongia = $(this).parents('tr').find("td:eq(5)").text();
-            var thanhtien = $(this).parents('tr').find("td:eq(7)").text();
+            var thanhtien = $(this).parents('tr').find("td:eq(8)").text();
 
 
             $.ajax({

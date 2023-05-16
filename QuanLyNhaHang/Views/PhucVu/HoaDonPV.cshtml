@@ -1,0 +1,112 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    ThucDon getTD(int? id)
+    {
+        ThucDon nv = context.ThucDon.Find(id);
+        if (nv != null) return nv;
+        else return new ThucDon();
+    }
+    string toDecimal(double? d)
+    {
+        return d.Value.ToString("#,##0.00");
+    }
+    int idb = ViewBag.idb;
+    var TinhTrangXNHD = context.HoaDon.Where(x => x.TinhTrang == false && x.Idban == idb && x.TinhTrangTt == null);
+    var TinhTrangXNHD1 = context.HoaDon.Where(x => x.TinhTrang == true && x.Idban == idb && x.TinhTrangTt == false);
+    var cthd = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).FirstOrDefault(x => x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null));
+
+    var idhd = cthd != null ? cthd.Idhd : 0;
+    var tongtien = cthd != null ? cthd.IdhdNavigation.TongTien : 0;
+}
+<div class="row" style="width:100%">
+    <div class="col-md-12 my-4">
+        <h2 class="h4 mb-1">Hóa đơn của bạn</h2>
+        <p class="mb-3">Child rows with additional detailed information</p>
+        <div class="card shadow">
+            <div class="card-body">
+                <!-- table -->
+
+                <table class="table table-hover table-borderless border-v tableHD">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên</th>
+                            <th>Đơn Giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int i = 0;
+                        }
+                        @foreach (ChiTietHoaDon item in ViewBag.HoaDonPV)
+                        {
+                            i++;
+
+                            <tr class="accordion-toggle collapsed" id="trxacnhan" data-toggle="collapse" data-parent="#c-2474" href="#collap-2474">
+                                <td>@i</td>
+                                <td>@getTD(item.Idtd).Ten</td>
+
+                                <td style="display : none" class="td-idcthd">@item.Idcthd</td>
+                                <td class="text-end">@toDecimal(@item.DonGia)</td>
+                                <td>@item.Sl</td>
+                                <td class="text-end">@toDecimal(@item.ThanhTien)</td>
+                                @if (item.Tgbep == null)
+                                {
+                                    <td class="tdxacnhan1"></td>
+
+                                }
+                                else
+                                {
+                                    <td class="tdxacnhan1"> Bếp đã xác nhận </td>
+
+                                }
+                                <td>
+                                    <input type="hidden" class="input-idcthd" value="@item.Idcthd" />
+                                    @if (item.Tgbep == null)
+                                    {
+                                        <button class="btn btn-primary btn-huy" value="@item.Idcthd"> Hủy </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-primary btn-huy" disabled> Hủy </button>
+                                    }
+
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+
+                        }
+                        <tr>
+                            <td>Tổng tiền</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-end">@toDecimal(@tongtien)</td>
+                            <td></td>
+                            <td></td>
+                            @if (@TinhTrangXNHD.Count() > 0 || @TinhTrangXNHD1.Count() > 0 || @cthd == null)
+                            {
+                                <td>
+                                    <button class="btn btn-outline-success btn-sendYCTT" value="@idhd" disabled> Gửi yêu cầu thanh toán</button>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <button class="btn btn-outline-success btn-sendYCTT" value="@idhd"> Gửi yêu cầu thanh toán</button>
+                                </td>
+                            }
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

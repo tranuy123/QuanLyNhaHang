@@ -37,30 +37,23 @@ connection.on("HienThiCTHD", function (chitiethoadon, ipmac, tongtien, idban,tb)
         
         tbody.append(tr);
     });
-
-    $.ajax({
-        type: "GET",
-        url: "/KhachHang/HoaDon",
-        success: function (response) {
-            $(".tableHD").html($(response).find(".tableHD"));
-        }
-    });
     $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
     });
     if (tb == 1) {
         if (ipmac == IPMAC) {
             window.location.href = "/KhachHang/HoaDon";
+            $('.toastGM').toast('show');
 
         }
-        $('.toastGM').toast('show');
     } else {
         if (ipmac == IPMAC) {
             window.location.href = "/KhachHang/HoaDon";
+            $('.toastGMTB').toast('show');
 
         }
-        $('.toastGMTB').toast('show');
     }
-
+    $(".DivViewOrderPhucVu").load(location.href + " .DivViewOrderPhucVu>*", function () {
+    });
   
     
 
@@ -237,9 +230,9 @@ $(document).ready(function () {
     });
 });
 //------------------------------------------------------------
-connection.on("GiveHD", function (hoadon,tt) {
+connection.on("GiveHD", function (hoadon,tt,ipmac) {
     var btnsendYCTT = $('.btn-sendYCTT');
-
+    var IPMAC = $("#IDMAC").val();
     var tbody = $("#tbodyXNTT");
 
     // Remove all existing rows from tbody
@@ -269,12 +262,14 @@ connection.on("GiveHD", function (hoadon,tt) {
         
         tbody.append(tr);
     });
-    if (tt == 1) {
-        $('.toastTT').toast('show');
-        btnsendYCTT.prop('disabled', true);
+    if (ipmac == IPMAC) {
+        if (tt == 1) {
+            $('.toastTT').toast('show');
+            btnsendYCTT.prop('disabled', true);
 
-    } else {
-        $('.toastTTTB').toast('show');
+        } else {
+            $('.toastTTTB').toast('show');
+        }
     }
 
 });
@@ -327,6 +322,8 @@ connection.on("NhanXNNT", function (ipmac) {
 
   
     $("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
+    });
+    $(".DivViewOrderPhucVu").load(location.href + " .DivViewOrderPhucVu>*", function () {
     });
 
 });

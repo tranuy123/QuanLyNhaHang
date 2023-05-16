@@ -18,9 +18,9 @@
     var TinhTrangXNHD1 = context.HoaDon.Where(x => x.TinhTrang == true && x.Idban == idb && x.TinhTrangTt == false);
     List<ChiTietHoaDon> getListCTHD()
     {
-        return context.ChiTietHoaDon.Include(x =>x.IdhdNavigation.IdbanNavigation).Where(x => x.IdhdNavigation.Idban == idb && x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null).ToList();
+        return context.ChiTietHoaDon.Include(x =>x.IdhdNavigation.IdbanNavigation).Where(x => x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null)).ToList();
     }
-    var cthd = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).FirstOrDefault(x => x.IdhdNavigation.Idban == idb && x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null);
+    var cthd = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).FirstOrDefault(x => x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null));
 
     var idhd = cthd != null ? cthd.Idhd : 0;
     var tongtien = cthd != null ? cthd.IdhdNavigation.TongTien : 0;

@@ -17,17 +17,19 @@
     {
         return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd);
     }
-
+    string toDecimal(double? d)
+    {
+        return d.Value.ToString("#,##0.00");
+    }
 }
 <div class="card-body">
                       <div class="toolbar">
-        <input type="button" class="btn btn-danger"  />
-        <a href="/PhucVu/GoiMonPV/@ViewBag.idb"> Gọi món </a>
+        <a href="/PhucVu/GoiMonPV/@ViewBag.idb" class="btn btn-primary"> Gọi món </a>
                         <form class="form">
                           <div class="form-row">
                             <div class="form-group col-auto mr-auto">
                               <label class="my-1 mr-2 sr-only" for="inlineFormCustomSelectPref1">Show</label>
-                              <select  class="custom-select mr-sm-2"  id="nhomTA" onchange="loadNhomThucAnPV()">
+                    <select class="custom-select mr-sm-2" id="nhomTA" onchange="loadNhomThucAnPV()">
                                 <option selected value=""> -- Nhóm thức ăn --</option>
                                 <option value="0">Tất cả</option>
                         @foreach (NhomThucAn item in getListNTA())
@@ -58,7 +60,7 @@
                 <th class="fw-bold">Action</th>
             </tr>
         </thead>
-        <tbody id="tbodyNTA">
+        <tbody id="tbodyNTAPV">
             @foreach (Gia item in ViewBag.menuPV)
             {
                 if (getCTHDT(ipmac, item.Idtd) != null)
@@ -84,14 +86,14 @@
                             </div>
                         </td>
                         <td>
-                            <p><strong>@getTD(@item.Idtd).Ten</strong></p>
+                            <strong>@getTD(@item.Idtd).Ten</strong>
 
                         </td>
                         <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text></td>
-                        <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text></td>
+                        <td style="display:none"><input class='inputDisabled text-center' value=@toDecimal(@item.Gia1) type=text></td>
 
                         <td>
-                            <p class="fw-bold">@item.Gia1</p>
+                            <strong> @toDecimal(@item.Gia1)</strong>
                         </td>
                         <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
                         <td>
@@ -118,13 +120,13 @@
                             </div>
                         </td>
                         <td>
-                            <p class="mb-0 text-muted"><strong>@getTD(@item.Idtd).Ten</strong></p>
+                           <strong>@getTD(@item.Idtd).Ten</strong>
                         </td>
                         <td style="display:none"><input class='inputDisabled text-center' value=@item.Idtd type=text></td>
-                        <td style="display:none"><input class='inputDisabled text-center' value=@item.Gia1 type=text></td>
+                        <td style="display:none"><input class='inputDisabled text-center' value=@toDecimal(@item.Gia1) type=text></td>
 
                         <td>
-                            <p class="fw-bold"><a href="#" class="text-muted">@item.Gia1</a></p>
+                            <strong> @toDecimal(@item.Gia1)</strong>
                         </td>
                         <td class="w-25">@getTD(item.Idtd).Detail<small class="text-muted"></small></td>
                         <td>
@@ -158,7 +160,6 @@
             url: "/loadNhomThucAnPV",
             data: "&idnta=" + idnta + "&idb=" + idb,
             success: function (result) {
-
                 $('#tbodyNTAPV').replaceWith(result);
 
 

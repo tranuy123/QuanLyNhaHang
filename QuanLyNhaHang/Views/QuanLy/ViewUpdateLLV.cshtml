@@ -1,0 +1,81 @@
+﻿@model QuanLyNhaHang.Models.LichLamViec
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<Khu> getListSanh()
+    {
+        return context.Khu.Where(x => x.Active == true).OrderByDescending(x => x.Idsanh).ToList();
+    }
+    List<NhanVien> getListNV()
+    {
+        return context.NhanVien.ToList();
+    }
+    List<Ca> getListCa()
+    {
+        return context.Ca.Where(x => x.Active == true).ToList();
+    }
+    Khu getKhu(int? id)
+    {
+        return context.Khu.Find(id);
+    }
+    Khu getSanh(int? id)
+    {
+        return context.Khu.Include(x => x.IdsanhNavigation).FirstOrDefault(x => x.Idkhu == id);
+    }
+}
+
+<div class="card">
+    <div class="card-body">
+        <form action="/QuanLy/UpdateLLV" method="post">
+            <div class="forms-header text-center">
+                <h4 class="forms-title "><b>@ViewData["Title"]</b></h4>
+            </div>
+            
+            <div>
+                <label style="margin:7px 0;">Khu</label>
+                <input type="hidden" asp-for="@Model.Idllv" value="@Model.Idllv"/>
+                <select required class="custom-select" asp-for="@Model.Idkhu" id="Idsanh" aria-label="Default select example">
+                    <option value="" selected disabled>@Model.IdkhuNavigation.TenKhu</option>
+
+                    @foreach (Khu item in getListSanh())
+                    {
+
+                        <option value="@item.Idkhu">@item.TenKhu</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label style="margin:7px 0;">Nhân viên</label>
+                <select required class="custom-select" asp-for="@Model.Idnv" id="Idsanh" aria-label="Default select example">
+                    <option value="" selected disabled>@Model.IdnvNavigation.Ten</option>
+
+                    @foreach (NhanVien item in getListNV())
+                    {
+
+                        <option value="@item.Idnv">@item.Ten</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label style="margin:7px 0;">Ca</label>
+                <select required class="custom-select" asp-for="@Model.Idca" id="Idsanh" aria-label="Default select example">
+                    <option value="" selected disabled>@Model.IdcaNavigation.TenCa</option>
+
+                    @foreach (Ca item in getListCa())
+                    {
+
+                        <option value="@item.Idca">@item.TenCa</option>
+                    }
+                </select>
+            </div>
+        
+            <div class="forms-footer" style="justify-content:space-between">
+
+                <input type="submit" class="btn btn-primary" value="Sửa">
+            </div>
+        </form>
+        <button class="btn btn-secondary" onclick="window.history.go(-1);">
+            Quay lại
+        </button>
+
+    </div>
+</div>
