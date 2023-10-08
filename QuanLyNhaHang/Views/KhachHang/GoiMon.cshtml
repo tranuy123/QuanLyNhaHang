@@ -1,25 +1,16 @@
 ﻿@using System.Net.NetworkInformation
+@using QuanLyNhaHang.Services;
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-    
+
     ThucDon getTD(int? id)
     {
         ThucDon nv = context.ThucDon.Find(id);
         if (nv != null) return nv;
         else return new ThucDon();
     }
-    string macAddress = "";
-    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
-    {
-        // Only consider Ethernet network interfaces
-        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
-            nic.OperationalStatus == OperationalStatus.Up)
-        {
-            macAddress = nic.GetPhysicalAddress().ToString();
-            break;
-        }
-    }
+    string macAddress = CommonServices.getDiaChiMac();
     var idb = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress);
     int idban = idb.Idban;
 

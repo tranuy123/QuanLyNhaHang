@@ -40,7 +40,7 @@ namespace QuanLyNhaHang.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=TRANUY\\SQLEXPRESS;Database=QuanLyNhaHang;User Id=sa;Password=123;");
+                optionsBuilder.UseSqlServer("Data Source=TRAN-UY\\MSSQLSERVER22;Initial Catalog=QuanLyNhaHang;Persist Security Info=True;User ID=sa;Password=123456");
             }
         }
 
@@ -262,8 +262,16 @@ namespace QuanLyNhaHang.Models
 
                 entity.Property(e => e.Idtk).HasColumnName("IDTK");
 
+                entity.Property(e => e.Image).HasMaxLength(250);
+
                 entity.Property(e => e.MaMv)
                     .HasColumnName("MaMV")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.QueQuan).HasMaxLength(250);
+
+                entity.Property(e => e.Sdt)
+                    .HasColumnName("SDT")
                     .HasMaxLength(50);
 
                 entity.Property(e => e.Ten).HasMaxLength(200);

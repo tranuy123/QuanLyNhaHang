@@ -1,18 +1,9 @@
 ﻿@using System.Net.NetworkInformation
+@using QuanLyNhaHang.Services;
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-    string macAddress = "";
-    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
-    {
-        // Only consider Ethernet network interfaces
-        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
-            nic.OperationalStatus == OperationalStatus.Up)
-        {
-            macAddress = nic.GetPhysicalAddress().ToString();
-            break;
-        }
-    }
+    string macAddress = CommonServices.getDiaChiMac();
     var idb = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress).Idban;
     var TinhTrangXNHD = context.HoaDon.Where(x => x.TinhTrang == false && x.Idban == idb && x.TinhTrangTt == null);
     var TinhTrangXNHD1 = context.HoaDon.Where(x => x.TinhTrang == true && x.Idban == idb && x.TinhTrangTt == false);

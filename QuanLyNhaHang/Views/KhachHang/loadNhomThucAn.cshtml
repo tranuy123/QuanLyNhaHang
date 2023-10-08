@@ -1,4 +1,5 @@
 ﻿@using System.Net.NetworkInformation
+@using QuanLyNhaHang.Services;
 
 @{
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
@@ -8,17 +9,7 @@
         if (nv != null) return nv;
         else return new ThucDon();
     }
-    string macAddress = "";
-    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
-    {
-        // Only consider Ethernet network interfaces
-        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
-            nic.OperationalStatus == OperationalStatus.Up)
-        {
-            macAddress = nic.GetPhysicalAddress().ToString();
-            break;
-        }
-    }
+    string macAddress = CommonServices.getDiaChiMac();
     ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd)
     {
         return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd);

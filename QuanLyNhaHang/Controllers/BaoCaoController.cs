@@ -6,11 +6,51 @@ using System.Globalization;
 using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace QuanLyNhaHang.Controllers
 {
     public class BaoCaoController : Controller
     {
+        QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+        [HttpGet]
+        public IActionResult BaoCao() 
+        {
+            return View();
+        }
+        [HttpPost("/doanhThuTheoNgay")]
+        public async Task<dynamic> doanhThuTheoNgay(string fromDay, string toDay)
+        {
+            DateTime FromDay = DateTime.ParseExact(fromDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime ToDay = DateTime.ParseExact(toDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            var data = await context.HoaDon
+              .Where(x => x.Tgxuat != null && (x.Tgxuat.Value.Date >= FromDay && x.Tgxuat.Value.Date <= ToDay))
+              .OrderBy(x => x.Tgxuat)
+              .GroupBy(x => x.Tgxuat.Value.Date)
+              .Select(x => new
+              {
+                  label = x.Key,
+                  doanhthu = x.Sum(x => x.TongTien)
+              })
+              .ToListAsync();
+            return data;
+        }
+        [HttpPost("/doanhThuTheoThang")]
+        public async Task<dynamic> doanhThuTheoThang()
+        {
+            var data = await context.HoaDon
+              .Where(x => x.Tgxuat != null)
+              .OrderBy(x => x.Tgxuat)
+              .GroupBy(x => x.Tgxuat.Value.Month)
+              .Select(x => new
+              {
+                  label = x.Key,
+                  doanhthu = x.Sum(x => x.TongTien)
+              })
+              .ToListAsync();
+            return data;
+        }
+
         [Route("/download/ChiTietHoaDon/{id:int}")]
         public IActionResult downloadPChiTietHoaDon(int id)
         {

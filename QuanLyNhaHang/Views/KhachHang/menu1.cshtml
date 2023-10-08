@@ -9,15 +9,28 @@
         .Include(x=>x.ThucDon)
         .Where(x => x.Active == true).ToList();
     }
-    string macAddress = "";
-    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+    string macAddress="";
+    //foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+    //{
+    //    // Only consider Ethernet network interfaces
+    //    if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
+    //        nic.OperationalStatus == OperationalStatus.Up)
+    //    {
+    //        macAddress = nic.GetPhysicalAddress().ToString();
+    //        break;
+    //    }
+    //}
+    NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+
+    foreach (NetworkInterface networkInterface in networkInterfaces)
     {
-        // Only consider Ethernet network interfaces
-        if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
-            nic.OperationalStatus == OperationalStatus.Up)
+        // Lọc ra các card mạng không phải là loopback và đã kích hoạt
+        if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+            networkInterface.OperationalStatus == OperationalStatus.Up)
         {
-            macAddress = nic.GetPhysicalAddress().ToString();
-            break;
+            // Lấy địa chỉ MAC
+             macAddress = networkInterface.GetPhysicalAddress().ToString();
+
         }
     }
     ViewBag.IDMAC = macAddress;

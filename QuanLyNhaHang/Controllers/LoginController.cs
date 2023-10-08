@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Net.NetworkInformation;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -42,7 +43,8 @@ namespace QuanLyNhaHang.Controllers
         [Route("/login")]
         public async Task<IActionResult> LoginUser(TaiKhoan taiKhoan, string returnUrl)
         {
-            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+        
+        QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             TaiKhoan a = context.TaiKhoan
                 .Include(x => x.IdvtNavigation)
                 .FirstOrDefault(x => x.TenTk == taiKhoan.TenTk);

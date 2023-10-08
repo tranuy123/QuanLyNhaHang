@@ -1,0 +1,34 @@
+﻿@using System.Globalization
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Doanh thu bán hàng</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+</head>
+<body>
+    <div class="col-md-2 mb-2 col-lg-2">
+        <input class="form-control"
+               type="text"
+               name="fromDay"
+               id="fromDay"
+               value="@DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)"
+               placeholder="Từ ngày" />
+    </div>
+    <label class="col-sm-1 col-lg-1 col-form-label">Đến ngày</label>
+    <div class="col-lg-2 col-sm-2">
+        <input class="form-control"
+               type="text"
+               name="toDay"
+               id="toDay"
+               value="@DateTime.Now.ToString("dd-MM-yyyy")"
+               placeholder="Tới ngày" />
+    </div>
+    <button id="doanhThuTheoThang" onclick="doanhThuTheoThang()"> doanh thu theo tháng</button>
+    <button id="doanhThuTheoNgay" onclick="doanhThuTheoNgay()"> doanh thu theo ngày</button>
+
+    <canvas id="doanhthu"></canvas>
+</body>
+</html>
+<script src="~/jschinh/common.js" defer asp-append-version="true"></script>
+<script src="~/jschinh/baocao.js" defer asp-append-version="true"></script>
