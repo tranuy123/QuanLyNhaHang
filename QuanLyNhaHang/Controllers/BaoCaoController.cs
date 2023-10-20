@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -50,7 +51,132 @@ namespace QuanLyNhaHang.Controllers
               .ToListAsync();
             return data;
         }
+        // -------------------------------------------------- đánh giá hiệu xuất nhân viên
+        [HttpGet("/BaoCao/HieuSuatNhanVien")]
+        public  IActionResult ViewHieuSuatNhanVien()
+        {
+            return View("HieuSuatNhanVien");
+        }
+        [HttpPost("/BaoCao/getDuLieuHieuSuatNhanVien")]
+        public async Task<dynamic> getDuLieuHieuSuatNhanVien(string fromDay, string toDay)
+        {
+            DateTime FromDay = DateTime.ParseExact(fromDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime ToDay = DateTime.ParseExact(toDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            //var data = await context.NhanVien
+            //    .Include(x => x.HoaDon)
+            //    .ThenInclude(x => x.ChiTietHoaDon)
+            //    .Include(x => x.IdnnvNavigation.QlDanhGia)
+            //    .Where(x => x.HoaDon.Any(hd => hd.Tgxuat != null && (hd.Tgxuat.Value.Date >= FromDay && hd.Tgxuat.Value.Date <= ToDay)
+            //                            ))
+            //    .ToListAsync(); 
 
+
+
+
+            //var data = await context.ChiTietHoaDon
+            //    .AsQueryable()
+            //    .Include(x => x.IdhdNavigation.IdbanNavigation)
+            //    .Include(x => x.IdcaNavigation.LichLamViec)
+            //    .ThenInclude(x => x.IdnvNavigation)
+            //    .Where(x => x.IdcaNavigation.LichLamViec.Any())
+            //    .ToListAsync();
+            //data = data.GroupBy(x => new { x.Idca, x.IdhdNavigation.IdbanNavigation.Idkhu })
+            //    .Select(group => group.First())
+            //    .ToList();
+            //data = data.GroupBy(x => x.IdcaNavigation.LichLamViec.FirstOrDefault().Idnv)
+            //    .Select(group => group.First())
+            //    .ToList();
+            //var data1 = data.Select(x => new
+            //{
+            //    TenNhanVien = x.IdcaNavigation.LichLamViec.FirstOrDefault().IdnvNavigation.Ten,
+            //    Diem = (x.TgphucVu - x.TghoanThanh)
+            //})
+            //.ToList();
+
+
+            var data = await context.NhanVien
+                .Include(x => x.LichLamViec)
+                .ThenInclude(x => x.IdcaNavigation)
+                .ThenInclude(x => x.ChiTietHoaDon)
+                .ThenInclude(x => x.IdhdNavigation)
+                .Where(x => x.LichLamViec.Any(llv => llv.IdcaNavigation.ChiTietHoaDon.Any(ct => ct.IdhdNavigation.Tgxuat.Value.Date >= FromDay && ct.IdhdNavigation.Tgxuat.Value.Date <= ToDay)))
+                .Select(x => new NhanVien()
+                {
+                    Ten = x.Ten,
+                    LichLamViec = x.LichLamViec
+                    .Where(llv => llv.IdcaNavigation.ChiTietHoaDon.Count() >0)
+                    .Select(llv => new LichLamViec()
+                    {
+                        IdcaNavigation = new Ca()
+                        {
+                            ChiTietHoaDon = llv.IdcaNavigation.ChiTietHoaDon.Select(ct => new ChiTietHoaDon()
+                            {
+                                TgphucVu = ct.TgphucVu,
+                                TghoanThanh = ct.TghoanThanh,   
+                                IdhdNavigation = new HoaDon()
+                                {
+                                    Tgxuat = ct.IdhdNavigation.Tgxuat,
+                                }
+                            })
+                            .Where(ct => ct.IdhdNavigation.Tgxuat.Value.Date >= FromDay && ct.IdhdNavigation.Tgxuat.Value.Date <= ToDay)
+                            .ToList(),
+                        }
+                    })
+                    .ToList(),
+                })
+                .ToListAsync();
+            var data1 = data.Select(x => new
+            {
+                Ten = x.Ten,
+                Diem = tinhDiemHieuSuatTheoLichLamViecs(x.LichLamViec.ToList()),
+            })
+            .ToList();
+            return data1;
+        }
+        public float tinhDiemHieuSuatTheoLichLamViecs(List<LichLamViec> lichLamViecs)
+        {
+            float diem = 0;
+            int i = 0;
+            foreach (LichLamViec lich in lichLamViecs)
+            {
+                diem += tinhDiemHieuSuatTheoChiTietHoaDon(lich.IdcaNavigation.ChiTietHoaDon.Where(x => x.TgphucVu!=null).ToList());
+                i++;
+            }
+            diem /=i;
+            return diem;
+        }
+        public float tinhDiemHieuSuatTheoChiTietHoaDon(List<ChiTietHoaDon> chiTietHoaDons)
+        {
+            float diem= 0;
+            int i = 0;
+            foreach (ChiTietHoaDon chiTietHoaDon in chiTietHoaDons)
+            {
+                diem += tinhDiemHieuSuatChiTietHoaDon(chiTietHoaDon);
+                i++;
+            }
+            diem /= i;
+            return diem;
+        }
+        public int tinhDiemHieuSuatChiTietHoaDon(ChiTietHoaDon chiTietHoaDon)
+        {
+            DateTime? tgPhucVu = chiTietHoaDon?.TgphucVu;
+            DateTime? tgHoanThanh = chiTietHoaDon?.TghoanThanh;
+            int thoiGianHoanThanh = 0;
+
+            int diem = 0;
+            TimeSpan timeSpan = tgPhucVu.Value - tgHoanThanh.Value;
+            thoiGianHoanThanh = (int)timeSpan.TotalSeconds;
+            QlDanhGia qlDanhGia = context.QlDanhGia.FirstOrDefault(x => x.ThoiGianTu <= thoiGianHoanThanh && x.ThoiGianDen >= thoiGianHoanThanh);
+            if (qlDanhGia == null)
+            {
+                diem = 1;
+            }
+            else
+            {
+                diem = (int)qlDanhGia.Diem;
+            }
+            return diem;
+        }
         [Route("/download/ChiTietHoaDon/{id:int}")]
         public IActionResult downloadPChiTietHoaDon(int id)
         {

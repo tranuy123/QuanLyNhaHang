@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Bootstrap.v3.Datetimepicker" Version="4.17.49" />
     <PackageReference Include="Bootstrap.v3.Datetimepicker.CSS" Version="4.17.49" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.31" />
@@ -12,11 +14,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Select.HtmlToPdf.NetCore" Version="22.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\ImagesTD\" />
+    <Folder Include="wwwroot\JsChinh\" />
   </ItemGroup>
 
 </Project>

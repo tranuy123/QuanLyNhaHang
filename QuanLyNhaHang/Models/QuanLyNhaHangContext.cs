@@ -23,16 +23,25 @@ namespace QuanLyNhaHang.Models
         public virtual DbSet<Ca> Ca { get; set; }
         public virtual DbSet<ChiTietHoaDon> ChiTietHoaDon { get; set; }
         public virtual DbSet<ChiTietHoaDonTam> ChiTietHoaDonTam { get; set; }
+        public virtual DbSet<ChiTietPhieuNhap> ChiTietPhieuNhap { get; set; }
+        public virtual DbSet<ChiTietPhieuXuat> ChiTietPhieuXuat { get; set; }
         public virtual DbSet<Gia> Gia { get; set; }
+        public virtual DbSet<HangHoa> HangHoa { get; set; }
         public virtual DbSet<HoaDon> HoaDon { get; set; }
         public virtual DbSet<Khu> Khu { get; set; }
         public virtual DbSet<LichLamViec> LichLamViec { get; set; }
+        public virtual DbSet<NhaCungCap> NhaCungCap { get; set; }
         public virtual DbSet<NhanVien> NhanVien { get; set; }
+        public virtual DbSet<NhomHangHoa> NhomHangHoa { get; set; }
         public virtual DbSet<NhomNhanVien> NhomNhanVien { get; set; }
         public virtual DbSet<NhomThucAn> NhomThucAn { get; set; }
+        public virtual DbSet<PhieuNhap> PhieuNhap { get; set; }
+        public virtual DbSet<PhieuXuat> PhieuXuat { get; set; }
+        public virtual DbSet<QlDanhGia> QlDanhGia { get; set; }
         public virtual DbSet<Sanh> Sanh { get; set; }
         public virtual DbSet<TaiKhoan> TaiKhoan { get; set; }
         public virtual DbSet<ThucDon> ThucDon { get; set; }
+        public virtual DbSet<TonKho> TonKho { get; set; }
         public virtual DbSet<VaiTro> VaiTro { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -40,7 +49,7 @@ namespace QuanLyNhaHang.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Data Source=TRAN-UY\\MSSQLSERVER22;Initial Catalog=QuanLyNhaHang;Persist Security Info=True;User ID=sa;Password=123456");
+                optionsBuilder.UseSqlServer("Server=TRAN-UY\\MSSQLSERVER22;Database=QuanLyNhaHang;User Id=sa;Password=123456;TrustServerCertificate=true");
             }
         }
 
@@ -148,6 +157,56 @@ namespace QuanLyNhaHang.Models
                 entity.Property(e => e.Sl).HasColumnName("SL");
             });
 
+            modelBuilder.Entity<ChiTietPhieuNhap>(entity =>
+            {
+                entity.HasKey(e => e.Idctpn);
+
+                entity.Property(e => e.Idctpn).HasColumnName("IDCTPN");
+
+                entity.Property(e => e.Hsd)
+                    .HasColumnName("HSD")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Idhh).HasColumnName("IDHH");
+
+                entity.Property(e => e.Idpn).HasColumnName("IDPN");
+
+                entity.Property(e => e.Nsx)
+                    .HasColumnName("NSX")
+                    .HasColumnType("datetime");
+
+                entity.HasOne(d => d.IdhhNavigation)
+                    .WithMany(p => p.ChiTietPhieuNhap)
+                    .HasForeignKey(d => d.Idhh)
+                    .HasConstraintName("FK_ChiTietPhieuNhap_HangHoa");
+
+                entity.HasOne(d => d.IdpnNavigation)
+                    .WithMany(p => p.ChiTietPhieuNhap)
+                    .HasForeignKey(d => d.Idpn)
+                    .HasConstraintName("FK_ChiTietPhieuNhap_PhieuNhap");
+            });
+
+            modelBuilder.Entity<ChiTietPhieuXuat>(entity =>
+            {
+                entity.HasKey(e => e.Idctpx);
+
+                entity.Property(e => e.Idctpx).HasColumnName("IDCTPX");
+
+                entity.Property(e => e.Idhh).HasColumnName("IDHH");
+
+                entity.Property(e => e.Idpx).HasColumnName("IDPX");
+
+                entity.HasOne(d => d.IdhhNavigation)
+                    .WithMany(p => p.ChiTietPhieuXuat)
+                    .HasForeignKey(d => d.Idhh)
+                    .HasConstraintName("FK_ChiTietPhieuXuat_HangHoa");
+
+                entity.HasOne(d => d.IdpxNavigation)
+                    .WithMany(p => p.ChiTietPhieuXuat)
+                    .HasForeignKey(d => d.Idpx)
+                    .HasConstraintName("FK_ChiTietPhieuXuat_PhieuXuat");
+            });
+
             modelBuilder.Entity<Gia>(entity =>
             {
                 entity.HasKey(e => e.Idgia);
@@ -169,6 +228,28 @@ namespace QuanLyNhaHang.Models
                     .WithMany(p => p.Gia)
                     .HasForeignKey(d => d.Idtd)
                     .HasConstraintName("FK_Gia_ThucDon");
+            });
+
+            modelBuilder.Entity<HangHoa>(entity =>
+            {
+                entity.HasKey(e => e.Idhh);
+
+                entity.Property(e => e.Idhh).HasColumnName("IDHH");
+
+                entity.Property(e => e.Idnhh).HasColumnName("IDNHH");
+
+                entity.Property(e => e.MaHh)
+                    .HasColumnName("MaHH")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.TenHh)
+                    .HasColumnName("TenHH")
+                    .HasMaxLength(100);
+
+                entity.HasOne(d => d.IdnhhNavigation)
+                    .WithMany(p => p.HangHoa)
+                    .HasForeignKey(d => d.Idnhh)
+                    .HasConstraintName("FK_HangHoa_NhomHangHoa");
             });
 
             modelBuilder.Entity<HoaDon>(entity =>
@@ -212,6 +293,8 @@ namespace QuanLyNhaHang.Models
 
                 entity.Property(e => e.MaKhu).HasMaxLength(50);
 
+                entity.Property(e => e.Ngay).HasColumnType("datetime");
+
                 entity.Property(e => e.TenKhu).HasMaxLength(200);
 
                 entity.HasOne(d => d.IdsanhNavigation)
@@ -246,6 +329,29 @@ namespace QuanLyNhaHang.Models
                     .WithMany(p => p.LichLamViec)
                     .HasForeignKey(d => d.Idnv)
                     .HasConstraintName("FK_LichLamViec_NhanVien");
+            });
+
+            modelBuilder.Entity<NhaCungCap>(entity =>
+            {
+                entity.HasKey(e => e.Idncc);
+
+                entity.Property(e => e.Idncc).HasColumnName("IDNCC");
+
+                entity.Property(e => e.DiaChi).HasMaxLength(500);
+
+                entity.Property(e => e.DienThoai).HasMaxLength(50);
+
+                entity.Property(e => e.GhiChu).HasMaxLength(500);
+
+                entity.Property(e => e.MaNcc)
+                    .HasColumnName("MaNCC")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Mail).HasMaxLength(100);
+
+                entity.Property(e => e.TenNcc)
+                    .HasColumnName("TenNCC")
+                    .HasMaxLength(100);
             });
 
             modelBuilder.Entity<NhanVien>(entity =>
@@ -289,6 +395,21 @@ namespace QuanLyNhaHang.Models
                     .HasConstraintName("FK_NhanVien_TaiKhoan");
             });
 
+            modelBuilder.Entity<NhomHangHoa>(entity =>
+            {
+                entity.HasKey(e => e.Idnhh);
+
+                entity.Property(e => e.Idnhh).HasColumnName("IDNHH");
+
+                entity.Property(e => e.MaNhh)
+                    .HasColumnName("MaNHH")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.TenNhh)
+                    .HasColumnName("TenNHH")
+                    .HasMaxLength(100);
+            });
+
             modelBuilder.Entity<NhomNhanVien>(entity =>
             {
                 entity.HasKey(e => e.Idnnv);
@@ -317,6 +438,93 @@ namespace QuanLyNhaHang.Models
                 entity.Property(e => e.TenNta)
                     .HasColumnName("TenNTA")
                     .HasMaxLength(200);
+            });
+
+            modelBuilder.Entity<PhieuNhap>(entity =>
+            {
+                entity.HasKey(e => e.Idpn);
+
+                entity.Property(e => e.Idpn).HasColumnName("IDPN");
+
+                entity.Property(e => e.GhiChu).HasMaxLength(500);
+
+                entity.Property(e => e.Idncc).HasColumnName("IDNCC");
+
+                entity.Property(e => e.Idnv).HasColumnName("IDNV");
+
+                entity.Property(e => e.NgayHd)
+                    .HasColumnName("NgayHD")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.NgayNhap).HasColumnType("datetime");
+
+                entity.Property(e => e.SoHd)
+                    .HasColumnName("SoHD")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.SoPn)
+                    .HasColumnName("SoPN")
+                    .HasMaxLength(100);
+
+                entity.HasOne(d => d.IdnccNavigation)
+                    .WithMany(p => p.PhieuNhap)
+                    .HasForeignKey(d => d.Idncc)
+                    .HasConstraintName("FK_PhieuNhap_NhaCungCap");
+
+                entity.HasOne(d => d.IdnvNavigation)
+                    .WithMany(p => p.PhieuNhap)
+                    .HasForeignKey(d => d.Idnv)
+                    .HasConstraintName("FK_PhieuNhap_NhanVien");
+            });
+
+            modelBuilder.Entity<PhieuXuat>(entity =>
+            {
+                entity.HasKey(e => e.Idpx);
+
+                entity.Property(e => e.Idpx).HasColumnName("IDPX");
+
+                entity.Property(e => e.GhiChu).HasMaxLength(500);
+
+                entity.Property(e => e.Idkh).HasColumnName("IDKH");
+
+                entity.Property(e => e.Idnv).HasColumnName("IDNV");
+
+                entity.Property(e => e.NgayHd)
+                    .HasColumnName("NgayHD")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.SoHd)
+                    .HasColumnName("SoHD")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.SoPx)
+                    .HasColumnName("SoPX")
+                    .HasMaxLength(100);
+
+                entity.HasOne(d => d.IdnvNavigation)
+                    .WithMany(p => p.PhieuXuat)
+                    .HasForeignKey(d => d.Idnv)
+                    .HasConstraintName("FK_PhieuXuat_NhanVien");
+            });
+
+            modelBuilder.Entity<QlDanhGia>(entity =>
+            {
+                entity.HasKey(e => e.IddanhGia);
+
+                entity.ToTable("QL_DanhGia");
+
+                entity.Property(e => e.IddanhGia).HasColumnName("IDDanhGia");
+
+                entity.Property(e => e.Idnnv).HasColumnName("IDNNV");
+
+                entity.Property(e => e.Ma).HasMaxLength(50);
+
+                entity.Property(e => e.Ten).HasMaxLength(50);
+
+                entity.HasOne(d => d.IdnnvNavigation)
+                    .WithMany(p => p.QlDanhGia)
+                    .HasForeignKey(d => d.Idnnv)
+                    .HasConstraintName("FK_QL_DanhGia_NhomNhanVien");
             });
 
             modelBuilder.Entity<Sanh>(entity =>
@@ -372,6 +580,22 @@ namespace QuanLyNhaHang.Models
                     .WithMany(p => p.ThucDon)
                     .HasForeignKey(d => d.Idnta)
                     .HasConstraintName("FK_ThucDon_NhomThucAn");
+            });
+
+            modelBuilder.Entity<TonKho>(entity =>
+            {
+                entity.HasKey(e => e.Idtk);
+
+                entity.Property(e => e.Idtk).HasColumnName("IDTK");
+
+                entity.Property(e => e.Idctpn).HasColumnName("IDCTPN");
+
+                entity.Property(e => e.NgayNhap).HasColumnType("datetime");
+
+                entity.HasOne(d => d.IdctpnNavigation)
+                    .WithMany(p => p.TonKho)
+                    .HasForeignKey(d => d.Idctpn)
+                    .HasConstraintName("FK_TonKho_ChiTietPhieuNhap");
             });
 
             modelBuilder.Entity<VaiTro>(entity =>

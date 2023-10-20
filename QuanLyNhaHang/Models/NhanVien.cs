@@ -13,6 +13,8 @@ namespace QuanLyNhaHang.Models
         {
             HoaDon = new HashSet<HoaDon>();
             LichLamViec = new HashSet<LichLamViec>();
+            PhieuNhap = new HashSet<PhieuNhap>();
+            PhieuXuat = new HashSet<PhieuXuat>();
         }
 
         public int Idnv { get; set; }
@@ -33,5 +35,7 @@ namespace QuanLyNhaHang.Models
         public virtual TaiKhoan IdtkNavigation { get; set; }
         public virtual ICollection<HoaDon> HoaDon { get; set; }
         public virtual ICollection<LichLamViec> LichLamViec { get; set; }
+        public virtual ICollection<PhieuNhap> PhieuNhap { get; set; }
+        public virtual ICollection<PhieuXuat> PhieuXuat { get; set; }
     }
 }

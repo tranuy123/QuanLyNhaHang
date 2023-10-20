@@ -20,6 +20,7 @@ namespace QuanLyNhaHang.Models
         public string TenKhu { get; set; }
         public bool? Active { get; set; }
         public int? Idsanh { get; set; }
+        public DateTime? Ngay { get; set; }
 
         public virtual Sanh IdsanhNavigation { get; set; }
         public virtual ICollection<Ban> Ban { get; set; }

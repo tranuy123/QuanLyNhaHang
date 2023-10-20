@@ -1,0 +1,53 @@
+﻿@model QuanLyNhaHang.Models.NhaCungCap
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<Sanh> getListSanh()
+    {
+        return context.Sanh.Where(x => x.Active == true).OrderByDescending(x => x.Idsanh).ToList();
+    }
+}
+
+<div class="card">
+    <div class="card-body">
+        <form action="/QuanLy/InsertNhaCungCap" method="post">
+            <div class="forms-header text-center">
+                <h4 class="forms-title "><b>Thêm nhà cung cấp</b></h4>
+            </div>
+            <div class="forms-body">
+                <div class="form-group">
+                    <label style="margin:7px 0;">Mã nhà cung cấp</label>
+                    <input asp-for="@Model.MaNcc" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Tên nhà cung cấp</label>
+                    <input asp-for="@Model.TenNcc" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Địa chỉ</label>
+                    <input asp-for="@Model.DiaChi" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Điện thoại</label>
+                    <input asp-for="@Model.DienThoai" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Mail</label>
+                    <input asp-for="@Model.Mail" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Ghi chú</label>
+                    <input asp-for="@Model.GhiChu" type="text" class="form-control" required>
+                </div>
+
+            </div>
+            <div class="forms-footer" style="justify-content:space-between">
+
+                <input type="submit" class="btn btn-primary" value="Thêm">
+            </div>
+        </form>
+        <button class="btn btn-secondary" onclick="window.history.go(-1);">
+            Quay lại
+        </button>
+    </div>
+</div>
+<script src="~/jschinh/NhaCungCap.js" defer></script>

@@ -30,7 +30,7 @@
 
 
     <link rel="stylesheet" href="~/css/feather.css">
-    <link rel="stylesheet" href="~/css/select2.css">
+    @* <link rel="stylesheet" href="~/css/select2.css"> *@
     <link rel="stylesheet" href="~/css/dropzone.css">
     <link rel="stylesheet" href="~/css/uppy.min.css">
     <link rel="stylesheet" href="~/css/jquery.steps.css">
@@ -45,10 +45,13 @@
 
     <link rel="stylesheet" href="~/css/app-dark.css" id="darkTheme" disabled>
     <script src="~/jquery-3.6.1.min.js"></script>
+    @* <script src="~/tom-select/dist/js/tom-select.base.min.js" defer></script> *@
+
     <script src="~/datetimepicker/moment.js/moment.min.js"></script>
     <script src="~/datetimepicker/umd/popper.min.js"></script>
     <link href="~/datetimepicker/bootstrap-datetimepicker.css" rel="stylesheet" />
     <script src="~/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/js/popper.min.js"></script>
 
     <script src="~/select/js/selectize.js"></script>
     <script src="~/select/js/selectize.min.js"></script>
@@ -68,32 +71,19 @@
         .table{
             color:black !important;
         }
-
+      
     </style>
+ 
 
 </head>
 <body class="vertical  light  ">
-
-    <nav class="topnav navbar navbar-light">
-        <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
-            <i class="fe fe-menu navbar-toggler-icon"></i>
-        </button>
-        <form class="form-inline mr-auto searchform text-muted">
-            <input class="form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted" type="search" placeholder="Type something..." aria-label="Search">
-        </form>
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
-                    <i class="fe fe-sun fe-16"></i>
-                </a>
-            </li>
-           
-            
-            
-            
-        </ul>
-    </nav>
-
+    <div id="toast" style="position: absolute; top: 0; right: 0;z-index: 99999;" class="toast align-items-center text-white border-0 position-fixed top-0 end-0 p-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastContent">
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close" onclick="hideToast()"></button>
+        </div>
+    </div>
     <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
         <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
             <i class="fe fe-x"><span class="sr-only"></span></i>
@@ -179,14 +169,46 @@
                             <li class="nav-item">
                                 <a class="nav-link pl-3" href="/QuanLy/ViewCa"><span class="ml-1 item-text">Danh mục nhân viên</span></a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link pl-3" href="/QuanLy/ViewQLDanhGia"><span class="ml-1 item-text">Danh mục điểm đánh giá</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link pl-3" href="/QuanLy/ViewNhomHangHoa"><span class="ml-1 item-text">Danh mục nhóm hàng hóa</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link pl-3" href="/QuanLy/ViewNhaCungCap"><span class="ml-1 item-text">Danh mục nhà cung cấp</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link pl-3" href="/QuanLy/ViewHangHoa"><span class="ml-1 item-text">Danh mục hàng hóa</span></a>
+                            </li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a href="#formsBaoCao" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                            <i class="fe fe-credit-card fe-16"></i>
+                            <span class="ml-3 item-text">Báo cáo</span>
+                        </a>
+                        <ul class="collapse list-unstyled pl-4 w-100" id="formsBaoCao">
 
                     <li class="nav-item w-100">
                         <a class="nav-link" href="/QuanLy/ViewBaoCao">
                             <i class="fe fe-layers fe-16"></i>
                             <span class="ml-3 item-text">Báo cáo</span>
                         </a>
+                    </li>
+                    <li class="nav-item w-100">
+                        <a class="nav-link" href="/BaoCao/BaoCao">
+                            <i class="fe fe-layers fe-16"></i>
+                            <span class="ml-3 item-text">Đồ thị doanh thu</span>
+                        </a>
+                    </li>
+                    <li class="nav-item w-100">
+                        <a class="nav-link" href="/BaoCao/HieuSuatNhanVien">
+                            <i class="fe fe-layers fe-16"></i>
+                            <span class="ml-3 item-text">Hiệu suất nhân viên</span>
+                        </a>
+                    </li>
+                        </ul>
                     </li>
                 }
                 @if (User.IsInRole("3"))
@@ -209,7 +231,7 @@
                 <li class="nav-item w-100">
                     <a class="nav-link" href="/Login/Logout">
                         <i class="fe fe-help-circle fe-16"></i>
-                        <span class="ml-3 item-text">Đăng xuất</span>
+                        <span class="ml-3 item-text">Đăng xuất (@nv.Ten)</span>
                     </a>
                 </li>
             </ul>
@@ -224,11 +246,11 @@
   <img class="modal-content" id="img01">
   <div id="caption"></div>
 </div>
-    <footer class="border-top footer text-muted">
+    @* <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2023 - QuanLyNhaHang - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
+    </footer> *@
 
     @*lỗi đoạn này*@
     @* <script src="~/js/jquery.min.js"></script>
@@ -254,7 +276,7 @@
     <script src="~/js/apexcharts.min.js"></script>
     <script src="~/js/apexcharts.custom.js"></script>
     <script src='~/js/jquery.mask.min.js'></script>
-    <script src='~/js/select2.min.js'></script>
+    @* <script src='~/js/select2.min.js'></script> *@
     <script src='~/js/jquery.steps.min.js'></script>
     <script src='~/js/jquery.validate.min.js'></script>
     <script src='~/js/uppy.min.js'></script>
@@ -268,11 +290,17 @@
     <script src="~/js/datamaps-zoomto.js"></script>
     <script src="~/js/datamaps.custom.js"></script>
     <script src="~/js/Chart.min.js"></script>
-
-   
+    <script src="~/lib/jquery/jquery.inputmask.js"></script>
+    <script src="~/jschinh/common.js" defer asp-append-version="true"></script>
    
     <script>
         $(document).ready(function () {
+            $('.form-select').selectize({
+                sortField: {
+                    field: 'text',
+                    direction: 'asc'
+                }
+            });
             $.fn.DataTable.ext.pager.numbers_length = 5;
             $("#example").dataTable({
                 "scrollY": "400px",
@@ -292,7 +320,7 @@
             });
 
            
-            $('#toDay,#fromDay').datetimepicker({
+            $('#toDay,#fromDay,#ngaySanXuat,#hanSuDung,#ngaySanXuat1,#hanSuDung1').datetimepicker({
                 locale: 'vi',
                 useStrict: true,
                 format: "DD-MM-yyyy",

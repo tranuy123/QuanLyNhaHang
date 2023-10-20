@@ -1,0 +1,410 @@
+﻿@using System.Globalization;
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<NhaCungCap> getListNhaCungCap()
+    {
+        return context.NhaCungCap.Where(x => x.Active == true).ToList();
+    }
+    List<HangHoa> getListHangHoa()
+    {
+        return context.HangHoa.Where(x => x.Active == true).ToList();
+    }
+    NhanVien nv = context.NhanVien.Find(Int32.Parse(User.Identity.Name));
+
+}
+<style>
+    .red-header {
+        background-color: red;
+        color: white;
+    }
+
+</style>
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs nav-fill p-0" id="myTab" data-bs-toggle="tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a href="#tabs-lapPhieu" id="tab-lapphieu" class="nav-link text-dark active" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                    <!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M19 12h2l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h5.5"></path>
+                        <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2"></path>
+                        <path d="M16 19h6"></path>
+                        <path d="M19 16v6"></path>
+                    </svg>
+                    Lập phiếu
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a href="#tabs-dsPhieu" class="nav-link text-dark" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                    <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M9 6l11 0"></path>
+                        <path d="M9 12l11 0"></path>
+                        <path d="M9 18l11 0"></path>
+                        <path d="M5 6l0 .01"></path>
+                        <path d="M5 12l0 .01"></path>
+                        <path d="M5 18l0 .01"></path>
+                    </svg>
+                    Danh sách phiếu
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body p-2">
+
+        <div class="tab-content">
+            
+            <div class="tab-pane fade show active"
+                 role="tabpanel"
+                 aria-labelledby="detail-tab"
+                 id="tabXemPhieu"
+            >
+                <form action="/download/BaoCaoHoaDon" method="post">
+
+                    <div class="form-group p-2 mb-2"
+                         id="groupTTSearchLichSu"
+                         style="border-radius: 5px; border: 1px solid black">
+                        <div class="row">
+                            <label class="col-sm-1 col-lg-1 col-form-label">Số phiếu</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="soPN"
+                                       value="Auto"
+                                       placeholder="Từ ngày"
+                                       disabled />
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Nhà CC</label>
+                            <div class="col-sm-4 col-lg-2">
+                                <select name="nhaCungCap" class="form-select" style="width : 150px">
+                                    <option selected>-- Nhà cung cấp--</option>
+                                    @foreach (NhaCungCap n in getListNhaCungCap())
+                                    {
+                                        <option value="@n.Idncc">@n.TenNcc</option>
+                                    }
+                                </select>
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Ngày nhập</label>
+                            <div class="col-lg-2 col-sm-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="ngayNhap"
+                                       value="@DateTime.Now.ToString("dd-MM-yyyy")"
+                                       placeholder="Ngày nhập" />
+                            </div>
+
+                            <div class="col-md-1 mb-2 col-lg-1 d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary" onclick="loadTableBCNK()">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-12 col-lg-1 col-form-label">Ghi chú</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="ghiChu"
+                                       value="Auto"
+                                       placeholder="Từ ngày"
+                                        />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group p-2 mb-2"
+                         id="groupThemHangHoa"
+                         style="border-radius: 5px; border: 1px solid black">
+                        <div class="row">
+                            <label class="col-sm-1 col-lg-1 col-form-label">Tên hàng hóa</label>
+                            <select name="hangHoa" class="form-select" style="width : 200px">
+                                <option selected>-- Tên hàng hóa--</option>
+                                @foreach (HangHoa n in getListHangHoa())
+                                {
+                                    <option value="@n.Idhh">@n.TenHh</option>
+                                }
+                            </select>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Đơn vị tính</label>
+                            <div class="col-sm-4 col-lg-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="donViTinh"
+                                       id="donViTinh"
+                                       value="Thùng"
+                                       placeholder="Ngày sản xuất" />
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Ngày sản xuất</label>
+                            <div class="col-lg-2 col-sm-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="ngaySanXuat"
+                                       id="ngaySanXuat"
+                                       placeholder="Ngày sản xuất" />
+                            </div>
+
+                            @* <div class="col-md-1 mb-2 col-lg-1 d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary" onclick="loadTableBCNK()">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div> *@
+                            <label class="col-sm-1 col-lg-1 col-form-label">Hạn sử dụng</label>
+                            <div class="col-lg-2 col-sm-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="hanSuDung"
+                                       id="hanSuDung"
+                                       placeholder="Hạn sử dụng" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-12 col-lg-1 col-form-label">Số lượng</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input class="form-control formatted-number"
+                                       type="text"
+                                       name="soLuong"
+                                       id="soLuong"
+                                       placeholder="Số lượng" />
+                            </div>
+                            <label class="col-sm-12 col-lg-1 col-form-label">Đơn giá</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input class="form-control formatted-number"
+                                       type="text"
+                                       name="donGia"
+                                       id="donGia"
+                                       placeholder="Đơn giá" />
+                            </div>
+                            <label class="col-sm-12 col-lg-1 col-form-label">Thành tiền</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input class="form-control formatted-number"
+                                       type="text"
+                                       name="thanhTien"
+                                       id="thanhTien"
+                                       placeholder="Thành tiền" />
+                            </div>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <button type="button" class="btn btn-primary" onclick="AddRowPhieuNhapKho()">
+                                    Thêm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="table-nhapkho" class="table-responsive" style="min-height:47vh;height:47vh;">
+                        <table class="table table-bordered table-vcenter table-input" id="tableTaoChiTietPhieuNhap">
+                            <thead>
+                                <tr class="text-wrap">
+                                    <th class="text-center p-1 first-th-column text-wrap" style="width:32px;">TT</th>
+                                    <th class="text-center p-1 w-25 text-wrap" style="position: sticky;left: 33px;z-index: 4 !important;">Tên hàng hóa</th>
+                                    <th class="text-center p-1 text-wrap">SL nhập</th>
+                                    <th class="text-center p-1 text-wrap">Giá nhập</th>
+                                    <th class="text-center p-1 text-wrap">Thành tiền</th>
+                                    <th class="text-center p-1 text-wrap">Ngày SX</th>
+                                    <th class="text-center p-1 text-wrap">Hạn SD</th>
+                                    <th class="text-center last-th-column p-1">
+                                        <a href="#" class="text-red" id="remove-all-phieuNhapCt">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M4 7l16 0"></path>
+                                                <path d="M10 11l0 6"></path>
+                                                <path d="M14 11l0 6"></path>
+                                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                            </svg>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="tBody-ThemChiTietPhieuNhap">
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+                <div class="card-footer p-2">
+                    <div class="row">
+                        <div class="col-lg-2 col-12">
+                        </div>
+                        <div class="col-lg-2 col-12 mb-1">
+                        </div>
+                        <div class="col-lg-2 col-12 mb-1">
+                        </div>
+                        <div class="col-lg-2 col-12 mb-1">
+                            <label class="form-label mb-0">Tổng cộng:</label>
+                            <input type="text" class="form-control formatted-number-float" id="tongTra" placeholder="Tổng cộng" readonly>
+                        </div>
+                        <div class="col-lg-2 col-12 mb-1">
+                            <label class="form-label mb-0">Người lập phiếu:</label>
+                            <input id="txtNhanVienTao" type="text" class="form-control" placeholder="Người lập phiếu" readonly=""
+                                   value="@nv.Ten">
+                        </div>
+                        <div class="col-2 mb-1">
+                            <label class="form-label mb-0 text-white">.</label>
+                            <div class="row justify-content-end">
+                                <div class="col-auto">
+                                    <button class="btn" id="btnXoaTrang">
+                                        Xóa trắng
+                                    </button>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-primary" onclick="ThemPhieuNhap()">
+                                        Lưu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane" id="tabs-dsPhieu" role="tabpanel">
+                <div class="card mb-2">
+                    <div class="card-status-top bg-blue"></div>
+                    <div class="card-header p-2">
+                        <div class="container px-0">
+                            <form class="row" id="formTimKiemPhieuNhapKho">
+                                <div class="col-12 mb-1">
+                                    <div class="row">
+                                        <div class="col-12 col-lg-3 mb-1">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">
+                                                    Từ ngày:
+                                                </label>
+                                                <div class="col-9">
+                                                    <input autocomplete="off" required type="text" autocomplete="off" class="form-control input-date-default" name="TuNgay">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 mb-1">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">
+                                                    Đến ngày:
+                                                </label>
+                                                <div class="col-9">
+                                                    <input autocomplete="off" required type="text" autocomplete="off" class="form-control input-date-default" name="DenNgay">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-6 mb-1">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">
+                                                    Nơi cung cấp:
+                                                </label>
+                                                <div class="col-9">
+                                                    <select class="form-select cbNhaCungCap" name="IdNhaCungCap">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-1">
+                                    <div class="row">
+                                        <div class="col-12 col-lg-5 mb-1">
+                                            <div class="row">
+                                                <label class="col-form-label col-3 col-lg-2">
+                                                    Hàng hóa:
+                                                </label>
+                                                <div class="col-9 col-lg-10">
+                                                    <select class="form-select cbHangHoa" name="IdHangHoa">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 mb-1">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">
+                                                    Số phiếu:
+                                                </label>
+                                                <div class="col-9">
+                                                    <input type="text" autocomplete="off" class="form-control" placeholder="Số phiếu" name="SoPhieu">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 mb-1">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">
+                                                    Số HĐ:
+                                                </label>
+                                                <div class="col-9">
+                                                    <input type="text" autocomplete="off" class="form-control" placeholder="Số hóa đơn" name="SoHD">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-1 mb-1">
+                                            <div class="row justify-content-end">
+                                                <div class="col-auto">
+                                                    <button class="btn btn-icon" type="submit">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div style="display: none;" id="progress">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-indeterminate bg-blue"></div>
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="max-height:53vh;">
+                            <table class="table text-nowrap table-bordered table-vcenter">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center first-th-column">#</th>
+                                        <th class="text-center">Số phiếu</th>
+                                        <th class="text-center">Ngày</th>
+                                        <th class="text-center">Nhà CC</th>
+                                        <th class="text-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-sum" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 16v2a1 1 0 0 1 -1 1h-11l6 -7l-6 -7h11a1 1 0 0 1 1 1v2"></path>
+                                            </svg>
+                                            Hàng
+                                        </th>
+                                        <th class="text-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-sum" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 16v2a1 1 0 0 1 -1 1h-11l6 -7l-6 -7h11a1 1 0 0 1 1 1v2"></path>
+                                            </svg>
+                                            CK
+                                        </th>
+                                        <th class="text-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-sum" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 16v2a1 1 0 0 1 -1 1h-11l6 -7l-6 -7h11a1 1 0 0 1 1 1v2"></path>
+                                            </svg>
+                                            VAT
+                                        </th>
+                                        <th class="text-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-sum" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                <path d="M18 16v2a1 1 0 0 1 -1 1h-11l6 -7l-6 -7h11a1 1 0 0 1 1 1v2"></path>
+                                            </svg>
+                                            Tổng
+                                        </th>
+                                        <th class="text-center">
+                                            Người lập
+                                        </th>
+                                        <th class="text-center last-th-column">
+                                            Thao tác
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBody-DsPhieu">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/jschinh/nhapkho.js" defer asp-append-version="true"></script>
+<script src="~/jschinh/common.js" defer asp-append-version="true"></script>

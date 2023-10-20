@@ -12,6 +12,7 @@ namespace QuanLyNhaHang.Models
         public NhomNhanVien()
         {
             NhanVien = new HashSet<NhanVien>();
+            QlDanhGia = new HashSet<QlDanhGia>();
         }
 
         public int Idnnv { get; set; }
@@ -20,5 +21,6 @@ namespace QuanLyNhaHang.Models
         public bool? Active { get; set; }
 
         public virtual ICollection<NhanVien> NhanVien { get; set; }
+        public virtual ICollection<QlDanhGia> QlDanhGia { get; set; }
     }
 }

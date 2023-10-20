@@ -25,7 +25,7 @@
             </div>
             <div>
                 <label style="margin:7px 0;">Sảnh</label>
-                <select required class="custom-select" asp-for="@Model.Idsanh" aria-label="Default select example">
+                <select required class="form-select" asp-for="@Model.Idsanh" aria-label="Default select example">
                     <option value="" selected disabled> --Sảnh--</option>
 
                     @foreach (Sanh item in getListSanh())
@@ -45,3 +45,4 @@
         </button>
     </div>
 </div>
+<script src="~/jschinh/khu.js" defer></script>

@@ -11,6 +11,8 @@ using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using SelectPdf;
+using QuanLyNhaHang.Services;
+using System.Threading.Tasks;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -23,6 +25,7 @@ namespace QuanLyNhaHang.Controllers
         {
             webHostEnvironment = hostEnvironment;
         }
+        QuanLyNhaHangContext context = new QuanLyNhaHangContext();
         public IActionResult Index()
         {
             return View("ThucDon");
@@ -71,8 +74,8 @@ namespace QuanLyNhaHang.Controllers
         public IActionResult updateTD(ThucDon dvt, IFormFile avt)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-            ThucDon dv = context.ThucDon.Find(dvt.Idtd);          
-            
+            ThucDon dv = context.ThucDon.Find(dvt.Idtd);
+
             dv.Ten = dvt.Ten;
             dv.MaTd = dvt.MaTd;
             dv.Idnta = dvt.Idnta;
@@ -89,7 +92,7 @@ namespace QuanLyNhaHang.Controllers
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             ThucDon dvt = context.ThucDon.Find(id);
-          
+
             dvt.Active = false;
 
             context.ThucDon.Update(dvt);
@@ -130,7 +133,7 @@ namespace QuanLyNhaHang.Controllers
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             ThucDon dvt = context.ThucDon.Find(id);
-           
+
             dvt.Active = true;
 
             context.ThucDon.Update(dvt);
@@ -152,13 +155,13 @@ namespace QuanLyNhaHang.Controllers
         }
         public IActionResult ViewInsertSanh()
         {
-            return View("ViewInsertSanh");  
+            return View("ViewInsertSanh");
         }
         [HttpPost]
         public IActionResult InsertSanh(Sanh nsx)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-            
+
             nsx.Active = true;
             context.Sanh.Add(nsx);
             context.SaveChanges();
@@ -170,7 +173,7 @@ namespace QuanLyNhaHang.Controllers
         public IActionResult DeleteSanh(int id)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-            Sanh nsx = context.Sanh.Find(id);         
+            Sanh nsx = context.Sanh.Find(id);
             nsx.Active = false;
 
             context.Sanh.Update(nsx);
@@ -192,7 +195,7 @@ namespace QuanLyNhaHang.Controllers
             Sanh n = context.Sanh.Find(nsx.Idsanh);
             n.MaSanh = nsx.MaSanh;
             n.TenSanh = nsx.TenSanh;
-           
+
 
             context.Sanh.Update(n);
             context.SaveChanges();
@@ -225,6 +228,21 @@ namespace QuanLyNhaHang.Controllers
             context.SaveChanges();
             TempData["ThongBao"] = "Khôi phục thành công!";
             return RedirectToAction("ViewSanh");
+        }
+        [HttpPost("DanhMuc/Sanh/api/getModelsCB")]
+        public async Task<dynamic> getModelsCB(string key)
+        {
+
+            var models = await context.Sanh.Where(x => (key == "" ? true : ((x.MaSanh != null && x.MaSanh.ToLower().Contains(key.ToLower())) ||
+                                               (x.TenSanh != null && x.TenSanh.ToLower().Contains(key.ToLower())))) &&
+                                                x.Active == true).Select(x => new
+                                                {
+                                                    Id = x.Idsanh,
+                                                    Ma = x.MaSanh,
+                                                    Ten = x.TenSanh,
+                                                }).ToListAsync();
+            return models;
+
         }
         //////////////////////////////////////////////////////////////////////
         public IActionResult ViewKhu()
@@ -323,7 +341,7 @@ namespace QuanLyNhaHang.Controllers
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             // Lấy danh sách khu theo id sảnh
-            var listKhu = context.Khu.Where(k => k.Idsanh == idSanh && k.Active==true).ToList();
+            var listKhu = context.Khu.Where(k => k.Idsanh == idSanh && k.Active == true).ToList();
 
             return listKhu;
         }
@@ -380,7 +398,7 @@ namespace QuanLyNhaHang.Controllers
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             if (active)
             {
-                ViewBag.NSX = context.Ban.Include(x =>x.IdkhuNavigation.IdsanhNavigation).Where(x => x.Active == true).ToList();
+                ViewBag.NSX = context.Ban.Include(x => x.IdkhuNavigation.IdsanhNavigation).Where(x => x.Active == true).ToList();
             }
             else
             {
@@ -418,7 +436,7 @@ namespace QuanLyNhaHang.Controllers
         public string UpdateGia(int idtd, int ids, float gia)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-            Gia a = context.Gia.FirstOrDefault(x =>x.Idsanh==ids && x.Idtd==idtd);
+            Gia a = context.Gia.FirstOrDefault(x => x.Idsanh == ids && x.Idtd == idtd);
             if (a != null)
             {
                 a.Gia1 = gia;
@@ -442,7 +460,7 @@ namespace QuanLyNhaHang.Controllers
         public IActionResult DeleteGia(int idtd, int ids)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-            Gia nsx = context.Gia.FirstOrDefault(x =>x.Idsanh==ids && x.Idtd==idtd);
+            Gia nsx = context.Gia.FirstOrDefault(x => x.Idsanh == ids && x.Idtd == idtd);
             nsx.Active = false;
 
             context.Gia.Update(nsx);
@@ -583,7 +601,7 @@ namespace QuanLyNhaHang.Controllers
             NhomThucAn n = context.NhomThucAn.Find(nsx.Idnta);
             n.MaNta = nsx.MaNta;
             n.TenNta = nsx.TenNta;
-            
+
 
 
             context.NhomThucAn.Update(n);
@@ -634,7 +652,7 @@ namespace QuanLyNhaHang.Controllers
             return View("ViewBaoCao");
         }
         [HttpPost("/loadTableLichSuHD")]
-        public IActionResult loadTableLichSuHD(string fromDay, string toDay,string MaHD,int IdSanh,int IdTieuKhu, int IdBan, int IdTD)
+        public IActionResult loadTableLichSuHD(string fromDay, string toDay, string MaHD, int IdSanh, int IdTieuKhu, int IdBan, int IdTD)
         {
             DateTime FromDay = DateTime.ParseExact(fromDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             DateTime ToDay = DateTime.ParseExact(toDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
@@ -648,7 +666,7 @@ namespace QuanLyNhaHang.Controllers
             .Include(x => x.ChiTietHoaDon)
             .OrderByDescending(x => x.Idhd)
             .ToList();
-            if (IdSanh==0 && IdTieuKhu==0 && IdBan==0 && IdTD==0)
+            if (IdSanh == 0 && IdTieuKhu == 0 && IdBan == 0 && IdTD == 0)
             {
                 ViewBag.ListPhieuNhap = listPhieu.Where(x => (MaHD == null ? true : x.MaHd.Contains(MaHD.ToUpper())));
             }
@@ -783,7 +801,7 @@ namespace QuanLyNhaHang.Controllers
 
             return View(n);
         }
-        public IActionResult UpdateLLV  (LichLamViec nsx)
+        public IActionResult UpdateLLV(LichLamViec nsx)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             LichLamViec n = context.LichLamViec.Find(nsx.Idllv);
@@ -799,6 +817,301 @@ namespace QuanLyNhaHang.Controllers
             TempData["ThongBao"] = "Sửa thành công!";
             return RedirectToAction("ViewLLV");
         }
-    }
+        //--------------------------------------
+        public IActionResult ViewQLDanhGia()
+        {
+            return View("ViewQLDanhGia");
+        }
+        public IActionResult ViewInsertQLDanhGia()
+        {
+            return View("ViewInsertQLDanhGia");
+        }
+        [HttpPost]
+        public IActionResult InsertQLDanhGia(QlDanhGia nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
 
+            nsx.Active = true;
+            context.QlDanhGia.Add(nsx);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Thêm thành công!";
+            return RedirectToAction("ViewQLDanhGia");
+
+        }
+        [Route("/QuanLy/ViewUpdateQLDanhGia/{id}")]
+        public IActionResult ViewUpdateQLDanhGia(int id)
+
+        {
+            ViewData["Title"] = "Cập nhập thông tin lịch làm việc";
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            QlDanhGia n = context.QlDanhGia.Include(x => x.IdnnvNavigation).FirstOrDefault(x => x.IddanhGia == id);
+
+            return View(n);
+        }
+        public IActionResult UpdateQLDanhGia(QlDanhGia nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            QlDanhGia n = context.QlDanhGia.Find(nsx.IddanhGia);
+
+            n.Ma = nsx.Ma;
+            n.Ten = nsx.Ten;
+            n.Idnnv = nsx.Idnnv;
+            n.ThoiGianTu = nsx.ThoiGianTu;
+            n.ThoiGianDen = nsx.ThoiGianDen;
+            n.Diem = nsx.Diem;
+            n.Active = nsx.Active;
+            context.QlDanhGia.Update(n);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Sửa thành công!";
+            return RedirectToAction("ViewQLDanhGia");
+        }
+        /////////////////////////////////////////////////////
+        public IActionResult ViewNhomHangHoa()
+        {
+            return View("ViewNhomHangHoa");
+        }
+        public IActionResult ViewInsertNhomHangHoa()
+        {
+            return View("ViewInsertNhomHangHoa");
+        }
+        [HttpPost]
+        public IActionResult InsertNhomHangHoa(NhomHangHoa nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
+            nsx.Active = true;
+            context.NhomHangHoa.Add(nsx);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Thêm thành công!";
+            return RedirectToAction("ViewNhomHangHoa");
+
+        }
+        [Route("/QuanLy/ViewUpdateNhomHangHoa/{id}")]
+        public IActionResult ViewUpdateNhomHangHoa(int id)
+
+        {
+            ViewData["Title"] = "Cập nhập thông tin NhomHangHoa";
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhomHangHoa nsx = context.NhomHangHoa.Find(id);
+            return View(nsx);
+        }
+        public IActionResult UpdateNhomHangHoa(NhomHangHoa nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhomHangHoa n = context.NhomHangHoa.Find(nsx.Idnhh);
+            n.MaNhh = nsx.MaNhh;
+            n.TenNhh = nsx.TenNhh;
+
+
+            context.NhomHangHoa.Update(n);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Sửa thành công!";
+            return RedirectToAction("ViewNhomHangHoa");
+        }
+        [Route("/QuanLy/deleteNhomHangHoa/{id}")]
+        public IActionResult DeleteNhomHangHoa(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhomHangHoa nsx = context.NhomHangHoa.Find(id);
+            nsx.Active = false;
+
+            context.NhomHangHoa.Update(nsx);
+            context.SaveChanges();
+            return RedirectToAction("ViewNhomHangHoa");
+        }
+        [HttpPost("/loadViewNhomHangHoa")]
+        public IActionResult loadViewNhomHangHoa(bool active)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            if (active)
+            {
+                ViewBag.NSX = context.NhomHangHoa.Where(x => x.Active == true).ToList();
+            }
+            else
+            {
+                ViewBag.NSX = context.NhomHangHoa.ToList();
+            }
+            return PartialView("ViewDivNhomHangHoa");
+        }
+        [Route("/QuanLy/khoiphucNhomHangHoa/{id}")]
+        public IActionResult khoiphucNhomHangHoa(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhomHangHoa dvt = context.NhomHangHoa.Find(id);
+
+            dvt.Active = true;
+
+            context.NhomHangHoa.Update(dvt);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Khôi phục thành công!";
+            return RedirectToAction("ViewNhomHangHoa");
+        }
+        ///////////////////////////////////////////////////////////////////
+        public IActionResult ViewNhaCungCap()
+        {
+            return View("ViewNhaCungCap");
+        }
+        public IActionResult ViewInsertNhaCungCap()
+        {
+            return View("ViewInsertNhaCungCap");
+        }
+        [HttpPost]
+        public IActionResult InsertNhaCungCap(NhaCungCap nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
+            nsx.Active = true;
+            context.NhaCungCap.Add(nsx);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Thêm thành công!";
+            return RedirectToAction("ViewNhaCungCap");
+
+        }
+        [Route("/QuanLy/ViewUpdateNhaCungCap/{id}")]
+        public IActionResult ViewUpdateNhaCungCap(int id)
+
+        {
+            ViewData["Title"] = "Cập nhập thông tin NhaCungCap";
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhaCungCap nsx = context.NhaCungCap.Find(id);
+            return View(nsx);
+        }
+        public IActionResult UpdateNhaCungCap(NhaCungCap nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhaCungCap n = context.NhaCungCap.Find(nsx.Idncc);
+            n.MaNcc = nsx.MaNcc;
+            n.TenNcc = nsx.TenNcc;
+            n.DiaChi = nsx.DiaChi;
+            n.DienThoai = nsx.DienThoai;
+            n.Mail = nsx.Mail;
+            n.GhiChu = nsx.GhiChu;
+
+
+            context.NhaCungCap.Update(n);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Sửa thành công!";
+            return RedirectToAction("ViewNhaCungCap");
+        }
+        [Route("/QuanLy/deleteNhaCungCap/{id}")]
+        public IActionResult DeleteNhaCungCap(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhaCungCap nsx = context.NhaCungCap.Find(id);
+            nsx.Active = false;
+
+            context.NhaCungCap.Update(nsx);
+            context.SaveChanges();
+            return RedirectToAction("ViewNhaCungCap");
+        }
+        [HttpPost("/loadViewNhaCungCap")]
+        public IActionResult loadViewNhaCungCap(bool active)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            if (active)
+            {
+                ViewBag.NSX = context.NhaCungCap.Where(x => x.Active == true).ToList();
+            }
+            else
+            {
+                ViewBag.NSX = context.NhaCungCap.ToList();
+            }
+            return PartialView("ViewDivNhaCungCap");
+        }
+        [Route("/QuanLy/khoiphucNhaCungCap/{id}")]
+        public IActionResult khoiphucNhaCungCap(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhaCungCap dvt = context.NhaCungCap.Find(id);
+
+            dvt.Active = true;
+
+            context.NhaCungCap.Update(dvt);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Khôi phục thành công!";
+            return RedirectToAction("ViewNhaCungCap");
+        }
+        /////////////////////////////////////////
+        public IActionResult ViewHangHoa()
+        {
+            return View("ViewHangHoa");
+        }
+        public IActionResult ViewInsertHangHoa()
+        {
+            return View("ViewInsertHangHoa");
+        }
+        [HttpPost]
+        public IActionResult InsertHangHoa(HangHoa nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
+            nsx.Active = true;
+            context.HangHoa.Add(nsx);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Thêm thành công!";
+            return RedirectToAction("ViewHangHoa");
+
+        }
+        [Route("/QuanLy/ViewUpdateHangHoa/{id}")]
+        public IActionResult ViewUpdateHangHoa(int id)
+
+        {
+            ViewData["Title"] = "Cập nhập thông tin HangHoa";
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            HangHoa nsx = context.HangHoa.Find(id);
+            return View(nsx);
+        }
+        public IActionResult UpdateHangHoa(HangHoa nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            HangHoa n = context.HangHoa.Find(nsx.Idhh);
+            n.MaHh = nsx.MaHh;
+            n.TenHh = nsx.TenHh;
+            n.Idnhh = nsx.Idnhh;
+
+
+            context.HangHoa.Update(n);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Sửa thành công!";
+            return RedirectToAction("ViewHangHoa");
+        }
+        [Route("/QuanLy/deleteHangHoa/{id}")]
+        public IActionResult DeleteHangHoa(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            HangHoa nsx = context.HangHoa.Find(id);
+            nsx.Active = false;
+
+            context.HangHoa.Update(nsx);
+            context.SaveChanges();
+            return RedirectToAction("ViewHangHoa");
+        }
+        [HttpPost("/loadViewHangHoa")]
+        public IActionResult loadViewHangHoa(bool active)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            if (active)
+            {
+                ViewBag.NSX = context.HangHoa.Where(x => x.Active == true).ToList();
+            }
+            else
+            {
+                ViewBag.NSX = context.HangHoa.ToList();
+            }
+            return PartialView("ViewDivHangHoa");
+        }
+        [Route("/QuanLy/khoiphucHangHoa/{id}")]
+        public IActionResult khoiphucHangHoa(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            HangHoa dvt = context.HangHoa.Find(id);
+
+            dvt.Active = true;
+
+            context.HangHoa.Update(dvt);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Khôi phục thành công!";
+            return RedirectToAction("ViewHangHoa");
+        }
+    }
 }

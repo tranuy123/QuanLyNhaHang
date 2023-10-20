@@ -1,0 +1,65 @@
+﻿@model QuanLyNhaHang.Models.QlDanhGia
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<NhomNhanVien> getListNNV()
+    {
+        return context.NhomNhanVien.ToList();
+    }
+}
+
+<div class="card">
+    <div class="card-body">
+        <form action="/QuanLy/InsertQLDanhGia" method="post">
+            <div class="forms-header text-center">
+                <h4 class="forms-title "><b>Thêm đánh giá</b></h4>
+            </div>
+
+            <div>
+                <label style="margin:7px 0;">Mã đánh giá</label>
+                <input asp-for="@Model.Ma" type="text" class="form-control" required>
+
+            </div>
+            <div>
+                <label style="margin:7px 0;">Tên đánh giá</label>
+                <input asp-for="@Model.Ten" type="text" class="form-control" required>
+
+            </div>
+            <div>
+                <label style="margin:7px 0;">Nhóm nhân viên</label>
+                <select required class="custom-select" asp-for="@Model.Idnnv" aria-label="Default select example">
+                    <option value="" selected disabled> --Nhóm nhân viên--</option>
+
+                    @foreach (NhomNhanVien item in getListNNV())
+                    {
+
+                        <option value="@item.Idnnv">@item.TenNnv</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label style="margin:7px 0;">Thời gian hoàn thành từ</label>
+                <input asp-for="@Model.ThoiGianTu" type="text" class="form-control" required>
+
+            </div>
+            <div>
+                <label style="margin:7px 0;">Thời gian hoàn thành đến</label>
+                <input asp-for="@Model.ThoiGianDen" type="text" class="form-control" required>
+
+            </div>
+            <div>
+                <label style="margin:7px 0;">Điểm</label>
+                <input asp-for="@Model.Diem" type="text" class="form-control" required>
+
+            </div>
+
+            <div class="forms-footer" style="justify-content:space-between">
+
+                <input type="submit" class="btn btn-primary" value="Thêm">
+            </div>
+        </form>
+        <button class="btn btn-secondary" onclick="window.history.go(-1);">
+            Quay lại
+        </button>
+    </div>
+</div>
+

@@ -34,7 +34,7 @@
         }
     }
     ViewBag.IDMAC = macAddress;
-    var IDkhu = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress);
+    var IDkhu = context.Ban.Include(x => x.IdkhuNavigation).FirstOrDefault(x => x.Ipmac == macAddress);
     var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
     List<Gia> getListGia()
     {
@@ -176,7 +176,7 @@
             <div class="container" data-aos="fade-up">
 
                 <div class="section-header">
-                    <p>Nhà Hàng <span>Trần Uy</span></p>
+                    <p>Nhà Hàng <span>Trần Uy</span> @IDkhu.TenBan (@IDkhu.IdkhuNavigation.TenKhu)</p>
                 </div>
 
                 <ul class="nav nav-tabs d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">

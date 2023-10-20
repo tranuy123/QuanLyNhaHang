@@ -1,0 +1,94 @@
+﻿@model QuanLyNhaHang.Models.QlDanhGia
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<NhomNhanVien> getListNNV()
+    {
+        return context.NhomNhanVien.Where(x => x.Active == true).OrderByDescending(x => x.Idnnv).ToList();
+    }
+    Khu getKhu(int? id)
+    {
+        return context.Khu.Find(id);
+    }
+    NhomNhanVien getNNV(int? id)
+    {
+        return context.NhomNhanVien.FirstOrDefault(x => x.Idnnv == id);
+    }
+}
+
+<div class="card">
+    <div class="card-body">
+        <form action="/QuanLy/UpdateQLDanhGia" method="post">
+            <div class="forms-header text-center">
+                <h4 class="forms-title "><b>@ViewData["Title"]</b></h4>
+            </div>
+            <div class="forms-body">
+                <div class="form-group">
+                    <label style="margin:7px 0;">Mã đánh giá</label>
+                    <input asp-for="@Model.Ma" type="text" class="form-control" required>
+                    <input asp-for="@Model.IddanhGia" type="hidden" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Tên đánh giá</label>
+                    <input asp-for="@Model.Ten" type="text" class="form-control" required>
+                </div>
+            </div>
+            <div>
+                <label style="margin:7px 0;">Nhóm nhân viên</label>
+                <select class="custom-select" id="Idsanh" aria-label="Default select example">
+                    <option value="" selected disabled>@getNNV(Model.Idnnv).TenNnv</option>
+
+                    @foreach (NhomNhanVien item in getListNNV())
+                    {
+
+                        <option value="@item.Idnnv">@item.TenNnv</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label style="margin:7px 0;">Thời gian hoàn thành từ</label>
+                <input asp-for="@Model.ThoiGianTu" type="text" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label style="margin:7px 0;">Thời gian hoàn thành đến</label>
+                <input asp-for="@Model.ThoiGianDen" type="text" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label style="margin:7px 0;">Điểm</label>
+                <input asp-for="@Model.Diem" type="text" class="form-control" required>
+            </div>
+            <div class="forms-footer" style="justify-content:space-between">
+
+                <input type="submit" class="btn btn-primary" value="Sửa">
+            </div>
+        </form>
+        <button class="btn btn-secondary" onclick="window.history.go(-1);">
+            Quay lại
+        </button>
+
+    </div>
+</div>
+<script>
+    $(function () {
+        // Lắng nghe sự kiện khi người dùng chọn sảnh
+        $('#Idsanh').change(function () {
+            var idsanh = $(this).val();
+            // Gọi hàm AJAX để lấy danh sách khu tương ứng với sảnh đó từ server
+            $.ajax({
+                type: "post",
+                url: "/get-list-khu",
+                data: "idSanh=" + idsanh,
+                success: function (data) {
+                    $('#Idkhu').find('option').remove().end();
+
+                    // Thêm các option mới tương ứng với danh sách khu vừa nhận được
+                    $.each(data, function (i, item) {
+                        $('#Idkhu').append($('<option>', {
+                            value: item.idkhu,
+                            text: item.tenKhu
+                        }));
+                    });
+                }
+            });
+        });
+    });
+</script>
