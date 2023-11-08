@@ -11,6 +11,7 @@ namespace QuanLyNhaHang.Models
     {
         public ChiTietPhieuNhap()
         {
+            ChiTietPhieuXuat = new HashSet<ChiTietPhieuXuat>();
             TonKho = new HashSet<TonKho>();
         }
 
@@ -25,6 +26,7 @@ namespace QuanLyNhaHang.Models
 
         public virtual HangHoa IdhhNavigation { get; set; }
         public virtual PhieuNhap IdpnNavigation { get; set; }
+        public virtual ICollection<ChiTietPhieuXuat> ChiTietPhieuXuat { get; set; }
         public virtual ICollection<TonKho> TonKho { get; set; }
     }
 }

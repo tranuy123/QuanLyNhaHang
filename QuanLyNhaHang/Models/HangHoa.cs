@@ -13,16 +13,21 @@ namespace QuanLyNhaHang.Models
         {
             ChiTietPhieuNhap = new HashSet<ChiTietPhieuNhap>();
             ChiTietPhieuXuat = new HashSet<ChiTietPhieuXuat>();
+            ThucDon = new HashSet<ThucDon>();
         }
 
         public int Idhh { get; set; }
         public int? Idnhh { get; set; }
+        public int? Iddvt { get; set; }
         public string MaHh { get; set; }
+        public bool HangDemDuoc { get; set; }
         public string TenHh { get; set; }
         public bool? Active { get; set; }
 
+        public virtual DonViTinh IddvtNavigation { get; set; }
         public virtual NhomHangHoa IdnhhNavigation { get; set; }
         public virtual ICollection<ChiTietPhieuNhap> ChiTietPhieuNhap { get; set; }
         public virtual ICollection<ChiTietPhieuXuat> ChiTietPhieuXuat { get; set; }
+        public virtual ICollection<ThucDon> ThucDon { get; set; }
     }
 }

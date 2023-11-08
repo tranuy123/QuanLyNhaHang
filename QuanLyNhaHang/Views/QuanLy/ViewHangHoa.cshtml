@@ -8,6 +8,10 @@
     {
         return context.NhomHangHoa.Find(id);
     }
+    DonViTinh getDVT(int? id)
+    {
+        return context.DonViTinh.Find(id);
+    }
 }
 
 
@@ -37,6 +41,7 @@
 
                         <th class="text-center">Mã hàng hóa</th>
                         <th class="text-center">Tên hàng hóa</th>
+                        <th class="text-center">Đơn vị tính</th>
                         <th class="text-center">Nhóm hàng hóa</th>
 
 
@@ -52,6 +57,7 @@
 
                             <td>@item.MaHh</td>
                             <td>@item.TenHh</td>
+                            <td class="text-left">@getDVT(@item.Iddvt).TenDvt</td>
                             <td class="text-left">@getNHH(@item.Idnhh).TenNhh</td>
 
 

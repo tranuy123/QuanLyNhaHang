@@ -1,0 +1,89 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<DonViTinh> getListDonViTinh()
+    {
+        return context.DonViTinh.Where(x => x.Active == true).OrderByDescending(x => x.Iddvt).ToList();
+    }
+}
+
+
+<div id="divDonViTinh" class="card pt-3">
+    <div class="card-body">
+        <div style="margin-bottom: -40px; position:absolute; z-index:1; display:flex;">
+            <div class="" style="width: auto;">
+
+                <a href="/QuanLy/ViewInsertDonViTinh" class="btn btn-primary">
+                    <span>Thêm đơn vị tính mới</span>
+                </a>
+
+            </div>
+            <div class="dropdown" style="margin-left: 20px">
+                <select id="active" onchange="changeHH()" class="custom-select" style="width:180px">
+                    <option value="true" selected>Hiện tại</option>
+                    <option value="false">Tất cả</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-responsive" style="white-space:nowrap;overflow-y: auto;">
+
+
+            <table id="example" class="table table-striped  table-hover text-center display nowrap" style="width:100%;">
+                <thead>
+                    <tr>
+
+                        <th class="text-center">Mã đơn vị tính</th>
+                        <th class="text-center">Tên đơn vị tính</th>
+
+
+                        <th class="text-center">Tùy chọn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DonViTinh item in getListDonViTinh())
+                    {
+
+
+                        <tr>
+
+                            <td>@item.MaDvt</td>
+                            <td>@item.TenDvt</td>
+
+
+                            <td>
+
+                                <a class="chinhsua" href="/QuanLy/ViewUpdateDonViTinh/@item.Iddvt">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+
+                                <a href="/QuanLy/deleteDonViTinh/@item.Iddvt" onclick="return confirm('Bạn có muốn xóa đơn vị tính này?')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </a>
+
+                            </td>
+                        </tr>
+                    }
+
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<script>
+    function changeHH() {
+        var active = $('#active').val();
+        $.ajax({
+            type: "post",
+            url: "/loadViewDonViTinh",
+            data: "active=" + active,
+            success: function (result) {
+                $('.table-responsive').replaceWith(result);
+            },
+            error: function () {
+                alert("Fail to delete");
+            }
+        });
+    }
+</script>

@@ -181,6 +181,9 @@
                             <li class="nav-item">
                                 <a class="nav-link pl-3" href="/QuanLy/ViewHangHoa"><span class="ml-1 item-text">Danh mục hàng hóa</span></a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link pl-3" href="/QuanLy/ViewDonViTinh"><span class="ml-1 item-text">Danh mục đơn vị tính</span></a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -210,6 +213,34 @@
                     </li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a href="#formxuatnhap" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                            <i class="fe fe-credit-card fe-16"></i>
+                            <span class="ml-3 item-text">Quản lý xuất nhập</span>
+                        </a>
+                        <ul class="collapse list-unstyled pl-4 w-100" id="formxuatnhap">
+
+                            <li class="nav-item w-100">
+                                <a class="nav-link" href="/XuatKho/XuatKho">
+                                    <i class="fe fe-layers fe-16"></i>
+                                    <span class="ml-3 item-text">Xuất kho</span>
+                                </a>
+                            </li>
+                            <li class="nav-item w-100">
+                                <a class="nav-link" href="/NhapKho/NhapKho">
+                                    <i class="fe fe-layers fe-16"></i>
+                                    <span class="ml-3 item-text">Nhập kho</span>
+                                </a>
+                            </li>
+                            <li class="nav-item w-100">
+                                <a class="nav-link" href="/TonKho/TonKho">
+                                    <i class="fe fe-layers fe-16"></i>
+                                    <span class="ml-3 item-text">Tồn kho</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                 }
                 @if (User.IsInRole("3"))
                 {
@@ -320,7 +351,7 @@
             });
 
            
-            $('#toDay,#fromDay,#ngaySanXuat,#hanSuDung,#ngaySanXuat1,#hanSuDung1').datetimepicker({
+            $('#toDay,#fromDay,#ngaySanXuat,#hanSuDung,#ngayNhap,#hanSuDung1,#tuNgay,#denNgay,#tuNgayCT,#denNgayCT').datetimepicker({
                 locale: 'vi',
                 useStrict: true,
                 format: "DD-MM-yyyy",

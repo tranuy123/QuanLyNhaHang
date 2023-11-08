@@ -436,7 +436,7 @@ namespace QuanLyNhaHang.Controllers
         public string UpdateGia(int idtd, int ids, float gia)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-            Gia a = context.Gia.FirstOrDefault(x => x.Idsanh == ids && x.Idtd == idtd);
+            Gia a = context.Gia.FirstOrDefault(x => x.Idsanh == ids && x.Idtd == idtd && x.Active == true);
             if (a != null)
             {
                 a.Gia1 = gia;
@@ -460,10 +460,9 @@ namespace QuanLyNhaHang.Controllers
         public IActionResult DeleteGia(int idtd, int ids)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-            Gia nsx = context.Gia.FirstOrDefault(x => x.Idsanh == ids && x.Idtd == idtd);
-            nsx.Active = false;
+            Gia nsx = context.Gia.FirstOrDefault(x => x.Idsanh == ids && x.Idtd == idtd && x.Active == true);
 
-            context.Gia.Update(nsx);
+            context.Gia.Remove(nsx);
             context.SaveChanges();
             return RedirectToAction("ViewGia");
         }
@@ -1068,6 +1067,7 @@ namespace QuanLyNhaHang.Controllers
             n.MaHh = nsx.MaHh;
             n.TenHh = nsx.TenHh;
             n.Idnhh = nsx.Idnhh;
+            n.Iddvt = nsx.Iddvt;
 
 
             context.HangHoa.Update(n);
@@ -1112,6 +1112,86 @@ namespace QuanLyNhaHang.Controllers
             context.SaveChanges();
             TempData["ThongBao"] = "Khôi phục thành công!";
             return RedirectToAction("ViewHangHoa");
+        }
+        /////////////////////////////////// đơn vị tính
+        public IActionResult ViewDonViTinh()
+        {
+            return View("ViewDonViTinh");
+        }
+        public IActionResult ViewInsertDonViTinh()
+        {
+            return View("ViewInsertDonViTinh");
+        }
+        [HttpPost]
+        public IActionResult InsertDonViTinh(DonViTinh nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
+            nsx.Active = true;
+            context.DonViTinh.Add(nsx);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Thêm thành công!";
+            return RedirectToAction("ViewDonViTinh");
+
+        }
+        [Route("/QuanLy/ViewUpdateDonViTinh/{id}")]
+        public IActionResult ViewUpdateDonViTinh(int id)
+
+        {
+            ViewData["Title"] = "Cập nhập thông tin DonViTinh";
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            DonViTinh nsx = context.DonViTinh.Find(id);
+            return View(nsx);
+        }
+        public IActionResult UpdateDonViTinh(DonViTinh nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            DonViTinh n = context.DonViTinh.Find(nsx.Iddvt);
+            n.MaDvt = nsx.MaDvt;
+            n.TenDvt = nsx.TenDvt;
+
+            context.DonViTinh.Update(n);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Sửa thành công!";
+            return RedirectToAction("ViewDonViTinh");
+        }
+        [Route("/QuanLy/deleteDonViTinh/{id}")]
+        public IActionResult DeleteDonViTinh(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            DonViTinh nsx = context.DonViTinh.Find(id);
+            nsx.Active = false;
+
+            context.DonViTinh.Update(nsx);
+            context.SaveChanges();
+            return RedirectToAction("ViewDonViTinh");
+        }
+        [HttpPost("/loadViewDonViTinh")]
+        public IActionResult loadViewDonViTinh(bool active)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            if (active)
+            {
+                ViewBag.NSX = context.DonViTinh.Where(x => x.Active == true).ToList();
+            }
+            else
+            {
+                ViewBag.NSX = context.DonViTinh.ToList();
+            }
+            return PartialView("ViewDivDonViTinh");
+        }
+        [Route("/QuanLy/khoiphucDonViTinh/{id}")]
+        public IActionResult khoiphucDonViTinh(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            DonViTinh dvt = context.DonViTinh.Find(id);
+
+            dvt.Active = true;
+
+            context.DonViTinh.Update(dvt);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Khôi phục thành công!";
+            return RedirectToAction("ViewDonViTinh");
         }
     }
 }

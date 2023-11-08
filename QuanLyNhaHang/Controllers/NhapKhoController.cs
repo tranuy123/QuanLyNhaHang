@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyNhaHang.Models;
 using QuanLyNhaHang.Models.Mapping;
+using QuanLyNhaHang.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,14 @@ namespace QuanLyNhaHang.Controllers
         {
             return View();
         }
+        [HttpPost("/NhapKho/getDonViTinh")]
+        public async Task<dynamic> getDonViTinh(int idHH)
+        {
+            HangHoa dvt = await context.HangHoa
+                .Include(x => x.IddvtNavigation)
+                .FirstOrDefaultAsync(x => x.Idhh == idHH);
+            return dvt.IddvtNavigation.TenDvt;
+        }
         [HttpPost("/NhapKho/ThemPhieuNhap")]
         public async Task<dynamic> ThemPhieuNhap([FromBody] TTPhieuNhap data)
         {
@@ -37,7 +46,7 @@ namespace QuanLyNhaHang.Controllers
                 List<ChiTietPhieuNhap> chiTietPhieuNhaps = _mapper.Map<List<ChiTietPhieuNhap>>(chiTietPhieuNhapMaps);
                 PhieuNhap phieuNhap = _mapper.Map<PhieuNhap>(phieuNhapMap);
 
-                phieuNhap.SoPn = taoSoPhieuNhap();
+                phieuNhap.SoPn = CommonServices.taoSoPhieuNhap(context);
                 phieuNhap.Idnv = nv.Idnnv;
                 phieuNhap.Active = true;
                 await context.PhieuNhap.AddAsync(phieuNhap);
@@ -77,13 +86,7 @@ namespace QuanLyNhaHang.Controllers
                 };
             }
         }
-        private string taoSoPhieuNhap()
-        {
-            DateTime now = DateTime.Now;
-            string date = now.ToString("yyyyMMdd");
-            var phieuNhap = context.PhieuNhap.Where(x => x.SoPn.Contains(date)).ToList();
-            return $"{date}-{(phieuNhap.Count() + 1).ToString("D2")}";
-        }
+
         public class TTPhieuNhap
         {
             public PhieuNhapMap PhieuNhap { get; set; }

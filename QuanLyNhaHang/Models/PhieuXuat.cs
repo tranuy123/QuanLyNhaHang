@@ -20,6 +20,7 @@ namespace QuanLyNhaHang.Models
         public string SoPx { get; set; }
         public string SoHd { get; set; }
         public DateTime? NgayHd { get; set; }
+        public DateTime? NgayTao { get; set; }
         public string GhiChu { get; set; }
         public bool? Active { get; set; }
 

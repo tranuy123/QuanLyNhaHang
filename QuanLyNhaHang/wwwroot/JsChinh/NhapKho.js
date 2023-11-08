@@ -1,10 +1,26 @@
 ﻿$(document).ready(function () {
-    formatNumberInput() });
-$('#groupThemHangHoa').on('change', 'input[name="soLuong"], input[name="donGia"]', function () {
+    formatNumberInput()
+});
+$('#groupThemHangHoa').on('input', 'input[name="soLuong"], input[name="donGia"]', function () {
     var soLuong = parseInt($('#groupThemHangHoa input[name="soLuong"]').val().replace(/,/g, ''));
     var donGia = parseInt($('#groupThemHangHoa input[name="donGia"]').val().replace(/,/g, ''));
     if (!isNaN(soLuong) && !isNaN(donGia)) { // Kiểm tra xem giá trị soLuong và donGia có phải là số hợp lệ
         $('#groupThemHangHoa #thanhTien').val(formatTotal(soLuong * donGia));
+    }
+});
+$('#groupThemHangHoa').on('change', 'select[name = "hangHoa"]', function () {
+    var idhh = $(this).val();
+    if (idhh != '') {
+        $.ajax({
+            url: '/NhapKho/getDonViTinh', // Đường dẫn đến action xử lý form
+            method: 'POST',
+            data: {
+                idHH: idhh,
+            },
+            success: function (response) {
+                $('#groupThemHangHoa #donViTinh').val(response);
+            }
+        });
     }
 });
 function TinhTongTien() {
@@ -148,6 +164,8 @@ function ThemPhieuNhap() {
         success: function (response) {
             if (response.statusCode == 200) {
                 $('#tBody-ThemChiTietPhieuNhap').empty();
+                $('#tongTra').val('');
+
             }
             showToast(response.message, response.statusCode);
         }

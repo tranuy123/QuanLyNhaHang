@@ -1,0 +1,234 @@
+﻿@using System.Globalization;
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<NhaCungCap> getListNhaCungCap()
+    {
+        return context.NhaCungCap.Where(x => x.Active == true).ToList();
+    }
+    List<HangHoa> getListHangHoa()
+    {
+        return context.HangHoa
+        .Include(x => x.ChiTietPhieuNhap)
+        .ThenInclude(x => x.TonKho)
+        .Where(x => x.Active == true && x.ChiTietPhieuNhap.Any(pn => pn.TonKho.Any())).ToList();
+    }
+    NhanVien nv = context.NhanVien.Find(Int32.Parse(User.Identity.Name));
+
+}
+<div class="card">
+    <div class="card-body">
+
+        <!-- Bordered Tabs Justified -->
+        <ul class="nav nav-tabs nav-tabs-bordered d-flex" id="borderedTabJustified" role="tablist">
+            <li class="nav-item flex-fill" role="presentation">
+                <button class="nav-link w-100 active" id="home-tab" onclick="offTabXuat()" data-bs-toggle="tab" data-bs-target="#borderedTabJustifiedContent" type="button" role="tab" aria-controls="home" aria-selected="true">Phiếu xuất kho</button>
+            </li>
+            <li class="nav-item flex-fill" role="presentation">
+                <button class="nav-link w-100" id="profile-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Lịch sử xuất kho</button>
+            </li>
+        </ul>
+        <div class="tab-content pt-2">
+            <form enctype="multipart/form-data" method="post" class="tab-pane fade active show" id="borderedTabJustifiedContent">
+                <div id="bordered-justified-home" class="groupXuatHang" role="tabpanel" aria-labelledby="home-tab">
+                    <div class="form-group  p-2 mb-2" style="border-radius: 5px; border: 1px solid black; background-color: lightgrey;">
+                        <div class="row mb-2">
+                            <label class="col-sm-1 col-lg-1 col-form-label">Số phiếu</label>
+                            <div class="col-sm-2 col-lg-2">
+                                <input value="Auto" disabled type="text" class="form-control" id="inputText">
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Ng.Nhập</label>
+                            <div class="col-sm-2 col-lg-2">
+                                <input type="text" required name="ngayNhap" value="@DateTime.Now.ToString("dd-MM-yyyy HH:mm")" placeholder="dd-MM-yyyy" class="form-control" id="ngayNhap">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-sm-1 col-lg-1 col-form-label">Số HĐ</label>
+                            <div class="col-sm-2 col-lg-2">
+                                <input type="text" name="soHD" class="form-control" id="SoHD">
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Ngày HĐ</label>
+                            <div class="col-sm-2 col-lg-2">
+                                <input type="text" name="ngayHD" class="form-control" value="@DateTime.Now.ToString("dd-MM-yyyy")" placeholder="dd-MM-yyyy" id="NgayHD">
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Ghi chú</label>
+                            <div class="col-sm-5 col-lg-5">
+                                <textarea rows="1" name="ghiChu" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group p-2 mb-2" id="groupTTChiTiet" style="border-radius: 5px; border: 1px solid black;">
+                        <div class="row">
+                            <label class="col-sm-1 col-lg-1 col-form-label">Tên hàng</label>
+                            <div class="col-md-5 mb-2 col-lg-5">
+                                <select id="selectHH" name="idHangHoa" class="form-select">
+                                    <option selected disabled value="">-- Tên hàng hóa --</option>
+                                     @foreach (HangHoa h in getListHangHoa())
+                                    {
+                                        <option value="@h.Idhh">@h.TenHh</option>
+                                    }
+                                </select>
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">SL còn</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input type="text" readonly class="form-control formatted-number" id="sLCon" placeholder="Số lượng còn">
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">ĐV tính</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input type="text" readonly class="form-control" id="dVT" name="dVT" placeholder="Đơn vị tính">
+                            </div>
+
+                        </div>
+                        <div class="row">
+
+                            <label class="col-sm-1 col-lg-1 col-form-label formatted-number">Số lượng</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input type="text" class="form-control" data-toggle="popover" data-content="Không được để trống" id="SLHH" placeholder="Số lượng">
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label formatted-number">Đơn giá</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input type="text" class="form-control" readonly id="DonGia" placeholder="Đơn giá">
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label formatted-number">Th.Tiền</label>
+                            <div class="col-md-2 mb-2 col-lg-2">
+                                <input type="text" class="form-control"  id="ThanhTien" readonly placeholder="Thành tiền">
+                            </div>
+                            <div class="col-md-2 mb-2 col-lg-2 d-flex justify-content-end">
+                                <button class="btn btn-primary" onclick="addChiTietPhieuXuat()" type="button">Thêm </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="table-responsive" style="max-height: 400px;overflow-x: auto;white-space:nowrap;">
+                    <table class="table table-bordered table-hover table-striped text-center" id="tableChiTietPhieuNhap">
+                        <thead style="position: sticky; top: 0;">
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên hàng hóa</th>
+                                <th>ĐVT</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyChiTietPhieuXuat">
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-group p-2 mb-2" style="border-radius: 5px; border: 1px solid black;">
+                    <div class="row">
+                        <label class="col-sm-1 col-lg-1 col-form-label">Phải trả</label>
+                        <div class="col-md-2 col-lg-2">
+                            <input type="text" class="form-control" readonly id="TienThanhToan" placeholder="Thanh toán">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2 mb-1">
+                    <div class="row justify-content-end">
+                        <div class="col-auto">
+                            <button class="btn btn-primary" onclick="themPhieuXuat()">
+                                Tạo Phiếu xuất kho
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="tab-content">
+            <form action="/download/BaoCaoPhieuXuat" method="post" class="tab-pane fade" id="bordered-justified-profile" role="tabpanel" aria-labelledby="profile-tab">
+                <div class="form-group p-2 mb-2" id="groupTTSearchLichSu" style="border-radius: 5px; border: 1px solid black;">
+                    <div class="row">
+                        <label class="col-sm-1 col-lg-1 col-form-label">Tên KH</label>
+                        <div class="col-sm-5 col-lg-5">
+                            @* <select id="khLS" name="khLS" class="form-select2">
+                                <option selected value="0">Tất cả</option>
+                                 @foreach (KhachHang n in getListKH)
+                                {
+                                    <option value="@n.Id">@n.TenKh</option>
+                                } 
+                            </select> *@
+                        </div>
+                        <label class="col-sm-1 col-lg-1 col-form-label">Từ ngày</label>
+                        <div class="col-md-2 mb-2 col-lg-2">
+                            <input class="form-control" type="text" name="fromDay" id="fromDay" value="@DateTime.Now.ToString("dd-MM-yyyy")" placeholder="Từ ngày" />
+                        </div>
+                        <label class="col-sm-1 col-lg-1 col-form-label">Đến ngày</label>
+                        <div class="col-lg-2 col-sm-2">
+                            <input class="form-control" type="text" name="toDay" id="toDay" value="@DateTime.Now.ToString("dd-MM-yyyy")" placeholder="Tới ngày" />
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <label class="col-sm-1 col-lg-1 col-form-label">Hàng hoá</label>
+                        <div class="col-sm-4 col-lg-4">
+                            @* <select id="hhLS" name="hhLS" class="form-select2">
+                                <option selected value="0">Tất cả</option>
+                                 @foreach (HangHoa n in getListHH)
+                                {
+                                    <option value="@n.Id">@n.TenHh</option>
+                                } 
+                            </select> *@
+                        </div>
+                        <label class="col-sm-1 col-lg-1 col-form-label">Số phiếu</label>
+                        <div class="col-md-2 mb-2 col-lg-2">
+                            <input class="form-control" type="text" name="soPhieuLS" id="soPhieuLS" placeholder="Số phiếu" />
+                        </div>
+                        <label class="col-sm-1 col-lg-1 col-form-label">Số HĐ</label>
+                        <div class="col-md-2 mb-2 col-lg-2">
+                            <input class="form-control" type="text" name="soHDLS" id="soHDLS" placeholder="Số hoá đơn" />
+                        </div>
+                        <div class="col-md-1 mb-2 col-lg-1 d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary" onclick="loadTableLichSuXuat()"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="tableLichSuXuat" class="table-responsive" style="white-space:nowrap;overflow-y: auto;">
+                    <table id="LichSuNhap" class="table table-striped table-hover text-center display nowrap" style="width:100%;max-height:500px">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Số phiếu</th>
+                                <th class="text-center">Tên khách hàng</th>
+                                <th class="text-center">Ngày tạo</th>
+                                <th class="text-center">Số hoá đơn</th>
+                                <th class="text-center">Ngày hoá đơn</th>
+                                <th class="text-center">Nhân viên tạo</th>
+                                <th class="text-center">Ghi chú</th>
+                                <th class="text-center">Tùy chọn</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           @*   @foreach (PhieuXuat p in getListPhieuXuat())
+                            {
+                                <tr>
+                                    <td>@p.SoPx</td>
+                                    <td>@p.IdkhNavigation.TenKh</td>
+                                    <td>@p.NgayTao.Value.ToString("dd-MM-yyyy HH:mm")</td>
+                                    <td>@p.SoHd</td>
+                                    <td>@dayToString(p.NgayHd)</td>
+                                    <td>@p.IdnvNavigation.TenNv</td>
+                                    <td>@p.GhiChu</td>
+                                    <td>
+                                        <a href="PhieuNhapKhoPDF" class="btn btn-outline-success">In</a>
+                                        <button type="button" onclick="ViewPhieuXuat('@p.Id')" class="btn btn-outline-primary mx-1">Xem</button>
+                                    </td>
+                                </tr>
+                            }  *@
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-outline-success col-lg-2 col-sm-2" type="submit">Xuất tất cả</button>
+                    </div>
+                </div>
+            </form>
+            <div class="d-lg-none" id="tabXemPhieu">
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/jschinh/XuatKho.js" defer asp-append-version="true"></script>
+<script src="~/jschinh/common.js" defer asp-append-version="true"></script>

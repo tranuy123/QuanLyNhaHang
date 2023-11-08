@@ -1,0 +1,277 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<NhomHangHoa> nhomHangHoas = context.NhomHangHoa.Where(x => x.Active == true).ToList();
+    List<HangHoa> hangHoas = context.HangHoa.Where(x => x.Active == true).ToList();
+    List<NhaCungCap> nhaCungCaps = context.NhaCungCap.Where(x => x.Active == true).ToList();
+
+    NhanVien nv = context.NhanVien.Find(Int32.Parse(User.Identity.Name));
+
+}
+<style>
+    .red-header {
+        background-color: red;
+        color: white;
+    }
+
+</style>
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs nav-fill p-0" id="myTab" data-bs-toggle="tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a href="#tabs-lapPhieu" id="tab-lapphieu" class="nav-link text-dark active" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                    <!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home-plus" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M19 12h2l-9 -9l-9 9h2v7a2 2 0 0 0 2 2h5.5"></path>
+                        <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2"></path>
+                        <path d="M16 19h6"></path>
+                        <path d="M19 16v6"></path>
+                    </svg>
+                    Báo cáo tổng hợp
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a href="#tabs-dsPhieu" class="nav-link text-dark" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                    <!-- Download SVG icon from http://tabler-icons.io/i/user -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M9 6l11 0"></path>
+                        <path d="M9 12l11 0"></path>
+                        <path d="M9 18l11 0"></path>
+                        <path d="M5 6l0 .01"></path>
+                        <path d="M5 12l0 .01"></path>
+                        <path d="M5 18l0 .01"></path>
+                    </svg>
+                    Báo cáo chi tiết
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-body p-2">
+
+        <div class="tab-content">
+
+            <div class="tab-pane fade"
+                 role="tabpanel"
+                 aria-labelledby="detail-tab"
+                 id="tabXemPhieu">
+                <form action="/download/BaoCaoHoaDon" method="post">
+
+                    <div class="form-group p-2 mb-2"
+                         id="groupTTSearchLichSu"
+                         style="border-radius: 5px; border: 1px solid black">
+                        <div class="row">
+                            <label class="col-sm-1 col-lg-1 col-form-label">Nhóm hàng</label>
+                            <div class="col-sm-4 col-lg-2">
+                                <select name="nhomHang" class="form-select" style="width : 150px">
+                                    <option selected value="0">-- Nhóm hàng--</option>
+                                    @foreach (NhomHangHoa n in nhomHangHoas)
+                                    {
+                                        <option value="@n.Idnhh">@n.TenNhh</option>
+                                    }
+                                </select>
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Tên hàng hóa</label>
+                            <div class="col-sm-4 col-lg-2">
+                                <select name="hangHoa" class="form-select" style="width : 150px">
+                                    <option selected value="0">-- Tên hàng hóa--</option>
+                                    @foreach (HangHoa n in hangHoas)
+                                    {
+                                        <option value="@n.Idhh">@n.TenHh</option>
+                                    }
+                                </select>
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Từ ngày</label>
+                            <div class="col-lg-2 col-sm-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="tuNgay"
+                                       id ="tuNgay"
+                                       value="@DateTime.Now.ToString("dd-MM-yyyy")"
+                                       placeholder="Ngày nhập" />
+                            </div>
+                            <label class="col-sm-1 col-lg-1 col-form-label">Đến ngày</label>
+                            <div class="col-lg-2 col-sm-2">
+                                <input class="form-control"
+                                       type="text"
+                                       name="denNgay"
+                                       id="denNgay"
+                                       value="@DateTime.Now.ToString("dd-MM-yyyy")"
+                                       placeholder="Ngày nhập" />
+                            </div>
+
+                            <div class="col-md-1 mb-2 col-lg-1 d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary" onclick="loadBaoCaoTH()">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="table-BaoCaoTH" class="table-responsive" style="min-height:47vh;height:47vh;">
+                        <table class="table table-bordered table-vcenter table-input" id="tableTaoChiTietPhieuNhap">
+                            <thead>
+                                <tr class="text-wrap">
+                                    <th class="text-center p-1 first-th-column text-wrap" style="width:32px;">TT</th>
+                                    <th class="text-center p-1 w-25 text-wrap" style="position: sticky;left: 33px;z-index: 4 !important;">Mã hàng hóa</th>
+                                    <th class="text-center p-1 w-25 text-wrap" style="position: sticky;left: 33px;z-index: 4 !important;">Tên hàng hóa</th>
+                                    <th class="text-center p-1 text-wrap">Tổng số lượng tồn</th>
+                                    <th class="text-center p-1 text-wrap">Tổng giá trị tồn</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="tBody-BaoCaoTongHop">
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+                <div class="card-footer p-2">
+                    <div class="row">
+                        <div class="col-lg-2 col-12">
+                        </div>
+                        <div class="col-lg-2 col-12 mb-1">
+                        </div>
+                        <div class="col-lg-2 col-12 mb-1">
+                        </div>
+                        <div class="col-lg-2 col-12 mb-1">
+                        </div>
+                        <div class="col-lg-2 col-12 mb-1">
+                        </div>
+                        <div class="col-2 mb-1">
+                            <label class="form-label mb-0 text-white">.</label>
+                            <div class="row justify-content-end">
+                                <div class="col-auto">
+                                    <button class="btn btn-primary">
+                                        In PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane show active" id="tabs-dsPhieu" role="tabpanel">
+                <div class="card mb-2">
+                    <div class="card-status-top bg-blue"></div>
+                    <div class="card-header p-2">
+                        <div class="container px-0">
+                                <div class="col-12 mb-1">
+                                    <div class="row">
+                                        <div class="col-12 col-lg-3 mb-1">
+                                            <div class="row">
+                                            <label class="col-sm-auto col-lg-auto col-form-label">Từ ngày</label>
+                                                <div class="col-lg-8 col-sm-8">
+                                                    <input class="form-control"
+                                                           type="text"
+                                                           name="tuNgayCT"
+                                                           id="tuNgayCT"
+                                                           value="@DateTime.Now.ToString("dd-MM-yyyy")"
+                                                           placeholder="Từ Ngày" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 mb-1">
+                                            <div class="row">
+                                            <label class="col-sm-auto col-lg-auto col-form-label">Đến ngày</label>
+                                                <div class="col-lg-8 col-sm-8">
+                                                    <input class="form-control"
+                                                           type="text"
+                                                           name="denNgayCT"
+                                                           id="denNgayCT"
+                                                           value="@DateTime.Now.ToString("dd-MM-yyyy")"
+                                                           placeholder="Đến ngày" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-6 mb-1">
+                                            <div class="row">
+                                                <label class="col-form-label col-3">
+                                                    Nơi cung cấp:
+                                                </label>
+                                                <div class="col-9">
+                                                    <select class="form-select cbNhaCungCap" name="nhaCungCap">
+                                                        <option selected value="0">-- nhà cung cấp--</option>
+                                                        @foreach (NhaCungCap n in nhaCungCaps)
+                                                        {
+                                                            <option value="@n.Idncc">@n.TenNcc</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mb-1">
+                                    <div class="row">
+                                        <label class="col-sm-1 col-lg-1 col-form-label">Nhóm hàng</label>
+                                        <div class="col-sm-4 col-lg-2">
+                                            <select name="nhomHangCT" class="form-select" style="width : 150px">
+                                                <option selected value="0">-- Nhóm hàng--</option>
+                                                @foreach (NhomHangHoa n in nhomHangHoas)
+                                                {
+                                                    <option value="@n.Idnhh">@n.TenNhh</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-1 col-lg-1 col-form-label">Tên hàng hóa</label>
+                                        <div class="col-sm-4 col-lg-2">
+                                            <select name="hangHoaCT" class="form-select" style="width : 150px">
+                                                <option selected value="0">-- Tên hàng hóa--</option>
+                                                @foreach (HangHoa n in hangHoas)
+                                                {
+                                                    <option value="@n.Idhh">@n.TenHh</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-12 col-lg-1 mb-1">
+                                            <div class="row justify-content-end">
+                                                <div class="col-auto">
+                                                    <button class="btn btn-icon" onclick="loadBaoCaoCT()">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"></path><path d="M21 21l-6 -6"></path></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-2">
+                        <div style="display: none;" id="progress">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-indeterminate bg-blue"></div>
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="max-height:53vh;">
+                            <table class="table text-nowrap table-bordered table-vcenter">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center first-th-column">STT</th>
+                                        <th class="text-center">Ngày nhập</th>
+                                        <th class="text-center">Nhà cung cấp</th>
+                                        <th class="text-center">Mã hàng</th>
+                                        <th class="text-center">Tên hàng </th>
+                                        <th class="text-center">Ngày SX</th>
+                                        <th class="text-center">Hạn SD </th>
+                                        <th class="text-center">Số lượng nhập</th>
+                                        <th class="text-center">Số lượng xuất</th>
+                                        <th class="text-center">Số lượng tồn</th>
+                                        <th class="text-center">ĐVT</th>
+                                        <th class="text-center">Giá nhập</th>
+
+                                        <th class="text-center last-th-column">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBody-BaoCaoChiTiet">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="~/jschinh/TonKho.js" defer asp-append-version="true"></script>

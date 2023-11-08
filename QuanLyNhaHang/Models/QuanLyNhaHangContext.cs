@@ -25,6 +25,7 @@ namespace QuanLyNhaHang.Models
         public virtual DbSet<ChiTietHoaDonTam> ChiTietHoaDonTam { get; set; }
         public virtual DbSet<ChiTietPhieuNhap> ChiTietPhieuNhap { get; set; }
         public virtual DbSet<ChiTietPhieuXuat> ChiTietPhieuXuat { get; set; }
+        public virtual DbSet<DonViTinh> DonViTinh { get; set; }
         public virtual DbSet<Gia> Gia { get; set; }
         public virtual DbSet<HangHoa> HangHoa { get; set; }
         public virtual DbSet<HoaDon> HoaDon { get; set; }
@@ -192,9 +193,16 @@ namespace QuanLyNhaHang.Models
 
                 entity.Property(e => e.Idctpx).HasColumnName("IDCTPX");
 
+                entity.Property(e => e.Idctpn).HasColumnName("IDCTPN");
+
                 entity.Property(e => e.Idhh).HasColumnName("IDHH");
 
                 entity.Property(e => e.Idpx).HasColumnName("IDPX");
+
+                entity.HasOne(d => d.IdctpnNavigation)
+                    .WithMany(p => p.ChiTietPhieuXuat)
+                    .HasForeignKey(d => d.Idctpn)
+                    .HasConstraintName("FK_ChiTietPhieuXuat_ChiTietPhieuNhap");
 
                 entity.HasOne(d => d.IdhhNavigation)
                     .WithMany(p => p.ChiTietPhieuXuat)
@@ -205,6 +213,21 @@ namespace QuanLyNhaHang.Models
                     .WithMany(p => p.ChiTietPhieuXuat)
                     .HasForeignKey(d => d.Idpx)
                     .HasConstraintName("FK_ChiTietPhieuXuat_PhieuXuat");
+            });
+
+            modelBuilder.Entity<DonViTinh>(entity =>
+            {
+                entity.HasKey(e => e.Iddvt);
+
+                entity.Property(e => e.Iddvt).HasColumnName("IDDVT");
+
+                entity.Property(e => e.MaDvt)
+                    .HasColumnName("MaDVT")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.TenDvt)
+                    .HasColumnName("TenDVT")
+                    .HasMaxLength(100);
             });
 
             modelBuilder.Entity<Gia>(entity =>
@@ -236,6 +259,8 @@ namespace QuanLyNhaHang.Models
 
                 entity.Property(e => e.Idhh).HasColumnName("IDHH");
 
+                entity.Property(e => e.Iddvt).HasColumnName("IDDVT");
+
                 entity.Property(e => e.Idnhh).HasColumnName("IDNHH");
 
                 entity.Property(e => e.MaHh)
@@ -245,6 +270,11 @@ namespace QuanLyNhaHang.Models
                 entity.Property(e => e.TenHh)
                     .HasColumnName("TenHH")
                     .HasMaxLength(100);
+
+                entity.HasOne(d => d.IddvtNavigation)
+                    .WithMany(p => p.HangHoa)
+                    .HasForeignKey(d => d.Iddvt)
+                    .HasConstraintName("FK_HangHoa_DonViTinh");
 
                 entity.HasOne(d => d.IdnhhNavigation)
                     .WithMany(p => p.HangHoa)
@@ -493,6 +523,8 @@ namespace QuanLyNhaHang.Models
                     .HasColumnName("NgayHD")
                     .HasColumnType("datetime");
 
+                entity.Property(e => e.NgayTao).HasColumnType("datetime");
+
                 entity.Property(e => e.SoHd)
                     .HasColumnName("SoHD")
                     .HasMaxLength(100);
@@ -566,6 +598,8 @@ namespace QuanLyNhaHang.Models
 
                 entity.Property(e => e.Detail).HasMaxLength(800);
 
+                entity.Property(e => e.Idhh).HasColumnName("IDHH");
+
                 entity.Property(e => e.Idnta).HasColumnName("IDNTA");
 
                 entity.Property(e => e.Image).HasMaxLength(250);
@@ -575,6 +609,11 @@ namespace QuanLyNhaHang.Models
                     .HasMaxLength(50);
 
                 entity.Property(e => e.Ten).HasMaxLength(200);
+
+                entity.HasOne(d => d.IdhhNavigation)
+                    .WithMany(p => p.ThucDon)
+                    .HasForeignKey(d => d.Idhh)
+                    .HasConstraintName("FK_ThucDon_HangHoa");
 
                 entity.HasOne(d => d.IdntaNavigation)
                     .WithMany(p => p.ThucDon)

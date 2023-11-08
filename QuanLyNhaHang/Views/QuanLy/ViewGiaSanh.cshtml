@@ -1,8 +1,10 @@
 ﻿@{
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-    List<ThucDon> getTD()
-    {
-        return context.ThucDon.Where(x => x.Active == true).OrderByDescending(x =>x.Idnta).ToList();
+    int idSanh = ViewBag.Idsanh;
+    List<ThucDon> thucDons =  context.ThucDon
+        .Include(x => x.Gia)
+        .Where(x => x.Active == true
+        ).OrderByDescending(x =>x.Idnta).ToList();
     }
    
 }
@@ -43,7 +45,7 @@
                     </tr>
                 </thead>
                 <tbody id="tbodygia">
-                    @foreach (ThucDon item in getTD())
+                    @foreach (ThucDon item in thucDons)
                     {
                         <tr>
                             <td>@item.MaTd
@@ -52,11 +54,11 @@
                             <td>@item.Ten</td>
                             @if (@getGia(ViewBag.Idsanh, item.Idtd) != null)
                             {
-                                <td class="giacell" data-idsanh="@ViewBag.Idsanh" data-idtd="@item.Idtd">@getGia(ViewBag.Idsanh,item.Idtd).Gia1</td>
+                                <td class="giacell formatted-number" data-idsanh="@ViewBag.Idsanh" data-idtd="@item.Idtd">@getGia(ViewBag.Idsanh,item.Idtd).Gia1</td>
                             }
                             else
                             {
-                                <td class="giacell" data-idsanh="@ViewBag.Idsanh" data-idtd="@item.Idtd"></td>
+                                <td class="giacell formatted-number" data-idsanh="@ViewBag.Idsanh" data-idtd="@item.Idtd"></td>
                             }
                             @if (@getGia(ViewBag.Idsanh, item.Idtd) != null)
                             {
@@ -83,134 +85,4 @@
     </div>
 
 </div>
-<script>
-    function changeHH() {
-        var active = $('#active').val();
-        var ids = $("#IDS").val();
-
-        $.ajax({
-            type: "post",
-            url: "/loadViewGia",
-            data: "active=" + active + "&ids=" + ids,
-            success: function (result) {
-                $('.table-responsive').replaceWith(result);
-            },
-            error: function () {
-                alert("Fail to delete");
-            }
-        });
-    }
-</script>
-<script>
-    $(function () {
-        $('table').on('click', '.btnthem', function () {
-            var $cell = $(this).closest('tr').find('.giacell');
-            var idsanh = $cell.data('idsanh');
-            var idtd = $cell.data('idtd');
-             var $btnLuu = $(this).closest('tr').find('.btnLuu');
-            var $btnHuy = $(this).closest('tr').find('.btnHuy1');
-            var $btnxoa = $(this).closest('tr').find('.btnxoa');
-
-            $cell.html('<input type="number" class="form-control" value="" />');
-            $btnLuu.removeClass("d-none");
-            $btnHuy.removeClass("d-none");
-            $btnxoa.addClass("d-none");
-
-            $(this).addClass("d-none");
-        });
-        $('table').on('click', '.btnsua', function () {
-            var $cell = $(this).closest('tr').find('.giacell');
-            var value = $cell.text();
-            var $btnLuu = $(this).closest('tr').find('.btnLuu');
-            var $btnHuy = $(this).closest('tr').find('.btnHuy');
-            var $btnxoa = $(this).closest('tr').find('.btnxoa');
-
-            var initial_value = value;
-
-            $cell.html('<input type="number" class="form-control" value="' + value + '" />');
-            $btnLuu.removeClass("d-none");
-            $btnHuy.removeClass("d-none");
-            $btnxoa.addClass("d-none");
-
-            $(this).addClass("d-none");
-            $cell.find('input').attr('data-initial-value', initial_value);
-
-        });
-        $('table').on('click', '.btnHuy', function () {
-            var $cell = $(this).closest('tr').find('.giacell');
-            // Đặt lại giá trị của ô input bằng giá trị ban đầu lưu trong data-initial-value
-            var initial_value = $cell.find('input').attr('data-initial-value');
-            $cell.html(initial_value);
-            $(".btnsua").removeClass("d-none");
-            $(".btnxoa").removeClass("d-none");
-
-            $(".btnLuu").addClass("d-none");
-            $(".btnHuy").addClass("d-none");
-        });
-        $('table').on('click', '.btnHuy1', function () {
-            var $cell = $(this).closest('tr').find('.giacell');
-            // Đặt lại giá trị của ô input bằng giá trị ban đầu lưu trong data-initial-value
-            $cell.html('<td></td>');
-
-            $(".btnthem").removeClass("d-none");
-            $(".btnxoa").removeClass("d-none");
-
-            $(".btnLuu").addClass("d-none");
-            $(".btnHuy1").addClass("d-none");
-        });
-
-        $('table').on('click', '.btnLuu', function () {
-            var idtd = $(this).closest('tr').find('input').val();
-            var ids = $("#IDS").val();
-            var $cell = $(this).closest('tr').find('.giacell');
-            var gia = $cell.find('input').val();
-
-            $.ajax({
-                type: "post",
-                url: "/UpdateGia",
-                data: "idtd=" + idtd + "&ids=" + ids + "&gia=" + gia,
-                success: function (result) {
-                    var new_value = $cell.find('input').val();
-                    $cell.html(new_value);
-                    $(".btnsua").removeClass("d-none");
-                    $(".btnthem").removeClass("d-none");
-
-                    $(".btnLuu").addClass("d-none");
-                    $(".btnHuy").addClass("d-none");
-                    $(".btnHuy1").addClass("d-none");
-                    $("#tbodygia").load(location.href + " #tbodygia>*", function () {
-                    });
-
-                },
-                error: function () {
-                    alert("Fail to delete");
-                }
-            });
-            
-        });
-        $('table').on('click', '.btnxoa', function () {
-            var idtd = $(this).closest('tr').find('input').val();
-            var ids = $("#IDS").val();
-
-            // Hỏi người dùng xác nhận xóa
-            var confirmDelete = confirm("Bạn có chắc muốn xóa?");
-
-            if (confirmDelete) {
-                $.ajax({
-                    type: "post",
-                    url: "/DeleteGia",
-                    data: "idtd=" + idtd + "&ids=" + ids,
-                    success: function (result) {
-                        $("#tbodygia").load(location.href + " #tbodygia>*", function () {
-                        });
-                    },
-                    error: function () {
-                        alert("Fail to delete");
-                    }
-                });
-            }
-        });
-
-
-    });
-</script>
+<script src="~/jschinh/giasanh.js"></script>

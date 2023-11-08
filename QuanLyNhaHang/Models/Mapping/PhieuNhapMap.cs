@@ -10,7 +10,7 @@ namespace QuanLyNhaHang.Models.Mapping
         public string? Idnv { get; set; }
         public string SoPn { get; set; }
         public string SoHd { get; set; }
-        public string? NgayNhap { get; set; }
+        public string NgayNhap { get; set; }
         public string? NgayHd { get; set; }
         public string GhiChu { get; set; }
         public bool? Active { get; set; }

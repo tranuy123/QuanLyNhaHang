@@ -17,7 +17,7 @@ namespace QuanLyNhaHang.Controllers
         [HttpGet]
         public IActionResult BaoCao() 
         {
-            return View();
+            return View("BaoCaoLoiNhuan");
         }
         [HttpPost("/doanhThuTheoNgay")]
         public async Task<dynamic> doanhThuTheoNgay(string fromDay, string toDay)
@@ -50,6 +50,47 @@ namespace QuanLyNhaHang.Controllers
               })
               .ToListAsync();
             return data;
+        }
+        [HttpPost("/baoCaoLoiNhuan")]
+        public async Task<dynamic> baoCaoLoiNhuan()
+        {
+            var doanhThu = await context.HoaDon
+              .Where(x => x.Tgxuat != null)
+              .OrderBy(x => x.Tgxuat)
+              .GroupBy(x => x.Tgxuat.Value.Month)
+              .Select(x => new
+              {
+                  label = x.Key,
+                  doanhthu = x.Sum(x => x.TongTien)
+              })
+              .ToListAsync();
+            var giaVon = context.PhieuNhap
+              .Include(x => x.ChiTietPhieuNhap)
+              .Where(x => x.NgayNhap != null)
+              .ToList()
+              .OrderBy(x => x.NgayNhap)
+              .GroupBy(x => x.NgayNhap.Value.Month)
+              .Select(x => new
+              {
+                  label = x.Key,
+                  doanhthu = tongPhieuNhap(x.ToList()),
+              })
+              .ToList();
+            return new
+            {
+                doanhThu = doanhThu,
+                giaVon = giaVon,
+            };
+        }
+        public double tongPhieuNhap(List<PhieuNhap> phieuNhaps)
+        {
+            double tong = (double)phieuNhaps.Sum(x => x.ChiTietPhieuNhap.Sum(ct => ct.Gia));
+            return tong;
+        }
+        public double tongChiTietPhieuNhap(List<ChiTietPhieuNhap> chiTietPhieuNhaps)
+        {
+            double tong = (double)chiTietPhieuNhaps.Sum(ct => ct.Gia);
+            return tong;
         }
         // -------------------------------------------------- đánh giá hiệu xuất nhân viên
         [HttpGet("/BaoCao/HieuSuatNhanVien")]

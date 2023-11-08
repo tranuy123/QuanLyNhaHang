@@ -120,7 +120,7 @@
                         <div class="row">
                             <label class="col-sm-1 col-lg-1 col-form-label">Tên hàng hóa</label>
                             <select name="hangHoa" class="form-select" style="width : 200px">
-                                <option selected>-- Tên hàng hóa--</option>
+                                <option selected value="">-- Tên hàng hóa--</option>
                                 @foreach (HangHoa n in getListHangHoa())
                                 {
                                     <option value="@n.Idhh">@n.TenHh</option>
@@ -130,9 +130,10 @@
                             <div class="col-sm-4 col-lg-2">
                                 <input class="form-control"
                                        type="text"
+                                       readonly
                                        name="donViTinh"
                                        id="donViTinh"
-                                       value="Thùng"
+                                       value=""
                                        placeholder="Ngày sản xuất" />
                             </div>
                             <label class="col-sm-1 col-lg-1 col-form-label">Ngày sản xuất</label>
