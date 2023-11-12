@@ -22,15 +22,20 @@
                     <label style="margin:7px 0;">Tên nhóm thức ăn</label>
                     <input asp-for="@Model.TenNta" type="text" class="form-control" required>
                 </div>
+
+                <div class="row justify-content-between">
+                    <div class="col-sm-2 col-form-label">
+                        <button class="btn btn-secondary" type="button" onclick="window.history.go(-1);"> Quay lại</button>
+                    </div>
+                    <div class="col-sm-auto col-form-label b">
+                        <input type="submit" class="btn btn-primary" value="Thêm">
+                    </div>
+
+                </div>
+
             </div>
             
-            <div class="forms-footer" style="justify-content:space-between">
-
-                <input type="submit" class="btn btn-primary" value="Thêm">
-            </div>
         </form>
-        <button class="btn btn-secondary" onclick="window.history.go(-1);">
-            Quay lại
-        </button>
+
     </div>
 </div>
