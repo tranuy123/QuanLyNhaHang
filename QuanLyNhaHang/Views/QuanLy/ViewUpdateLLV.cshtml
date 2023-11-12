@@ -30,52 +30,60 @@
                 <h4 class="forms-title "><b>@ViewData["Title"]</b></h4>
             </div>
             
-            <div>
-                <label style="margin:7px 0;">Khu</label>
-                <input type="hidden" asp-for="@Model.Idllv" value="@Model.Idllv"/>
-                <select required class="custom-select" asp-for="@Model.Idkhu" id="Idsanh" aria-label="Default select example">
-                    <option value="" selected disabled>@Model.IdkhuNavigation.TenKhu</option>
+            <div class="form-body"
 
-                    @foreach (Khu item in getListSanh())
-                    {
+                <div>
+                    <label style="margin:7px 0;">Khu</label>
+                    <input type="hidden" asp-for="@Model.Idllv" value="@Model.Idllv"/>
+                    <select required class="custom-select" asp-for="@Model.Idkhu" id="Idsanh" aria-label="Default select example">
+                        <option value="" selected disabled>@Model.IdkhuNavigation.TenKhu</option>
 
-                        <option value="@item.Idkhu">@item.TenKhu</option>
-                    }
-                </select>
-            </div>
-            <div>
-                <label style="margin:7px 0;">Nhân viên</label>
-                <select required class="custom-select" asp-for="@Model.Idnv" id="Idsanh" aria-label="Default select example">
-                    <option value="" selected disabled>@Model.IdnvNavigation.Ten</option>
+                        @foreach (Khu item in getListSanh())
+                        {
 
-                    @foreach (NhanVien item in getListNV())
-                    {
+                            <option value="@item.Idkhu">@item.TenKhu</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label style="margin:7px 0;">Nhân viên</label>
+                    <select required class="custom-select" asp-for="@Model.Idnv" id="Idsanh" aria-label="Default select example">
+                        <option value="" selected disabled>@Model.IdnvNavigation.Ten</option>
 
-                        <option value="@item.Idnv">@item.Ten</option>
-                    }
-                </select>
-            </div>
-            <div>
-                <label style="margin:7px 0;">Ca</label>
-                <select required class="custom-select" asp-for="@Model.Idca" id="Idsanh" aria-label="Default select example">
-                    <option value="" selected disabled>@Model.IdcaNavigation.TenCa</option>
+                        @foreach (NhanVien item in getListNV())
+                        {
 
-                    @foreach (Ca item in getListCa())
-                    {
+                            <option value="@item.Idnv">@item.Ten</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label style="margin:7px 0;">Ca</label>
+                    <select required class="custom-select" asp-for="@Model.Idca" id="Idsanh" aria-label="Default select example">
+                        <option value="" selected disabled>@Model.IdcaNavigation.TenCa</option>
 
-                        <option value="@item.Idca">@item.TenCa</option>
-                    }
-                </select>
-            </div>
+                        @foreach (Ca item in getListCa())
+                        {
+
+                            <option value="@item.Idca">@item.TenCa</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="row justify-content-between">
+                    <div class="col-sm-2 col-form-label">
+                        <button class="btn btn-secondary" type="button" onclick="window.history.go(-1);"> Quay lại</button>
+                    </div>
+                    <div class="col-sm-auto col-form-label b">
+                        <input type="submit" class="btn btn-primary" value="Sửa">
+                    </div>
+
+                </div>
         
-            <div class="forms-footer" style="justify-content:space-between">
 
-                <input type="submit" class="btn btn-primary" value="Sửa">
             </div>
         </form>
-        <button class="btn btn-secondary" onclick="window.history.go(-1);">
-            Quay lại
-        </button>
+
 
     </div>
 </div>

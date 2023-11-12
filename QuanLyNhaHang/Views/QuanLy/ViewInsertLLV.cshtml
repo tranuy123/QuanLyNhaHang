@@ -23,52 +23,60 @@
             <div class="forms-header text-center">
                 <h4 class="forms-title "><b>Thêm lịch làm việc</b></h4>
             </div>
-         
-            <div>
-                <label style="margin:7px 0;">Khu</label>
-                <select required class="custom-select" asp-for="@Model.Idkhu" aria-label="Default select example">
-                    <option value="" selected disabled> --Khu--</option>
+            
 
-                    @foreach (Khu item in getListKhu())
-                    {
+            <div class="form-body">
+                <div>
+                    <label style="margin:7px 0;">Khu</label>
+                    <select required class="custom-select" asp-for="@Model.Idkhu" aria-label="Default select example">
+                        <option value="" selected disabled> --Khu--</option>
 
-                        <option value="@item.Idkhu">@item.TenKhu</option>
-                    }
-                </select>
+                        @foreach (Khu item in getListKhu())
+                        {
+
+                            <option value="@item.Idkhu">@item.TenKhu</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label style="margin:7px 0;">Nhân viên</label>
+                    <select required class="custom-select" asp-for="@Model.Idnv" aria-label="Default select example">
+                        <option value="" selected disabled> --Nhân viên--</option>
+
+                        @foreach (NhanVien item in getListNV())
+                        {
+
+                            <option value="@item.Idnv">@item.Ten</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label style="margin:7px 0;">Ca</label>
+                    <select required class="custom-select" asp-for="@Model.Idca" aria-label="Default select example">
+                        <option value="" selected disabled> --Ca--</option>
+
+                        @foreach (Ca item in getListCa())
+                        {
+
+                            <option value="@item.Idca">@item.TenCa</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="row justify-content-between">
+                    <div class="col-sm-2 col-form-label">
+                        <button class="btn btn-secondary" type="button" onclick="window.history.go(-1);"> Quay lại</button>
+                    </div>
+                    <div class="col-sm-auto col-form-label b">
+                        <input type="submit" class="btn btn-primary" value="Thêm">
+                    </div>
+
+                </div>
             </div>
-            <div>
-                <label style="margin:7px 0;">Nhân viên</label>
-                <select required class="custom-select" asp-for="@Model.Idnv" aria-label="Default select example">
-                    <option value="" selected disabled> --Nhân viên--</option>
 
-                    @foreach (NhanVien item in getListNV())
-                    {
 
-                        <option value="@item.Idnv">@item.Ten</option>
-                    }
-                </select>
-            </div>
-            <div>
-                <label style="margin:7px 0;">Ca</label>
-                <select required class="custom-select" asp-for="@Model.Idca" aria-label="Default select example">
-                    <option value="" selected disabled> --Ca--</option>
-
-                    @foreach (Ca item in getListCa())
-                    {
-
-                        <option value="@item.Idca">@item.TenCa</option>
-                    }
-                </select>
-            </div>
-
-            <div class="forms-footer" style="justify-content:space-between">
-
-                <input type="submit" class="btn btn-primary" value="Thêm">
-            </div>
         </form>
-        <button class="btn btn-secondary" onclick="window.history.go(-1);">
-            Quay lại
-        </button>
+
     </div>
 </div>
 

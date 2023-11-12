@@ -24,27 +24,34 @@
                     <label style="margin:7px 0;">Tên sảnh</label>
                     <input asp-for="@Model.TenKhu" type="text" class="form-control" required>
                 </div>
-            </div>
-            <div>
-                <label style="margin:7px 0;">Sảnh</label>
-                <select required class="form-select" asp-for="@Model.Idsanh" aria-label="Default select example">
-                    <option value="" disabled> --Sảnh--</option>
 
-                    @foreach (Sanh item in getListSanh())
-                    {
+                <div>
+                    <label style="margin:7px 0;">Sảnh</label>
+                    <select required class="form-select" asp-for="@Model.Idsanh" aria-label="Default select example">
+                        <option value="" disabled> --Sảnh--</option>
 
-                        <option value="@item.Idsanh">@item.TenSanh</option>
-                    }
-                </select>
-            </div>
-            <div class="forms-footer" style="justify-content:space-between">
+                        @foreach (Sanh item in getListSanh())
+                        {
 
-                <input type="submit" class="btn btn-primary" value="Sửa">
+                            <option value="@item.Idsanh">@item.TenSanh</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="row justify-content-between">
+                    <div class="col-sm-2 col-form-label">
+                        <button class="btn btn-secondary" type="button" onclick="window.history.go(-1);"> Quay lại</button>
+                    </div>
+                    <div class="col-sm-auto col-form-label b">
+                        <input type="submit" class="btn btn-primary" value="Sửa">
+                    </div>
+
+                </div>
+
+
             </div>
         </form>
-        <button class="btn btn-secondary" onclick="window.history.go(-1);">
-            Quay lại
-        </button>
+
 
     </div>
 </div>

@@ -28,8 +28,8 @@
                     <label style="margin:7px 0;">Tên bàn</label>
                     <input asp-for="@Model.TenBan" type="text" class="form-control" required>
                 </div>
-            </div>
-            <div>
+
+
                 <label style="margin:7px 0;">Sảnh</label>
                 <select required class="custom-select" id="Idsanh" aria-label="Default select example">
                     <option value="" selected disabled> --Sảnh--</option>
@@ -40,24 +40,59 @@
                         <option value="@item.Idsanh">@item.TenSanh</option>
                     }
                 </select>
+
+
+                <label style="margin:7px 0;">Khu</label>
+                <select required id="Idkhu" class="custom-select" asp-for="@Model.Idkhu" aria-label="Default select example">
+                    <option value="" selected disabled> --Sảnh--</option>
+
+
+                </select>
+
+
+
+                <div class="row justify-content-between">
+                    <div class="col-sm-2 col-form-label">
+                        <button class="btn btn-secondary" type="button" onclick="window.history.go(-1);"> Quay lại</button>
+                    </div>
+                    <div class="col-sm-auto col-form-label b">
+                        <input type="submit" class="btn btn-primary" value="Thêm">
+                    </div>
+
+                </div>
+
+                
+
             </div>
-            <div>
+           @* <div>
+                <label style="margin:7px 0;">Sảnh</label>
+                <select required class="custom-select" id="Idsanh" aria-label="Default select example">
+                    <option value="" selected disabled> --Sảnh--</option>
+
+                    @foreach (Sanh item in getListSanh())
+                    {
+
+                        <option value="@item.Idsanh">@item.TenSanh</option>
+                    }
+                </select>
+            </div>*@
+           @* <div>
                 <label style="margin:7px 0;">Khu</label>
                 <select required id="Idkhu" class="custom-select" asp-for="@Model.Idkhu" aria-label="Default select example">
                     <option value="" selected disabled> --Sảnh--</option>
 
                   
                 </select>
-            </div>
+            </div>*@
 
-            <div class="forms-footer" style="justify-content:space-between">
+            @*<div class="forms-footer" style="justify-content:space-between">
 
                 <input type="submit" class="btn btn-primary" value="Thêm">
-            </div>
+            </div>*@
         </form>
-        <button class="btn btn-secondary" onclick="window.history.go(-1);">
+        @*<button class="btn btn-secondary" type="button" onclick="window.history.go(-1);">
             Quay lại
-        </button>
+        </button>*@
     </div>
 </div>
 <script>

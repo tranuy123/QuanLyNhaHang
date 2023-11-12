@@ -24,39 +24,47 @@
                     <label style="margin:7px 0;">Tên ca</label>
                     <input asp-for="@Model.TenCa" type="text" class="form-control" required>
                 </div>
+
+                <div>
+                    <label style="margin:7px 0;">Thứ</label>
+                    <select required class="custom-select" asp-for="@Model.Thu" aria-label="Default select example">
+                        <option value="" selected disabled> --Thứ--</option>
+
+
+
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+
+
+
+
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Thời gian bắt đầu</label>
+                    <input asp-for="@Model.TgbatDau" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Thời gian kết thúc</label>
+                    <input asp-for="@Model.TgketThuc" type="text" class="form-control" required>
+                </div>
+
+                <div class="row justify-content-between">
+                    <div class="col-sm-2 col-form-label">
+                        <button class="btn btn-secondary" type="button" onclick="window.history.go(-1);"> Quay lại</button>
+                    </div>
+                    <div class="col-sm-auto col-form-label b">
+                        <input type="submit" class="btn btn-primary" value="Sửa">
+                    </div>
+
+                </div>
             </div>
-            <div>
-                <label style="margin:7px 0;">Thứ</label>
-                <select required class="custom-select" asp-for="@Model.Thu" aria-label="Default select example">
-                    <option value="" selected disabled> --Thứ--</option>
-
-
-
-                    <option value="Monday">Monday</option>
-                    <option value="Tuesday">Tuesday</option>
-                    <option value="Wednesday">Wednesday</option>
-                    <option value="Thursday">Thursday</option>
-                    <option value="Friday">Friday</option>
-                    <option value="Saturday">Saturday</option>
-                    <option value="Sunday">Sunday</option>
-
-
-
-
-                </select>
-            </div>
-            <div class="form-group">
-                <label style="margin:7px 0;">Thời gian bắt đầu</label>
-                <input asp-for="@Model.TgbatDau" type="text" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label style="margin:7px 0;">Thời gian kết thúc</label>
-                <input asp-for="@Model.TgketThuc" type="text" class="form-control" required>
-            </div>
-            <div class="forms-footer" style="justify-content:space-between">
-
-                <input type="submit" class="btn btn-primary" value="Sửa">
-            </div>
+            
         </form>
         <button class="btn btn-secondary" onclick="window.history.go(-1);">
             Quay lại

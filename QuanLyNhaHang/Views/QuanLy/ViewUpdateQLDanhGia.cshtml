@@ -31,39 +31,45 @@
                     <label style="margin:7px 0;">Tên đánh giá</label>
                     <input asp-for="@Model.Ten" type="text" class="form-control" required>
                 </div>
-            </div>
-            <div>
-                <label style="margin:7px 0;">Nhóm nhân viên</label>
-                <select class="custom-select" id="Idsanh" aria-label="Default select example">
-                    <option value="" selected disabled>@getNNV(Model.Idnnv).TenNnv</option>
 
-                    @foreach (NhomNhanVien item in getListNNV())
-                    {
+                <div>
+                    <label style="margin:7px 0;">Nhóm nhân viên</label>
+                    <select class="custom-select" id="Idsanh" aria-label="Default select example">
+                        <option value="" selected disabled>@getNNV(Model.Idnnv).TenNnv</option>
 
-                        <option value="@item.Idnnv">@item.TenNnv</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label style="margin:7px 0;">Thời gian hoàn thành từ</label>
-                <input asp-for="@Model.ThoiGianTu" type="text" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label style="margin:7px 0;">Thời gian hoàn thành đến</label>
-                <input asp-for="@Model.ThoiGianDen" type="text" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label style="margin:7px 0;">Điểm</label>
-                <input asp-for="@Model.Diem" type="text" class="form-control" required>
-            </div>
-            <div class="forms-footer" style="justify-content:space-between">
+                        @foreach (NhomNhanVien item in getListNNV())
+                        {
 
-                <input type="submit" class="btn btn-primary" value="Sửa">
+                            <option value="@item.Idnnv">@item.TenNnv</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Thời gian hoàn thành từ</label>
+                    <input asp-for="@Model.ThoiGianTu" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Thời gian hoàn thành đến</label>
+                    <input asp-for="@Model.ThoiGianDen" type="text" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label style="margin:7px 0;">Điểm</label>
+                    <input asp-for="@Model.Diem" type="text" class="form-control" required>
+                </div>
+
+                <div class="row justify-content-between">
+                    <div class="col-sm-2 col-form-label">
+                        <button class="btn btn-secondary" type="button" onclick="window.history.go(-1);"> Quay lại</button>
+                    </div>
+                    <div class="col-sm-auto col-form-label b">
+                        <input type="submit" class="btn btn-primary" value="Sửa">
+                    </div>
+
+                </div>
+
             </div>
         </form>
-        <button class="btn btn-secondary" onclick="window.history.go(-1);">
-            Quay lại
-        </button>
+
 
     </div>
 </div>
