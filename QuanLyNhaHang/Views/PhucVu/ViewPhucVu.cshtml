@@ -8,14 +8,16 @@
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
     var ca = context.Ca.FirstOrDefault(x => x.Thu == dayOfWeekString && now.TimeOfDay >= x.TgbatDau && now.TimeOfDay <= x.TgketThuc && x.Active==true).Idca;
     int idnv = int.Parse(User.FindFirstValue(ClaimTypes.Name));
-    var idkhu = context.LichLamViec.FirstOrDefault(x => x.Idca == ca && x.Idnv== idnv && x.Active==true).Idkhu;
+    var idkhu = context.LichLamViec.FirstOrDefault(x => x.Idca == ca && x.Idnv== idnv && x.Active==true)?.Idkhu;
+
     List<ChiTietHoaDon> listCTHDPV(){
         return  context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation)
                     .Include(x => x.IdtdNavigation)
                     .Where(x => x.IdhdNavigation.IdbanNavigation.Idkhu == idkhu && x.TghoanThanh != null && x.TgphucVu ==null).ToList();
-    } 
+    }
 
 }
+
                             <!-- simple table -->
                                 <div class="card shadow">
                                     <div class="card-body">

@@ -66,34 +66,61 @@ namespace QuanLyNhaHang.Controllers
             return PartialView();
         }
         [HttpPost("/addHoaDon")]
-        public string addHoaDon(string IPMAC,int IDTD, float DonGia)
+        public dynamic addHoaDon(string IPMAC,int IDTD, float DonGia)
         {
-            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-            ChiTietHoaDonTam ct = new ChiTietHoaDonTam();
-            
-            ct.Ipmac = IPMAC;
-            ct.Idtd = IDTD;
-            ct.DonGia = DonGia;
-            ct.Sl = 1;
-            ct.ThanhTien = DonGia;
-            context.ChiTietHoaDonTam.Add(ct);
-            context.SaveChanges();
+            try
+            {
 
 
-            return "Thêm món thành công";
+                QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+                ChiTietHoaDonTam ct = new ChiTietHoaDonTam();
+
+                ct.Ipmac = IPMAC;
+                ct.Idtd = IDTD;
+                ct.DonGia = DonGia;
+                ct.Sl = 1;
+                ct.ThanhTien = DonGia;
+                context.ChiTietHoaDonTam.Add(ct);
+                context.SaveChanges();
+                return new
+                {
+                    StatusCode = 200,
+                    message = "Hủy món thành công",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new
+                {
+                    StatusCode = 500,
+                    message = "Hủy món thất bại",
+                };
+            }
+
         }
         [HttpPost("/HuyHoaDonTam")]
-        public string HuyHoaDonTam(string IPMAC, int IDTD)
+        public dynamic HuyHoaDonTam(string IPMAC, int IDTD)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             ChiTietHoaDonTam ct = context.ChiTietHoaDonTam.FirstOrDefault(x =>x.Ipmac == IPMAC && x.Idtd==IDTD);
-
-           
-            context.ChiTietHoaDonTam.Remove(ct);
-            context.SaveChanges();
-
-
-            return "Hủy món thành công";
+            try
+            {
+                context.ChiTietHoaDonTam.Remove(ct);
+                context.SaveChanges();
+                return new
+                {
+                    StatusCode = 200,
+                    message = "Hủy món thành công",
+                };
+            }
+            catch(Exception ex)
+            {
+                return new
+                {
+                    StatusCode = 500,
+                    message = "Hủy món thất bại",
+                };
+            }
         }
         [HttpPost("/UpdateSL")]
         public string UpdateSL(int IDCTHDT, int SL, string DonGia, string ThanhTien)

@@ -433,5 +433,14 @@ namespace SignalRChat.Hubs
                 tran.Rollback();
             }
         }
+        public async Task YeuCauHoTro(string mac)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
+                Ban ban = context.Ban.FirstOrDefault(x => x.Ipmac == mac);
+
+
+            await Clients.All.SendAsync("NhanYeuCauHoTro", ban);
+        }
     }
 }

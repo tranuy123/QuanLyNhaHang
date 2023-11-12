@@ -337,3 +337,35 @@ $(document).ready(function () {
         });
     });
 });
+//------------------------------------------------------------------
+connection.on("NhanYeuCauHoTro", function (item) {
+    console.log(item);
+    var idkhu = $("#idKhuOrderPhucVu").val();
+    console.log(idkhu);
+    var tbody = $("#tbody-ThongBao");
+
+    tbody.empty(); // Xóa bỏ các hàng hiện tại trong bảng
+
+            var tr = $(`<tr>
+                        <td>${item.tenBan}</td>
+                        <td></td>
+                    </tr>`);
+            tbody.append(tr);
+        
+    function ganstt() {
+        var stt = $('#tbody-ThongBao tr').val();
+        return Number(stt.length) + 1;
+        
+    }
+});
+
+$(document).ready(function () {
+    $(document).on('click', '#hoTro', function () {
+
+        var mac = $('#MACMenu1').val();
+        console.log(mac);
+        connection.invoke("YeuCauHoTro", mac).catch(function (err) {
+            return console.error(err.toString());
+        });
+    });
+});

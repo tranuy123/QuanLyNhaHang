@@ -5,6 +5,7 @@ using QuanLyNhaHang.Models;
 using System;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Security.Claims;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -13,13 +14,36 @@ namespace QuanLyNhaHang.Controllers
 
     public class PhucVuController : Controller
     {
+        QuanLyNhaHangContext _context = new QuanLyNhaHangContext();
         public IActionResult Index()
         {
+            DateTime now = DateTime.Now;
+            DayOfWeek dayOfWeek = now.DayOfWeek;
+            string dayOfWeekString = dayOfWeek.ToString();
+            var ca = _context.Ca.FirstOrDefault(x => x.Thu == dayOfWeekString && now.TimeOfDay >= x.TgbatDau && now.TimeOfDay <= x.TgketThuc && x.Active == true).Idca;
+            int idnv = int.Parse(User.FindFirstValue(ClaimTypes.Name));
+            var idkhu = _context.LichLamViec.FirstOrDefault(x => x.Idca == ca && x.Idnv == idnv && x.Active == true)?.Idkhu;
+            if (idkhu == null)
+            {
+                return View("Error");
+            }
             return View("ViewPhucVu");
         }
         public IActionResult Order()
         {
+            DateTime now = DateTime.Now;
+            DayOfWeek dayOfWeek = now.DayOfWeek;
+            string dayOfWeekString = dayOfWeek.ToString();
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            var ca = context.Ca.FirstOrDefault(x => x.Thu == dayOfWeekString && now.TimeOfDay >= x.TgbatDau && now.TimeOfDay <= x.TgketThuc && x.Active == true).Idca;
+            int idnv = int.Parse(User.FindFirstValue(ClaimTypes.Name));
+            var idkhu = context.LichLamViec.FirstOrDefault(x => x.Idca == ca && x.Idnv == idnv && x.Active == true)?.Idkhu;
+            if (idkhu == null)
+            {
+                return View("Error");
+            }
             return View("ViewOrderPhucVu");
+
         }
         [Route("/PhucVu/MenuPV/{idb}")]
 

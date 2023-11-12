@@ -25,11 +25,16 @@ namespace QuanLyNhaHang.Controllers
         {
             webHostEnvironment = hostEnvironment;
         }
+        public IActionResult Error()
+        {
+            return View("Shared/Error");
+        }
         QuanLyNhaHangContext context = new QuanLyNhaHangContext();
         public IActionResult Index()
         {
             return View("ThucDon");
         }
+        
         public IActionResult ViewInsertThucDon()
         {
             return View("ViewInsertTD");
@@ -799,6 +804,17 @@ namespace QuanLyNhaHang.Controllers
             LichLamViec n = context.LichLamViec.Include(x => x.IdcaNavigation).Include(x => x.IdkhuNavigation).Include(x => x.IdnvNavigation).FirstOrDefault(x => x.Idllv == id);
 
             return View(n);
+        }
+        [Route("/QuanLy/deleteLLV/{id}")]
+        public IActionResult deleteLLV(int id)
+
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            LichLamViec n = context.LichLamViec.Include(x => x.IdcaNavigation).Include(x => x.IdkhuNavigation).Include(x => x.IdnvNavigation).FirstOrDefault(x => x.Idllv == id);
+            n.Active = false;
+            context.LichLamViec.Update(n);
+            context.SaveChanges();
+            return RedirectToAction("ViewLLV");
         }
         public IActionResult UpdateLLV(LichLamViec nsx)
         {
