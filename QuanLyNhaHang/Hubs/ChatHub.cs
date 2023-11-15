@@ -328,19 +328,26 @@ namespace SignalRChat.Hubs
             context.SaveChanges();
             List<ChiTietHoaDon> chiTietHoaDons = context.ChiTietHoaDon
                 .Include(x => x.IdtdNavigation)
+                .ThenInclude(x => x.DinhMuc)
                 .ThenInclude(x => x.IdhhNavigation)
+                .ThenInclude(x => x.IdnhhNavigation)
+                .Include(x => x.IdhdNavigation)
+                .ThenInclude(x => x.IdbanNavigation)
+                .ThenInclude(x => x.IdkhuNavigation)
+                .ThenInclude(x => x.IdsanhNavigation)
                 .Where(x => x.Idhd == int.Parse(id)).ToList();
             List<ChiTietPhieuXuatMap> chiTietPhieuXuats = new List<ChiTietPhieuXuatMap>();
             foreach (ChiTietHoaDon chiTiet in chiTietHoaDons)
             {
-                if (chiTiet.IdtdNavigation.Idhh != null)
+                
+                if (chiTiet.IdtdNavigation.DinhMuc.Any())
                 {
-                    if (chiTiet.IdtdNavigation.IdhhNavigation.HangDemDuoc == true)
+                    if (chiTiet.IdtdNavigation.DinhMuc.FirstOrDefault().IdhhNavigation.IdnhhNavigation.HangHoa == true)
                     {
                         ChiTietPhieuXuatMap px = new ChiTietPhieuXuatMap();
-                        px.Idhh = chiTiet.IdtdNavigation.Idhh.ToString();
+                        px.Idhh = chiTiet.IdtdNavigation.DinhMuc.FirstOrDefault().Idhh.ToString();
                         px.SoLuong = chiTiet.Sl.ToString();
-                        px.Gia = getGiaHangHoa((int)chiTiet.IdtdNavigation.Idhh).ToString();
+                        px.Gia = chiTiet.DonGia.ToString();
                         chiTietPhieuXuats.Add(px);
                     }
                 }

@@ -11,14 +11,16 @@ namespace QuanLyNhaHang.Models
     {
         public NhomHangHoa()
         {
-            HangHoa = new HashSet<HangHoa>();
+            HangHoaNavigation = new HashSet<HangHoa>();
         }
 
         public int Idnhh { get; set; }
         public string MaNhh { get; set; }
         public string TenNhh { get; set; }
+        public bool NguyenLieu { get; set; }
+        public bool HangHoa { get; set; }
         public bool? Active { get; set; }
 
-        public virtual ICollection<HangHoa> HangHoa { get; set; }
+        public virtual ICollection<HangHoa> HangHoaNavigation { get; set; }
     }
 }

@@ -9,6 +9,8 @@
         public string SoLuong { get; set; }
         public string Gia { get; set; }
         public bool? Active { get; set; }
+        public string ThucXuat { get; set; }
+        public string ChenhLech { get; set; }
 
         public virtual ChiTietPhieuNhap IdctpnNavigation { get; set; }
         public virtual HangHoa IdhhNavigation { get; set; }

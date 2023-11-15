@@ -125,3 +125,13 @@ function addRowBaoCaoChiTiet(data) {
     </tr>`;
     $('#tBody-BaoCaoChiTiet').append(newRow);
 }
+function offTab1() {
+    $('#tabXemPhieu').removeClass('active').addClass('hide');
+    $('#tabs-dsPhieu').addClass('active').addClass('show');
+
+}
+function offTab2() {
+    $('#tabXemPhieu').addClass('active').addClass('show');
+    $('#tabs-dsPhieu').removeClass('active').addClass('hide');
+
+}

@@ -916,6 +916,8 @@ namespace QuanLyNhaHang.Controllers
             NhomHangHoa n = context.NhomHangHoa.Find(nsx.Idnhh);
             n.MaNhh = nsx.MaNhh;
             n.TenNhh = nsx.TenNhh;
+            n.NguyenLieu = nsx.NguyenLieu;
+            n.HangHoa = nsx.HangHoa;
 
 
             context.NhomHangHoa.Update(n);
@@ -1084,6 +1086,7 @@ namespace QuanLyNhaHang.Controllers
             n.TenHh = nsx.TenHh;
             n.Idnhh = nsx.Idnhh;
             n.Iddvt = nsx.Iddvt;
+            n.GiaBan = nsx.GiaBan;
 
 
             context.HangHoa.Update(n);

@@ -47,7 +47,7 @@ function formatNumberInput() {
 
 function showToast(message, statusCode) {
     var backgrounColor;
-    document.getElementById('toast').className = 'toast align-items-center text-white border-0 position-fixed top-0 end-0 p-3';
+    document.getElementById('toast').className = 'toast fade show';
     $("#toastContent").text(message);
     if (statusCode === 200) {
         backgrounColor = "bg-success";

@@ -14,6 +14,8 @@ namespace QuanLyNhaHang.Models
         public int? Idctpn { get; set; }
         public int? Idhh { get; set; }
         public double? SoLuong { get; set; }
+        public double? ThucXuat { get; set; }
+        public double? ChenhLech { get; set; }
         public double? Gia { get; set; }
         public bool? Active { get; set; }
 

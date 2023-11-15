@@ -146,6 +146,7 @@ function ThemPhieuNhap() {
     var idNCC = $('select[name="nhaCungCap"]').val();
     if (idNCC == '') {
         showToast("Vui lòng chọn nhà cung cấp", 500);
+        return;
     }
     var ngayNhap = $('input[name="ngayNhap"]').val();
     var ghiChu = $('input[name="ghiChu"]').val();

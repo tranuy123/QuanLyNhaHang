@@ -1,6 +1,16 @@
-﻿function baoCaoLoiNhuan() {
+﻿var _myChart = null;
+$(document).ready(function () {
+    baoCaoLoiNhuan()
+});
+function baoCaoLoiNhuan() {
+    var tuNgay = $('#tuNgay').val();
+    var denNgay = $('#denNgay').val();
     $.ajax({
         url: '/baoCaoLoiNhuan',
+        data: {
+            TuNgay: tuNgay,
+            DenNgay: denNgay,
+        },
         method: 'POST',
         success: function (data) {
             console.log(data);
@@ -9,7 +19,9 @@
             // Trích xuất dữ liệu từ phản hồi
             var doanhThuData = data.doanhThu;
             var giaVonData = data.giaVon;
-
+            if (_myChart !== null) {
+                _myChart.destroy();
+            }
             // Tiếp tục xây dựng biểu đồ với dữ liệu này
             buildBarChart(doanhThuData, giaVonData);
         },
@@ -65,7 +77,7 @@ function buildBarChart(doanhThuData, giaVonData) {
     };
 
     var ctx = document.getElementById('myBarChart').getContext('2d');
-    var myBarChart = new Chart(ctx, {
+    _myChart = new Chart(ctx, {
         type: 'bar',
         data: data,
         options: options,

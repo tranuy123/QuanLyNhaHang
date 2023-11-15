@@ -1,0 +1,133 @@
+﻿@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<ThucDon> thucDons = context.ThucDon.Where(x => x.Active == true).ToList();
+    List<HangHoa> hangHoas = context.HangHoa.Where(x => x.Active == true).ToList();
+}
+<div class="tab-pane" id="tabs-MoiTuongQuan" role="tabpanel">
+    <div class="card">
+        <div class="card-body bg-azure-lt p-1">
+            <div class="row">
+                <div class="col-md-3 pe-0 mb-1">
+                </div>
+                <div class="col-md-9 ps-1">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 pe-0">
+                    <div class="card" style="height: 75vh;">
+                        <div class="table-responsive border-bottom">
+                            <table class="table table-nowrap table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center w-1 py-1"></th>
+                                        <th class="text-center">Tên món ăn</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-ProfileTQ">
+                                    @foreach (ThucDon cls in ViewBag.ThucDon)
+                                    {
+                                        if (cls.DinhMuc.FirstOrDefault(x => x.Idtd == cls.Idtd) == null)
+                                        {
+                                            @* <tr data-id="@cls.Idtd">
+                                                <td class="text-center w-1"><input type="checkbox" class="custom-control-input"></td>
+                                                <td>@cls.Ten</td>
+                                            </tr> *@
+                                            <tr data-id="@cls.Idtd">
+                                                <td class="text-center w-1">
+                                                    <input type="checkbox" class="single-checkbox" />
+                                                </td>
+                                                <td>@cls.Ten</td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            @* <tr data-id="@cls.Idtd" class="text-red custom-control custom-checkbox">
+                                                <td class="text-center w-1"><input type="checkbox" class="custom-control-input"></td>
+                                                <td>@cls.Ten</td>
+                                            </tr> *@
+                                            <tr data-id="@cls.Idtd" class="text-danger">
+                                                <td class="text-center w-1">
+                                                        <input type="checkbox" class="single-checkbox" />
+                                                </td>
+                                                <td>@cls.Ten</td>
+                                            </tr>
+
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9 ps-1">
+                    <div class="row">
+                        <div class="col-md-8 pe-0">
+                            <div class="card" style="height: 75vh;">
+                                <div class="table-responsive" style="height: 68vh;">
+                                    <table class="table table-nowrap table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center w-1 "></th>
+                                                <th class="text-center">Hàng hóa</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbodyDVKT">
+                                            @foreach (HangHoa hh in ViewBag.HangHoa)
+                                            {
+                                                <tr data-id="@hh.Idhh">
+                                                    <td class="text-center w-1"><input type="checkbox"></td>
+                                                    <td>@hh.TenHh</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-4 ps-0">
+                            <div class="card" style="height: 75vh;">
+                                <div class="table-responsive border-bottom" style="height: 68vh;">
+                                    <table class="table table-nowrap table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Định mức</th>
+                                                <th class="text-center">Số lượng</th>
+
+                                                <th class="text-center w-1 last-th-column">
+                                                    <a href="#" class="deleteallrow list-group-item-actions">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-red icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                                            <path d="M4 7l16 0"></path>
+                                                            <path d="M10 11l0 6"></path>
+                                                            <path d="M14 11l0 6"></path>
+                                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                                        </svg>
+                                                    </a>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbodyDVKTDC">
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-auto ms-auto d-print-none p-2 pe-3">
+                                        <a class="btn mb-2 btn-outline-primary active" onclick="luuProFileCt()">
+                                            Lưu
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/jschinh/dinhmuc.js"></script>

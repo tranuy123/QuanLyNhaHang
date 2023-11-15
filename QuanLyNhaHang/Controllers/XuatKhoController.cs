@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace QuanLyNhaHang.Controllers
@@ -30,13 +31,14 @@ namespace QuanLyNhaHang.Controllers
         {
             var tonKho = context.TonKho
                 .Include(x => x.IdctpnNavigation)
+                .ThenInclude(x => x.IdhhNavigation)
                 .Where(x => x.IdctpnNavigation.Idhh == idHH)
                 .ToList();
             var ton = new
             {
                 DonViTinh = getDonViTinh((int)tonKho.First().IdctpnNavigation.Idhh),
                 SoLuong = tonKho.Sum(x => x.SoLuong),
-                DonGia = tonKho.Max(x => x.IdctpnNavigation.Gia),
+                DonGia = tonKho.Max(x => x.IdctpnNavigation.IdhhNavigation.GiaBan),
             };
 
             return ton;
@@ -47,6 +49,13 @@ namespace QuanLyNhaHang.Controllers
                 .Include(x => x.IddvtNavigation)
                 .FirstOrDefault(x => x.Idhh == idHH);
             return dvt.IddvtNavigation.TenDvt;
+        }
+        public string getTenHH(int idHH)
+        {
+            HangHoa tenhh = context.HangHoa
+                .Include(x => x.IddvtNavigation)
+                .FirstOrDefault(x => x.Idhh == idHH);
+            return tenhh.TenHh;
         }
         [HttpPost("/XuatKho/ThemPhieuXuat")]
         public async Task<dynamic> luuPhieuXuat([FromBody] TTPhieuXuat data)
@@ -64,12 +73,13 @@ namespace QuanLyNhaHang.Controllers
                 phieuXuat.Active = true;
                 phieuXuat.Idnv = nv.Idnnv;
                 phieuXuat.SoPx = CommonServices.taoSoPhieuXuat(context);
+                phieuXuat.NgayTao = DateTime.Now;
                 context.PhieuXuat.Add(phieuXuat);
                 context.SaveChanges();
 
                 foreach (ChiTietPhieuXuatMap t in chiTietPhieuXuatMaps.ToList())
                 {
-                    double slq = double.Parse(t.SoLuong);
+                    double slq = double.Parse(t.ThucXuat);
                     foreach (TonKho slhhc in soLuongHhcon.Where(x => x.IdctpnNavigation.Idhh == int.Parse(t.Idhh)))
                     {
                         ChiTietPhieuXuat ct = new ChiTietPhieuXuat();
@@ -77,11 +87,13 @@ namespace QuanLyNhaHang.Controllers
                         ct.Idpx = phieuXuat.Idpx;
                         ct.Gia = double.Parse(t.Gia);
                         ct.Idctpn = slhhc.Idctpn;
+                        ct.SoLuong = t.SoLuong == null ? double.Parse(t.ThucXuat) : double.Parse(t.SoLuong);
+                        ct.ChenhLech = t.ChenhLech == null ? 0 : double.Parse(t.ChenhLech);
                         ct.Active = true;
                         //nếu mà trong kho còn nhiều hơn số xuất
                         if (slhhc.SoLuong > slq)
                         {
-                            ct.SoLuong = double.Parse(t.SoLuong);
+                            ct.ThucXuat = double.Parse(t.ThucXuat);
                             slhhc.SoLuong -= slq;
                             context.TonKho.Update(slhhc);
                             context.ChiTietPhieuXuat.Add(ct);
@@ -91,7 +103,7 @@ namespace QuanLyNhaHang.Controllers
                         //nếu mà trong kho ngang với số cần xuất
                         if (slhhc.SoLuong == slq)
                         {
-                            ct.SoLuong = double.Parse(t.SoLuong);
+                            ct.ThucXuat = double.Parse(t.ThucXuat);
                             context.TonKho.Remove(slhhc);
                             context.ChiTietPhieuXuat.Add(ct);
                             context.SaveChanges();
@@ -100,10 +112,10 @@ namespace QuanLyNhaHang.Controllers
                         //nếu trong kho còn ít hơn số cần xuất
                         if (slhhc.SoLuong < slq)
                         {
-                            ct.SoLuong = (double)slhhc.SoLuong;
+                            ct.ThucXuat = (double)slhhc.SoLuong;
                             slq = (double)(slq - slhhc.SoLuong);
 
-                            t.SoLuong = slq.ToString();
+                            t.ThucXuat = slq.ToString();
                             context.TonKho.Remove(slhhc);
                             context.ChiTietPhieuXuat.Add(ct);
                             context.SaveChanges();
@@ -111,6 +123,9 @@ namespace QuanLyNhaHang.Controllers
                     }
                     chiTietPhieuXuatMaps.Remove(t);
                     context.SaveChanges();
+                }
+                if (data.TuNgay != null && data.DenNgay != null) {
+                    await updateDSChiTietHoaDon(data.TuNgay, data.DenNgay);
                 }
                 tran.Commit();
                 return new
@@ -129,13 +144,71 @@ namespace QuanLyNhaHang.Controllers
                 };
             }
 
-        } 
-    }
+        }
+        public async Task updateDSChiTietHoaDon(string TuNgay, string DenNgay)
+        {
+            DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            var listHH = new List<dynamic>();
+            List<ChiTietHoaDon> chiTietHoaDons = await context.ChiTietHoaDon
+                .Include(x => x.IdhdNavigation)
+                .Where(x => x.IdhdNavigation.Tgxuat.Value.Date >= tuNgay.Date && x.IdhdNavigation.Tgxuat.Value.Date <= denNgay.Date && x.DaXuat != true && x.IdtdNavigation.Idnta != 3).ToListAsync();
+            foreach (ChiTietHoaDon chiTietHoaDon in chiTietHoaDons)
+            {
+                chiTietHoaDon.DaXuat = true;
+            }
+            context.ChiTietHoaDon.UpdateRange(chiTietHoaDons);
+            await context.SaveChangesAsync();
 
-    
+        }
+        [HttpPost("/XuatKho/getDSXuatKho")]
+        public async Task<dynamic> getDSXuatKho(string TuNgay, string DenNgay)
+        {
+            DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            var listHH = new List<dynamic>();
+            List<ChiTietHoaDon> chiTietHoaDons = await context.ChiTietHoaDon
+                .Include(x => x.IdhdNavigation)
+                .Where(x => x.IdhdNavigation.Tgxuat.Value.Date >= tuNgay.Date && x.IdhdNavigation.Tgxuat.Value.Date <= denNgay.Date && x.DaXuat != true && x.IdtdNavigation.Idnta != 3).ToListAsync();
+            foreach (ChiTietHoaDon cthd in chiTietHoaDons)
+            {
+                List<DinhMuc> dinhMucs = context.DinhMuc
+                    .Include(x => x.IdhhNavigation)
+                    .ThenInclude(x => x.ChiTietPhieuNhap)
+                    .ThenInclude(x => x.TonKho).Where(x => x.Idtd == cthd.Idtd).ToList();
+                foreach (DinhMuc dm in dinhMucs)
+                {
+                    var hanghoa = new
+                    {
+                        idhh = dm.Idhh,
+                        soLuong = (float)(dm.SoLuong * cthd.Sl),
+                        donGia = dm.IdhhNavigation.ChiTietPhieuNhap.Where(x => x.TonKho.Any()).Max(x => x.Gia),
+                    };
+                    listHH.Add(hanghoa);    
+                }
+            }
+            var hangHoas = listHH.GroupBy(x => x.idhh)
+                .Select(x => new
+                {
+                    idhh = x.Key,
+                    tenHangHoa = getTenHH((int)x.Key),
+                    donViTinh = getDonViTinh((int)x.Key),
+                    soLuong = (float)x.Sum(x => (float)x.soLuong),
+                    donGia = x.First().donGia,
+                });
+            return hangHoas;
+        }
+        [HttpGet("/XuatKho/XuatKhoNguyenLieu")]
+        public IActionResult ViewXuatNguyenLieu()
+        {
+            return View("PhieuXuatNguyenLieu");
+        }
+    }    
     public class TTPhieuXuat
     {
         public PhieuXuatMap PhieuXuat { get; set; }
         public List<ChiTietPhieuXuatMap> ChiTietPhieuXuat { get; set; }
+        public string TuNgay { get;set; }
+        public string DenNgay { get; set; }
     }
 }

@@ -17,7 +17,8 @@ namespace QuanLyNhaHang.Controllers
         [HttpGet]
         public IActionResult BaoCao() 
         {
-            return View("BaoCaoLoiNhuan");
+            //return View("BaoCaoLoiNhuan");
+            return View();
         }
         [HttpPost("/doanhThuTheoNgay")]
         public async Task<dynamic> doanhThuTheoNgay(string fromDay, string toDay)
@@ -51,25 +52,32 @@ namespace QuanLyNhaHang.Controllers
               .ToListAsync();
             return data;
         }
-        [HttpPost("/baoCaoLoiNhuan")]
-        public async Task<dynamic> baoCaoLoiNhuan()
+        [HttpGet("/QuanLy/ViewBaoCaoLoiNhuan")]
+        public IActionResult ViewBaoCaoLoiNhuan()
         {
+            return View("BaoCaoLoiNhuan");
+        }
+        [HttpPost("/baoCaoLoiNhuan")]
+        public async Task<dynamic> baoCaoLoiNhuan(string TuNgay, string DenNgay)
+        {
+            DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             var doanhThu = await context.HoaDon
-              .Where(x => x.Tgxuat != null)
+              .Where(x => x.Tgxuat.Value.Date >= tuNgay.Date && x.Tgxuat.Value.Date <= denNgay.Date)
               .OrderBy(x => x.Tgxuat)
-              .GroupBy(x => x.Tgxuat.Value.Month)
+              .GroupBy(x => x.Tgxuat.Value.Date)
               .Select(x => new
               {
                   label = x.Key,
                   doanhthu = x.Sum(x => x.TongTien)
               })
               .ToListAsync();
-            var giaVon = context.PhieuNhap
-              .Include(x => x.ChiTietPhieuNhap)
-              .Where(x => x.NgayNhap != null)
+            var giaVon = context.PhieuXuat
+              .Include(x => x.ChiTietPhieuXuat)
+              .Where(x => x.NgayTao.Value.Date >= tuNgay.Date && x.NgayTao.Value.Date <= denNgay.Date)
               .ToList()
-              .OrderBy(x => x.NgayNhap)
-              .GroupBy(x => x.NgayNhap.Value.Month)
+              .OrderBy(x => x.NgayTao)
+              .GroupBy(x => x.NgayTao.Value.Date)
               .Select(x => new
               {
                   label = x.Key,
@@ -82,9 +90,9 @@ namespace QuanLyNhaHang.Controllers
                 giaVon = giaVon,
             };
         }
-        public double tongPhieuNhap(List<PhieuNhap> phieuNhaps)
+        public double tongPhieuNhap(List<PhieuXuat> phieuNhaps)
         {
-            double tong = (double)phieuNhaps.Sum(x => x.ChiTietPhieuNhap.Sum(ct => ct.Gia));
+            double tong = (double)phieuNhaps.Sum(x => x.ChiTietPhieuXuat.Sum(ct => ct.Gia));
             return tong;
         }
         public double tongChiTietPhieuNhap(List<ChiTietPhieuNhap> chiTietPhieuNhaps)
@@ -101,6 +109,9 @@ namespace QuanLyNhaHang.Controllers
         [HttpPost("/BaoCao/getDuLieuHieuSuatNhanVien")]
         public async Task<dynamic> getDuLieuHieuSuatNhanVien(string fromDay, string toDay)
         {
+            fromDay = "01-01-2023";
+            toDay = "13-11-2023";
+
             DateTime FromDay = DateTime.ParseExact(fromDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             DateTime ToDay = DateTime.ParseExact(toDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             //var data = await context.NhanVien

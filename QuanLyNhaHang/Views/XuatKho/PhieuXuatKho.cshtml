@@ -8,9 +8,10 @@
     List<HangHoa> getListHangHoa()
     {
         return context.HangHoa
+        .Include(x => x.IdnhhNavigation)
         .Include(x => x.ChiTietPhieuNhap)
         .ThenInclude(x => x.TonKho)
-        .Where(x => x.Active == true && x.ChiTietPhieuNhap.Any(pn => pn.TonKho.Any())).ToList();
+        .Where(x => x.Active == true && x.ChiTietPhieuNhap.Any(pn => pn.TonKho.Any()) && x.IdnhhNavigation.HangHoa == true).ToList();
     }
     NhanVien nv = context.NhanVien.Find(Int32.Parse(User.Identity.Name));
 
@@ -38,7 +39,7 @@
                             </div>
                             <label class="col-sm-1 col-lg-1 col-form-label">Ng.Nhập</label>
                             <div class="col-sm-2 col-lg-2">
-                                <input type="text" required name="ngayNhap" value="@DateTime.Now.ToString("dd-MM-yyyy HH:mm")" placeholder="dd-MM-yyyy" class="form-control" id="ngayNhap">
+                                <input type="text" required name="ngayNhap" value="@DateTime.Now.ToString("dd-MM-yyyy")" placeholder="dd-MM-yyyy" class="form-control" id="ngayNhap">
                             </div>
                         </div>
                         <div class="row">
@@ -128,7 +129,7 @@
                 <div class="col-2 mb-1">
                     <div class="row justify-content-end">
                         <div class="col-auto">
-                            <button class="btn btn-primary" onclick="themPhieuXuat()">
+                            <button type="button" class="btn btn-primary" onclick="themPhieuXuat()">
                                 Tạo Phiếu xuất kho
                             </button>
                         </div>

@@ -13,13 +13,14 @@ namespace QuanLyNhaHang.Models
         {
             ChiTietPhieuNhap = new HashSet<ChiTietPhieuNhap>();
             ChiTietPhieuXuat = new HashSet<ChiTietPhieuXuat>();
-            ThucDon = new HashSet<ThucDon>();
+            DinhMuc = new HashSet<DinhMuc>();
         }
 
         public int Idhh { get; set; }
         public int? Idnhh { get; set; }
         public int? Iddvt { get; set; }
         public string MaHh { get; set; }
+        public double? GiaBan { get; set; }
         public bool HangDemDuoc { get; set; }
         public string TenHh { get; set; }
         public bool? Active { get; set; }
@@ -28,6 +29,6 @@ namespace QuanLyNhaHang.Models
         public virtual NhomHangHoa IdnhhNavigation { get; set; }
         public virtual ICollection<ChiTietPhieuNhap> ChiTietPhieuNhap { get; set; }
         public virtual ICollection<ChiTietPhieuXuat> ChiTietPhieuXuat { get; set; }
-        public virtual ICollection<ThucDon> ThucDon { get; set; }
+        public virtual ICollection<DinhMuc> DinhMuc { get; set; }
     }
 }

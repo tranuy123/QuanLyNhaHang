@@ -20,6 +20,7 @@ namespace QuanLyNhaHang.Models
         public DateTime? TghoanThanh { get; set; }
         public DateTime? TgphucVu { get; set; }
         public bool? TrangThaiOrder { get; set; }
+        public bool? DaXuat { get; set; }
         public bool? Active { get; set; }
         public int? Idca { get; set; }
 

@@ -77,12 +77,21 @@
 
 </head>
 <body class="vertical  light  ">
-    <div id="toast" style="position: absolute; top: 0; right: 0;z-index: 99999;" class="toast align-items-center text-white border-0 position-fixed top-0 end-0 p-3" role="alert" aria-live="assertive" aria-atomic="true">
+@*     <div id="toast" style="position: absolute; top: 0; right: 0;z-index: 99999;" class="toast align-items-center text-white border-0 position-fixed top-0 end-0 p-3" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body" id="toastContent">
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close" onclick="hideToast()"></button>
         </div>
+    </div> *@
+    <div class="toast fade hide" id="toast" style="position: absolute; top: 0; right: 0;z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="mr-auto">Thông báo</strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="toast-body text-white mb-3" id="toastContent"></div>
     </div>
     <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
         <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
@@ -205,6 +214,12 @@
                             <span class="ml-3 item-text">Đồ thị doanh thu</span>
                         </a>
                     </li>
+                            <li class="nav-item w-100">
+                                <a class="nav-link" href="/QuanLy/ViewBaoCaoLoiNhuan">
+                                    <i class="fe fe-layers fe-16"></i>
+                                    <span class="ml-3 item-text">Báo cáo lợi nhuận</span>
+                                </a>
+                            </li>
                     <li class="nav-item w-100">
                         <a class="nav-link" href="/BaoCao/HieuSuatNhanVien">
                             <i class="fe fe-layers fe-16"></i>
@@ -224,6 +239,12 @@
                                 <a class="nav-link" href="/XuatKho/XuatKho">
                                     <i class="fe fe-layers fe-16"></i>
                                     <span class="ml-3 item-text">Xuất kho</span>
+                                </a>
+                            </li>
+                            <li class="nav-item w-100">
+                                <a class="nav-link" href="/XuatKho/XuatKhoNguyenLieu">
+                                    <i class="fe fe-layers fe-16"></i>
+                                    <span class="ml-3 item-text">Xuất kho nguyên liệu</span>
                                 </a>
                             </li>
                             <li class="nav-item w-100">
@@ -271,6 +292,9 @@
     </aside>
 
         <main role="main" class="main-content">
+        <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
+            <i class="fe fe-menu navbar-toggler-icon"></i>
+        </button>
             @RenderBody()
         </main>
         <div id="myModal" class="modal">

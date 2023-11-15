@@ -1,56 +1,8 @@
-﻿$(document).ready(function () {
+﻿var _tuNgay = null;
+var _denNgay = null;
+$(document).ready(function () {
     formatNumberInput()
 });
-$('#groupTTChiTiet').on('change', 'select[name = "idHangHoa"]', function () {
-    var idHH = $(this).val();
-    if (idHH != '') {
-        $.ajax({
-            url: '/XuatKho/getDonViTinhVaSL', // Đường dẫn đến action xử lý form
-            method: 'POST',
-            data: {
-                idHH: idHH,
-            },
-            success: function (response) {
-                $('#groupTTChiTiet #dVT').val(response.donViTinh);
-                $('#groupTTChiTiet #DonGia').val(formatTotal(response.donGia));
-                $('#groupTTChiTiet #sLCon').val(formatTotal(getSoLuongCon(idHH, response.soLuong)));
-            }
-        });
-    }
-});
-$('#groupTTChiTiet').on('input', '#SLHH', function () {
-    kiemTraSoLuong();
-});
-function getSoLuongCon(idHH, soLuong) {
-    var $rowsWithSameId = $('#tbodyChiTietPhieuXuat tr[data-idhh="' + idHH + '"]');
-    if ($rowsWithSameId.length == 0) {
-        return soLuong;
-    } else {
-        var soluongdacap = 0;
-        $rowsWithSameId.each(function (index) {
-            soluongdacap += Number($(this).find('td input[name="soLuong"]').val());
-        });
-        return soLuong - Number(soluongdacap);
-    }
-}
-function kiemTraSoLuong() {
-    var sLCon = parseInt($('#groupTTChiTiet #sLCon').val().replace(/,/g, ''));
-    var sl = parseInt($('#groupTTChiTiet #SLHH').val().replace(/,/g, ''));
-    if (sl > sLCon) {
-        alert("Số lượng vượt quá số lượng tồn");
-        $('#groupTTChiTiet #SLHH').val("");
-        return;
-    } else {
-        tinhThanhTien() 
-    }
-}
-function tinhThanhTien() {
-    var soLuong = parseInt($('#groupTTChiTiet #SLHH').val().replace(/,/g, ''));
-    var donGia = parseInt($('#groupTTChiTiet #DonGia').val().replace(/,/g, ''));
-    if (!isNaN(soLuong) && !isNaN(donGia)) { // Kiểm tra xem giá trị soLuong và donGia có phải là số hợp lệ
-        $('#groupTTChiTiet #ThanhTien').val(formatTotal(soLuong * donGia));
-    }
-}
 function addChiTietPhieuXuat() {
     var tenHangHoa = $('#groupTTChiTiet select[name="idHangHoa"]').text();
     var idHangHoa = $('#groupTTChiTiet select[name="idHangHoa"]').val();
@@ -156,8 +108,11 @@ function themPhieuXuat() {
         var row = $(this);
         var rowData = {};
         rowData.Idhh = row.find('input[name="idHangHoa"]').val();
-        rowData.ThucXuat = row.find('input[name="soLuong"]').val();
+        rowData.SoLuong = row.find('input[name="soLuong"]').val();
         rowData.Gia = row.find('input[name="donGia"]').val();
+        rowData.ChenhLech = row.find('input[name="chenhLech"]').val();
+        rowData.ThucXuat = row.find('input[name="thucXuat"]').val();
+
         tableData.push(rowData);
     });
     //var idNCC = $('select[name="nhaCungCap"]').val();
@@ -173,8 +128,8 @@ function themPhieuXuat() {
     var data = {
         PhieuXuat: queryStringToData(dataPhieuNhapMaster),
         ChiTietPhieuXuat: tableData,
-        TuNgay: null,
-        DenNgay: null,
+        TuNgay: _tuNgay,
+        DenNgay: _denNgay
     };
     $.ajax({
         url: '/XuatKho/ThemPhieuXuat', // Đường dẫn đến action xử lý form
@@ -190,4 +145,96 @@ function themPhieuXuat() {
             showToast(response.message, response.statusCode);
         }
     });
+}
+
+function getDSNguyenLieu() {
+     _tuNgay = $('#tuNgay').val();
+     _denNgay = $('#denNgay').val();
+
+    $.ajax({
+        url: '/XuatKho/getDSXuatKho', // Đường dẫn đến action xử lý form
+        method: 'POST',
+        data: {
+            TuNgay: _tuNgay,
+            denNgay: _denNgay,
+        },
+        success: function (response) {
+            $('#tbodyChiTietPhieuXuat').empty();
+            $('#TienThanhToan').val('');
+            response.forEach(function (data) {
+                processDataNguyenLieu(data);
+            });
+            TinhTongTienPhieuXuat();
+            //if (response.statusCode == 200) {
+            //    $('#tbodyChiTietPhieuXuat').empty();
+            //    $('#TienThanhToan').val('');
+
+            //}
+            //showToast(response.message, response.statusCode);
+        }
+    });
+}
+function processDataNguyenLieu(data) {
+    var newRow = $(`<tr data-idhh = "${data.idhh}">
+        <td class="first-td-column text-center p-1 td-sticky">
+            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:32px;z-index:2;" />
+            <input type="hidden" name="idHangHoa" value="${data.idhh}" />
+        </td>
+        <td class="p-1 td-sticky" style="position: sticky;left: 33px;background-color: #fff !important; z-index:2">
+        ${data.tenHangHoa}
+        </td>
+        <td class="p-1">
+            <input autocomplete="off" readonly type="text" class="w-100 form-control form-table input-date-short-mask" style="width:90px;" value="${data.donViTinh}" id="dVT" name="dVT" />
+        </td>
+          <td class="p-1">
+            <input autocomplete="off" t type="text" class="w-100 form-control form-table formatted-number" style="width:80px;" value="${data.donGia}" name="donGia" />
+        </td>
+        <td class="p-1">
+            <input autocomplete="off" type="text" readonly class="w-100 form-control form-table formatted-number" style="width:55px;" value="${data.soLuong}" name="soLuong" />
+
+        </td>
+                <td class="p-1">
+            <input autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value="${data.soLuong}" name="thucXuat" />
+
+        </td>
+        <td class="p-1">
+            <input autocomplete="off" type="text" readonly class="w-100 form-control form-table formatted-number" style="width:100px;" value="${data.soLuong * data.donGia}" name="thanhTien" />
+        </td>
+                <td class="p-1">
+            <input autocomplete="off" type="text" readonly class="w-100 form-control form-table" style="width:100px;" value="0" name="chenhLech" />
+        </td>
+        <td class="text-center p-1 last-td-column">
+            <button type="button" class="btn btn-icon btn-sm text-red remove-phieuXuatCt">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M18 6l-12 12"></path>
+                    <path d="M6 6l12 12"></path>
+                </svg>
+            </button>
+        </td>
+    </tr>`)
+    $('#tbodyChiTietPhieuXuat').append(newRow);
+    formatNumberInput();
+}
+$('#tbodyChiTietPhieuXuat').on('input', 'input[name="thucXuat"]', function () {
+    var tr = $(this).closest('tr');
+
+    var soLuong = parseInt(tr.find('input[name="soLuong"]').val().replace(/,/g, ''));
+    var thucXuat = parseInt(tr.find('input[name="thucXuat"]').val().replace(/,/g, ''));
+    var donGia = parseInt(tr.find('input[name ="donGia"]').val().replace(/,/g, ''));
+    if (!isNaN(thucXuat) && !isNaN(donGia)) { // Kiểm tra xem giá trị soLuong và donGia có phải là số hợp lệ
+        tr.find('input[name="thanhTien"]').val(formatTotal(thucXuat * donGia));
+        tr.find('input[name="chenhLech"]').val(thucXuat - soLuong);
+        TinhTongTienPhieuXuat();
+    }
+});
+function offTab1() {
+    $('#tabXemPhieu').removeClass('active').addClass('hide');
+    $('#tabs-dsPhieu').addClass('active').addClass('show');
+
+}
+function offTab2() {
+    $('#tabXemPhieu').addClass('active').addClass('show');
+    $('#tabs-dsPhieu').removeClass('active').addClass('hide');
+
 }
