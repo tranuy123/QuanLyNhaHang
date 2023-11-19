@@ -9,7 +9,11 @@
     var TinhTrangXNHD1 = context.HoaDon.Where(x => x.TinhTrang == true && x.Idban == idb && x.TinhTrangTt == false);
     List<ChiTietHoaDon> getListCTHD()
     {
-        return context.ChiTietHoaDon.Include(x =>x.IdhdNavigation.IdbanNavigation).Where(x => x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null)).ToList();
+        return context.ChiTietHoaDon.Include(x =>x.IdhdNavigation.IdbanNavigation).Where(x => x.HangHoa != true && x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null)).ToList();
+    }
+    List<ChiTietHoaDon> getListCTHDHH()
+    {
+        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.HangHoa == true && x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null)).ToList();
     }
     var cthd = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).FirstOrDefault(x => x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null));
 
@@ -21,6 +25,12 @@
         ThucDon nv = context.ThucDon.Find(id);
         if (nv != null) return nv;
         else return new ThucDon();
+    }
+    HangHoa getHH(int? id)
+    {
+        HangHoa nv = context.HangHoa.Find(id);
+        if (nv != null) return nv;
+        else return new HangHoa();
     }
     string toDecimal(double? d)
     {
@@ -102,6 +112,45 @@
                                             </tr>
 
                           }
+                        @foreach (ChiTietHoaDon item in getListCTHDHH())
+                        {
+                            i++;
+
+                            <tr class="accordion-toggle collapsed" id="trxacnhan" data-toggle="collapse" data-parent="#c-2474" href="#collap-2474">
+                                <td>@i</td>
+                                <td>@getHH(item.Idtd).TenHh</td>
+
+                                <td style="display : none" class="td-idcthd">@item.Idcthd</td>
+                                <td class="text-end">@toDecimal(@item.DonGia)</td>
+                                <td>@item.Sl</td>
+                                <td class="text-end">@toDecimal(@item.ThanhTien)</td>
+                                @if (item.Tgbep == null)
+                                {
+                                    <td class="tdxacnhan1"></td>
+
+                                }
+                                else
+                                {
+                                    <td class="tdxacnhan1"> Bếp đã xác nhận </td>
+
+                                }
+                                <td>
+                                    <input type="hidden" class="input-idcthd" value="@item.Idcthd" />
+                                    @if (item.Tgbep == null)
+                                    {
+                                        <button class="btn btn-primary btn-huy" value="@item.Idcthd"> Hủy </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-primary btn-huy" disabled> Hủy </button>
+                                    }
+
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+
+                        }
                         <tr>
                             <td>Tổng tiền</td>
                             <td></td>

@@ -17,8 +17,8 @@ namespace QuanLyNhaHang.Models
         public int Idnhh { get; set; }
         public string MaNhh { get; set; }
         public string TenNhh { get; set; }
-        public bool NguyenLieu { get; set; }
-        public bool HangHoa { get; set; }
+        public bool? NguyenLieu { get; set; }
+        public bool? HangHoa { get; set; }
         public bool? Active { get; set; }
 
         public virtual ICollection<HangHoa> HangHoaNavigation { get; set; }

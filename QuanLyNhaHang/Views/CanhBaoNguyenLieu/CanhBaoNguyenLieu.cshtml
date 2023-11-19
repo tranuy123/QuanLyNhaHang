@@ -1,0 +1,127 @@
+﻿@using QuanLyNhaHang.Models.ModelsTam;
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<ThucDon> thucDons = context.ThucDon.Where(x => x.Active == true).ToList();
+    List<HangHoa> hangHoas = context.HangHoa.Where(x => x.Active == true).ToList();
+    var DSNL = ViewBag.DSNL;
+
+}
+<div class="tab-pane" id="tabs-MoiTuongQuan" role="tabpanel">
+    <div class="card">
+        <div class="card-body bg-azure-lt p-1">
+            <div class="row">
+                <label class="col-sm-1 col-lg-1 col-form-label">Từ ngày</label>
+                <div class="col-sm-2 col-lg-2">
+                    <input type="text" name="tuNgay" class="form-control" value="@DateTime.Now.ToString("dd-MM-yyyy")" placeholder="dd-MM-yyyy" id="tuNgay">
+                </div>
+                <label class="col-sm-1 col-lg-1 col-form-label">Đến ngày</label>
+                <div class="col-sm-2 col-lg-2">
+                    <input type="text" name="denNgay" class="form-control" value="@DateTime.Now.ToString("dd-MM-yyyy")" placeholder="dd-MM-yyyy" id="denNgay">
+                </div>
+                <div class="col-md-1 mb-2 col-lg-1 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary" onclick="getDSXKNL()">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 pe-0 mb-1">
+                </div>
+                <div class="col-md-9 ps-1">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 pe-0">
+                    <div class="card" style="height: 75vh;">
+                        <div class="table-responsive border-bottom">
+                            <table class="table table-nowrap table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center w-1 py-1"></th>
+                                        <th class="text-center">Tên món ăn</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-ThucDon">
+                                    @foreach (ThucDon cls in ViewBag.ThucDon)
+                                    {
+                                        <tr data-id="@cls.Idtd">
+                                            <td class="text-center w-1">
+                                                <input type="text" value="1" class="form-control formatted-number" name="soLuong" />
+                                            </td>
+                                            <td>@cls.Ten</td>
+                                        </tr>
+
+                                        
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-9 ps-1">
+                    <div class="row">
+                        <div class="col-md-12 pe-0">
+                            <div class="card" style="height: 75vh;">
+                                <div class="table-responsive" style="height: 68vh;">
+                                    <table class="table table-nowrap table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Hàng hóa</th>
+                                                <th class="text-center">Đơn vị</th>
+                                                <th class="text-center">Số lượng tồn</th>
+                                                <th class="text-center">Số lượng cần sử dụng</th>
+                                                <th class="text-center">Đơn giá</th>
+                                                <th class="text-center">Thành tiền</th>
+                                            </tr>
+                                        </thead>
+                                        @{
+                                            double tongTien = 0;
+                                        }
+                                        <tbody id="tbodyCBNL">
+                                            @foreach (CanhBaoNguyenLieu hh in DSNL)
+                                            {
+                                                <tr data-id="@hh.Idhh">
+                                                   
+                                                    <td>@hh.TenHangHoa</td>
+                                                    <td>@hh.DonViTinh</td>
+                                                    <td><input type="text" readonly class="form-control formatted-number" value="@hh.TonKho" /></td>
+                                                    @if(hh.SoLuong > hh.TonKho)
+                                                    {
+                                                        <td><input type="text" readonly name="soLuong" class="form-control formatted-number text-danger" value="@hh.SoLuong" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="text" readonly name="soLuong" class="form-control formatted-number" value="@hh.SoLuong" /></td>
+                                                    }
+                                                    <td><input type="text" readonly class="form-control formatted-number" value="@hh.DonGia" /></td>
+                                                    <td><input type="text" readonly class="form-control formatted-number" value="@(hh.DonGia * hh.SoLuong)" /></td>
+                                                </tr>
+                                                tongTien += (double)(hh.SoLuong * hh.DonGia);
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="form-group p-2 mb-2" style="border-radius: 5px; border: 1px solid black;">
+                                    <div class="row">
+                                        <label class="col-sm-1 col-lg-3 col-form-label">Tổng tiền xuất</label>
+                                        <div class="col-md-2 col-lg-9" style="
+                                                            display: flex;
+                                                            flex-direction: row-reverse;
+                                                            ">
+                                            <input type="text" class="form-control formatted-number" readonly id="TienThanhToan" value="@tongTien" placeholder="Thanh toán">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/jschinh/common.js"></script>
+<script src="~/jschinh/canhbaonguyenlieu.js"></script>

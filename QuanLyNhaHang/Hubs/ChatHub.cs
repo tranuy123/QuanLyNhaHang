@@ -109,6 +109,7 @@ namespace SignalRChat.Hubs
                             ct.DonGia = ctt.DonGia;
                             ct.Sl = ctt.Sl;
                             ct.DonGia = ctt.DonGia;
+                            ct.HangHoa = ctt.HangHoa;
                             ct.Active = true;
                             ct.Idca = ca;
                             if (ctt.Sl == 1)
@@ -148,6 +149,7 @@ namespace SignalRChat.Hubs
                             ct.Idtd = ctt.Idtd;
                             ct.DonGia = ctt.DonGia;
                             ct.Sl = ctt.Sl;
+                            ct.HangHoa = ctt.HangHoa;
                             ct.DonGia = ctt.DonGia;
                             ct.Active = true;
                             ct.Idca = ca;
@@ -340,16 +342,16 @@ namespace SignalRChat.Hubs
             foreach (ChiTietHoaDon chiTiet in chiTietHoaDons)
             {
                 
-                if (chiTiet.IdtdNavigation.DinhMuc.Any())
+                if (chiTiet.HangHoa == true)
                 {
-                    if (chiTiet.IdtdNavigation.DinhMuc.FirstOrDefault().IdhhNavigation.IdnhhNavigation.HangHoa == true)
-                    {
                         ChiTietPhieuXuatMap px = new ChiTietPhieuXuatMap();
-                        px.Idhh = chiTiet.IdtdNavigation.DinhMuc.FirstOrDefault().Idhh.ToString();
+                        px.Idhh = chiTiet.Idtd.ToString();
                         px.SoLuong = chiTiet.Sl.ToString();
-                        px.Gia = chiTiet.DonGia.ToString();
+                        px.ThucXuat = chiTiet.Sl.ToString();
+                        px.ChenhLech = "0";
+
+                    px.Gia = chiTiet.DonGia.ToString();
                         chiTietPhieuXuats.Add(px);
-                    }
                 }
             }
             if (chiTietPhieuXuats.Count() > 0)
@@ -389,7 +391,7 @@ namespace SignalRChat.Hubs
 
                 foreach (ChiTietPhieuXuatMap t in chiTietPhieuXuatMaps.ToList())
                 {
-                    double slq = double.Parse(t.SoLuong);
+                    double slq = double.Parse(t.ThucXuat);
                     foreach (TonKho slhhc in soLuongHhcon.Where(x => x.IdctpnNavigation.Idhh == int.Parse(t.Idhh)))
                     {
                         ChiTietPhieuXuat ct = new ChiTietPhieuXuat();
@@ -397,11 +399,13 @@ namespace SignalRChat.Hubs
                         ct.Idpx = phieuXuat.Idpx;
                         ct.Gia = double.Parse(t.Gia);
                         ct.Idctpn = slhhc.Idctpn;
+                        ct.SoLuong = t.SoLuong == null ? double.Parse(t.ThucXuat) : double.Parse(t.SoLuong);
+                        ct.ChenhLech = t.ChenhLech == null ? 0 : double.Parse(t.ChenhLech);
                         ct.Active = true;
                         //nếu mà trong kho còn nhiều hơn số xuất
                         if (slhhc.SoLuong > slq)
                         {
-                            ct.SoLuong = double.Parse(t.SoLuong);
+                            ct.ThucXuat = double.Parse(t.ThucXuat);
                             slhhc.SoLuong -= slq;
                             context.TonKho.Update(slhhc);
                             context.ChiTietPhieuXuat.Add(ct);
@@ -411,7 +415,7 @@ namespace SignalRChat.Hubs
                         //nếu mà trong kho ngang với số cần xuất
                         if (slhhc.SoLuong == slq)
                         {
-                            ct.SoLuong = double.Parse(t.SoLuong);
+                            ct.ThucXuat = double.Parse(t.ThucXuat);
                             context.TonKho.Remove(slhhc);
                             context.ChiTietPhieuXuat.Add(ct);
                             context.SaveChanges();
@@ -420,10 +424,10 @@ namespace SignalRChat.Hubs
                         //nếu trong kho còn ít hơn số cần xuất
                         if (slhhc.SoLuong < slq)
                         {
-                            ct.SoLuong = (double)slhhc.SoLuong;
+                            ct.ThucXuat = (double)slhhc.SoLuong;
                             slq = (double)(slq - slhhc.SoLuong);
 
-                            t.SoLuong = slq.ToString();
+                            t.ThucXuat = slq.ToString();
                             context.TonKho.Remove(slhhc);
                             context.ChiTietPhieuXuat.Add(ct);
                             context.SaveChanges();

@@ -14,6 +14,7 @@ namespace QuanLyNhaHang.Controllers
         public IActionResult DinhMuc()
         {
             ViewBag.ThucDon = context.ThucDon
+                .Include(x => x.IdntaNavigation)
                 .Include(x => x.DinhMuc).Where(x => x.Active == true).ToList();
             ViewBag.HangHoa = context.HangHoa
                 .Include(x => x.IdnhhNavigation)

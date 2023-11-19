@@ -9,6 +9,11 @@
 
         return context.ThucDon.Find(id);
     }
+    HangHoa getHHH(int? id)
+    {
+
+        return context.HangHoa.Find(id);
+    }
     NhanVien getNV(int? id)
     {
 
@@ -149,9 +154,14 @@
                                 {
                                     index++;
                                     var hh = getHH(ct.Idtd);
+                                    var hhh = getHHH(ct.Idtd);
                                     <tr>
                                         <td class="text-center">@index</td>
-                                        <td class="text-start">@hh.Ten</td>
+                                        @if(ct.HangHoa == true){
+                                            <td class="text-start">@hhh.TenHh</td>
+                                        }else{
+                                            <td class="text-start">@hh.Ten</td>
+                                        }
                                         <td>phần</td>
                                         <td class="text-end">@toDecimal(ct.Sl)</td>
                                         <td class="text-end">@toDecimal(ct.DonGia)</td>

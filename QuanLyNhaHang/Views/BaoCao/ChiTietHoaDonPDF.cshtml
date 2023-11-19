@@ -8,7 +8,12 @@
 
         return context.ThucDon.Find(id);
     }
-    
+    HangHoa getHHH(int? id)
+    {
+        HangHoa nv = context.HangHoa.Find(id);
+        if (nv != null) return nv;
+        else return new HangHoa();
+    }
 
     string toDecimal(double? d){
         return d.Value.ToString("#,##0.00");
@@ -146,10 +151,17 @@
                                 @foreach(ChiTietHoaDon ct in Model.ChiTietHoaDon){
                                     index++;
                                     var hh = getHH(ct.Idtd);
+                                    var hhh = getHHH(ct.Idtd);
                                     <tr>
                                     <td class="text-center">@index</td>
                                     <td class="text-center">@hh.MaTd</td>
-                                    <td class="text-start">@hh.Ten</td>
+                                    @if(ct.HangHoa == true){
+                                            <td class="text-start">@hhh.TenHh</td>
+                                    }
+                                    else
+                                    {
+                                            <td class="text-start">@hh.Ten</td>
+                                    }
                                     <td class="text-end">@toDecimal(ct.Sl)</td>
                                     <td class="text-end">@toDecimal(ct.DonGia)</td>
                                     <td class="text-end">@toDecimal2(ct.DonGia*ct.Sl)</td>

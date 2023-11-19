@@ -19,10 +19,56 @@
             </button>
         </div>
     </div>
-    <div style="width: 80%; margin: auto;">
-        <canvas id="myBarChart"></canvas>
-    </div>
 
-   
+
+    <div class="col-md-16 mb-12">
+        <div class="card shadow">
+            <div class="card-body">
+                <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Dạng biểu đồ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Dạng bảng</a>
+                    </li>
+ @*                    <li class="nav-item">
+                        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Contact</a>
+                    </li> *@
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <div style="width: 80%; margin: auto;">
+                            <canvas id="myBarChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <table class="table table-bordered table-hover table-striped text-center" id="tableChiTietPhieuNhap">
+                            <thead style="position: sticky; top: 0;">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Ngày</th>
+                                    <th>Doanh thu</th>
+                                    <th>Giá vốn</th>
+                                    <th>Lợi nhuận</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyBaoCaoLoiNhuan">
+                            </tbody>
+                            <tfoot>
+                                <tr id="tongTien">
+                                    <td></td>
+                                    <td>Tổng</td>
+                                    <td><input type="text" readonly class="form-control formatted-number" id="doanhThu" value="" /></td>
+                                    <td><input type="text" readonly class="form-control formatted-number" id="giaVon" value="" /></td>
+                                    <td><input type="text" readonly class="form-control formatted-number" id="loiNhuan" value="" /></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 <script src="~/jschinh/baocaoloinhuan.js"></script>

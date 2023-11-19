@@ -281,6 +281,8 @@ namespace QuanLyNhaHang.Models
 
                 entity.Property(e => e.Idhh).HasColumnName("IDHH");
 
+                entity.Property(e => e.Avatar).HasMaxLength(500);
+
                 entity.Property(e => e.Iddvt).HasColumnName("IDDVT");
 
                 entity.Property(e => e.Idnhh).HasColumnName("IDNHH");

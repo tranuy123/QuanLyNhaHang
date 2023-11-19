@@ -27,10 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\ImagesTD\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\jschinh\XuatKho.js" />
   </ItemGroup>
 

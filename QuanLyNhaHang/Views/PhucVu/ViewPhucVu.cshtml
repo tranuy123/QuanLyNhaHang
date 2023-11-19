@@ -13,9 +13,20 @@
     List<ChiTietHoaDon> listCTHDPV(){
         return  context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation)
                     .Include(x => x.IdtdNavigation)
-                    .Where(x => x.IdhdNavigation.IdbanNavigation.Idkhu == idkhu && x.TghoanThanh != null && x.TgphucVu ==null).ToList();
+                    .Where(x => x.IdhdNavigation.IdbanNavigation.Idkhu == idkhu && x.TghoanThanh != null && x.TgphucVu ==null && x.HangHoa != true).ToList();
     }
-
+    List<ChiTietHoaDon> listCTHDPVHH()
+    {
+        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation)
+                    .Include(x => x.IdtdNavigation)
+                    .Where(x => x.IdhdNavigation.IdbanNavigation.Idkhu == idkhu && x.TghoanThanh != null && x.TgphucVu == null && x.HangHoa == true).ToList();
+    }
+    HangHoa getHH(int? id)
+    {
+        HangHoa nv = context.HangHoa.Find(id);
+        if (nv != null) return nv;
+        else return new HangHoa();
+    }
 }
 
                             <!-- simple table -->
@@ -55,6 +66,22 @@
                                                
                                                
                                                 }
+                @foreach (ChiTietHoaDon item in listCTHDPVHH())
+                {
+                    i++;
+
+                    <tr>
+                        <td>@i</td>
+                        <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
+                        <td>@getHH(item.Idtd).TenHh</td>
+                        <td>@item.Sl</td>
+                        <td></td>
+                        <td><button class="btn btn-primary btnTGPV" value="@item.Idcthd">Xác nhận</button></td>
+                    </tr>
+
+
+
+                }
                                             </tbody>
                                         </table>
                                     </div>
@@ -91,3 +118,5 @@
         });
     });
     </script>
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>

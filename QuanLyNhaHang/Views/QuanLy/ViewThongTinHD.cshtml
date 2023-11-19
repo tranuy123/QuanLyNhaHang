@@ -17,6 +17,12 @@
         if (nv != null) return nv;
         else return new ThucDon();
     }
+    HangHoa getHH(int? id)
+    {
+        HangHoa nv = context.HangHoa.Find(id);
+        if (nv != null) return nv;
+        else return new HangHoa();
+    }
 
 
     string format(Double? a)
@@ -93,7 +99,13 @@
                 @foreach (ChiTietHoaDon c in Model.ChiTietHoaDon)
                 {
                     <tr>
-                        <td class="text-start">@getTD(c.Idtd).Ten</td>
+                        @if(c.HangHoa == true){
+                            <td class="text-start">@getHH(c.Idtd).TenHh</td>
+                        }
+                        else
+                        {
+                            <td class="text-start">@getTD(c.Idtd).Ten</td>
+                        }
                         <td class="text-center">@c.Sl</td>
                         <td class="text-center">@format(@c.DonGia)</td>
 

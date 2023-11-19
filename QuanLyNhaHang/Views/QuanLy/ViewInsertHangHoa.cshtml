@@ -18,6 +18,14 @@
                 <h4 class="forms-title "><b>Thêm hàng hóa</b></h4>
             </div>
             <div class="forms-body">
+                <div class="col-sm-12 col-md-12 pr-0 mt-2">
+                    <div class="row align-items-center">
+                        <div class="col-auto avatar avatar-xl">
+                            <img src="/ImagesTD/ava.jpg" class="thumbnail-sm" id="previewImage">
+                        </div>
+                        <div class="col-auto"> <input type="file" name="Avatar" class="form-control" id="fileAvatar" placeholder="Chọn file avatar"></div>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label style="margin:7px 0;">Mã hàng hóa</label>
                     <input asp-for="@Model.MaHh" type="text" class="form-control" required>

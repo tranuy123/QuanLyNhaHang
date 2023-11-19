@@ -13,10 +13,12 @@
             var idtd = button.data('idtd');
             var price = button.data('price');
             var ipmac = button.data('ipmac');
+            var hangHoa = button.data('hanghoa');
+            console.log(hangHoa);
             $.ajax({
                 type: "post",
                 url: "/addHoaDon",
-                data: "IPMAC=" + ipmac + "&IDTD=" + idtd + "&DonGia=" + price,
+                data: "IPMAC=" + ipmac + "&IDTD=" + idtd + "&DonGia=" + price + "&HangHoa=" + hangHoa,
                 success: function (result) {
                     if (result.statusCode == 200) {
                         button.addClass('d-none');
@@ -46,7 +48,6 @@
         success: function (result) {
             console.log(ipmac, idtd);
             if (result.statusCode == 200) {
-                console.log(123);
                 button.addClass('d-none'); // sử dụng biến lưu lại context
                 button.siblings('.add-to-cart').removeClass('d-none');
                 $('.toastHMN').toast('show');

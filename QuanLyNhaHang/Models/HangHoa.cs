@@ -21,8 +21,9 @@ namespace QuanLyNhaHang.Models
         public int? Iddvt { get; set; }
         public string MaHh { get; set; }
         public double? GiaBan { get; set; }
-        public bool HangDemDuoc { get; set; }
+        public bool? HangDemDuoc { get; set; }
         public string TenHh { get; set; }
+        public string Avatar { get; set; }
         public bool? Active { get; set; }
 
         public virtual DonViTinh IddvtNavigation { get; set; }

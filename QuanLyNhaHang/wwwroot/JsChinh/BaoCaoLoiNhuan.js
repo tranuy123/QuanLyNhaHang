@@ -1,6 +1,8 @@
 ﻿var _myChart = null;
 $(document).ready(function () {
-    baoCaoLoiNhuan()
+    baoCaoLoiNhuan();
+    formatNumberInput();
+
 });
 function baoCaoLoiNhuan() {
     var tuNgay = $('#tuNgay').val();
@@ -24,6 +26,14 @@ function baoCaoLoiNhuan() {
             }
             // Tiếp tục xây dựng biểu đồ với dữ liệu này
             buildBarChart(doanhThuData, giaVonData);
+            $('#tbodyBaoCaoLoiNhuan:not(#tongTien)').empty();
+            data.listLoiNhuan.forEach(function (data, i) {
+                
+                addRowTableBCLN(data,i);
+            });
+            TinhTongDoanhThu();
+            TinhTongGiaVon();
+            TinhTongLoiNhuan();
         },
         error: function (error) {
             console.log(error);
@@ -83,4 +93,49 @@ function buildBarChart(doanhThuData, giaVonData) {
         options: options,
     });
 
+}
+function addRowTableBCLN(data, i) {
+    var stt = i + 1;
+    var newRow = $(`<tr>
+                <td>${stt}</td>
+                <td>${data.ngay}</td>
+                <td><input type="text" readonly class="form-control formatted-number" name="doanhThu" value="${data.doanhThu}" /></td>
+                <td><input type="text" readonly class="form-control formatted-number" name="giaVon" value="${data.giaVon}" /></td>
+                <td><input type="text" readonly class="form-control formatted-number" name="loiNhuan" value="${data.doanhThu - data.giaVon}" /></td>
+    </tr>`)
+    $('#tbodyBaoCaoLoiNhuan').append(newRow);
+    formatNumberInput();
+}
+function TinhTongDoanhThu() {
+    var tongTien = 0;
+    $('#tbodyBaoCaoLoiNhuan tr').each(function () {
+        var thanhTien = parseInt($(this).find('input[name="doanhThu"]').val().replace(/,/g, ''));
+        if (!isNaN(thanhTien)) {
+            tongTien += thanhTien;
+        }
+
+    });
+    $('#doanhThu').val(formatTotal(tongTien));
+}
+function TinhTongGiaVon() {
+    var tongTien = 0;
+    $('#tbodyBaoCaoLoiNhuan tr').each(function () {
+        var thanhTien = parseInt($(this).find('input[name="giaVon"]').val().replace(/,/g, ''));
+        if (!isNaN(thanhTien)) {
+            tongTien += thanhTien;
+        }
+
+    });
+    $('#giaVon').val(formatTotal(tongTien));
+}
+function TinhTongLoiNhuan() {
+    var tongTien = 0;
+    $('#tbodyBaoCaoLoiNhuan tr').each(function () {
+        var thanhTien = parseInt($(this).find('input[name="loiNhuan"]').val().replace(/,/g, ''));
+        if (!isNaN(thanhTien)) {
+            tongTien += thanhTien;
+        }
+
+    });
+    $('#loiNhuan').val(formatTotal(tongTien));
 }

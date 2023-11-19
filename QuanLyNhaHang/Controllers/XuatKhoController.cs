@@ -203,6 +203,46 @@ namespace QuanLyNhaHang.Controllers
         {
             return View("PhieuXuatNguyenLieu");
         }
+        [HttpPost("/XuatKho/LichSuXuat")]
+        public async Task<dynamic> LichSuXuat(string TuNgay, string DenNgay, string maPhieu)
+        {
+            DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            var phieuXuats = await context.PhieuXuat
+                .Where(x => (x.NgayTao.Value.Date >= tuNgay.Date && x.NgayTao.Value.Date <= denNgay.Date)
+                && (maPhieu == "" || maPhieu == null || x.SoPx == maPhieu))
+             .Select(x => new
+             {
+                 SoPx = x.SoPx,
+                 NgayTao = x.NgayTao,
+                 IdnvNavigation = x.IdnvNavigation,
+                 GhiChu = x.GhiChu,
+                 TongTien = x.ChiTietPhieuXuat.Sum(x => x.SoLuong * x.Gia),
+                 TongChenhLech = x.ChiTietPhieuXuat.Sum(x => x.ChenhLech),
+                 SoLuongHH = x.ChiTietPhieuXuat.Count(),
+                 ChiTietPhieuXuat = x.ChiTietPhieuXuat.Select(x => new
+                 {
+                     IdhhNavigation = x.IdhhNavigation,
+                     SoLuong = x.SoLuong,
+                     ChenhLech = x.ChenhLech,
+                     ThucXuat = x.ThucXuat,
+                     Gia = x.Gia,
+                     DVT = x.IdhhNavigation.IddvtNavigation.TenDvt,
+                 }).ToList()
+             })
+            .ToListAsync();
+            //var ketqua = phieuXuats.Select(x => new
+            //{
+            //    PhieuXuat = x,
+            //    ChiTietPhieuXuat = GetChiTietPhieuXuats(x.Idpx),
+            //}).ToList();
+            return Ok(phieuXuats);
+        }
+        public List<ChiTietPhieuXuat> GetChiTietPhieuXuats(int id)
+        {
+            List<ChiTietPhieuXuat> chiTietPhieuXuats = context.ChiTietPhieuXuat.Where(x => x.Idpx == id).ToList();
+            return chiTietPhieuXuats;
+        }
     }    
     public class TTPhieuXuat
     {

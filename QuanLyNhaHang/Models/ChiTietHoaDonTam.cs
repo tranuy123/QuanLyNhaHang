@@ -16,5 +16,6 @@ namespace QuanLyNhaHang.Models
         public int? Sl { get; set; }
         public double? DonGia { get; set; }
         public double? ThanhTien { get; set; }
+        public bool? HangHoa { get; set; }
     }
 }

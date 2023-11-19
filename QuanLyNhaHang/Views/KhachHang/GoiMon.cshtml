@@ -10,6 +10,12 @@
         if (nv != null) return nv;
         else return new ThucDon();
     }
+    HangHoa getHH(int? id)
+    {
+        HangHoa nv = context.HangHoa.Find(id);
+        if (nv != null) return nv;
+        else return new HangHoa();
+    }
     string macAddress = CommonServices.getDiaChiMac();
     var idb = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress);
     int idban = idb.Idban;
@@ -19,7 +25,11 @@
     var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
     List<ChiTietHoaDonTam> getListCTHDT()
     {
-        return context.ChiTietHoaDonTam.Where(x => x.Ipmac == macAddress).ToList();
+        return context.ChiTietHoaDonTam.Where(x => x.Ipmac == macAddress && x.HangHoa != true).ToList();
+    }
+    List<ChiTietHoaDonTam> getListCTHDTHH()
+    {
+        return context.ChiTietHoaDonTam.Where(x => x.Ipmac == macAddress && x.HangHoa == true).ToList();
     }
     var KiemTraTT = context.ChiTietHoaDonTam.Where(x => x.Ipmac == macAddress).ToList();
     string toDecimal(double? d)
@@ -112,6 +122,50 @@
                                                     
                                                    
                                                 }
+                        @foreach (ChiTietHoaDonTam item in getListCTHDTHH())
+                        {
+
+                            <tr>
+
+                                <td>
+                                    <div class="avatar avatar-md">
+
+                                        @if (@getHH(item.Idtd).Avatar == null)
+                                        {
+                                            <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                                                 src="~/ImagesTD/camon.png" />
+                                        }
+                                        else
+                                        {
+                                            <img class="modal-image" style="width : auto; height: 200px;object-fit: contain;"
+                                                 src="~/ImagesTD/@getHH(item.Idtd).Avatar" />
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="hidden" id="IDCTHDT" value="@item.Idcthdt" />
+                                    <p class="mb-0 text-muted"><strong>@getHH(@item.Idtd).TenHh</strong></p>
+
+                                </td>
+                                <td style="display:none"><input class='inputDisabled text-center' name="Idtd" data-groupid="3" value=@item.Idtd type=text></td>
+                                <td style="display:none"><input class='inputDisabled text-center' name="DonGia" value=@item.DonGia type=text></td>
+                                <td style="display:none">
+                                    <p class="mb-0 text-muted">@ViewBag.IDMAC</p>
+                                </td>
+                                <td>
+                                    <p class="dongia mb-0 text-muted" id="tdDonGia"><strong>@toDecimal(@item.DonGia)</strong></p>
+                                </td>
+                                <td class="w-15"><input class="form-control" type="number" min="0" id="SL" value="@item.Sl" /></td>
+                                <td>Dĩa</td>
+                                <td class="text-muted" id="tdThanhTien"><strong>@toDecimal((item.Sl * item.DonGia))</strong></td>
+                                <td>
+                                    <button class="HuyHoaDonTam btn btn-secondary"> Hủy chọn món </button>
+                                </td>
+                                <td style="display:none" class="NTA"><input type="text" value="3" /></td>
+                            </tr>
+
+
+                        }
                                 <tr>
                                     <td><h5>Tổng</h5></td>
                                     <td></td>

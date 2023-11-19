@@ -66,12 +66,16 @@ namespace QuanLyNhaHang.Controllers
             return PartialView();
         }
         [HttpPost("/addHoaDon")]
-        public dynamic addHoaDon(string IPMAC,int IDTD, float DonGia)
+        public dynamic addHoaDon(string IPMAC,int IDTD, float DonGia, int HangHoa)
         {
             try
             {
 
-
+                bool hh = false;
+                if(HangHoa == 1)
+                {
+                    hh = true;
+                }
                 QuanLyNhaHangContext context = new QuanLyNhaHangContext();
                 ChiTietHoaDonTam ct = new ChiTietHoaDonTam();
 
@@ -80,6 +84,7 @@ namespace QuanLyNhaHang.Controllers
                 ct.DonGia = DonGia;
                 ct.Sl = 1;
                 ct.ThanhTien = DonGia;
+                ct.HangHoa = hh;
                 context.ChiTietHoaDonTam.Add(ct);
                 context.SaveChanges();
                 return new

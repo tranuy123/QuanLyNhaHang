@@ -84,11 +84,46 @@ namespace QuanLyNhaHang.Controllers
                   doanhthu = tongPhieuNhap(x.ToList()),
               })
               .ToList();
+            var listLoiNhuan = new List<dynamic>();
+            foreach (var d in doanhThu)
+            {
+                var data = new
+                {
+                    Ngay = d.label,
+                    DoanhThu = (double)d.doanhthu,
+                    GiaVon = (double)0,
+                };
+                listLoiNhuan.Add (data);
+            }
+            foreach (var d in giaVon)
+            {
+                var data = new
+                {
+                    Ngay = d.label,
+                    DoanhThu = (double)0,
+                    GiaVon = (double)d.doanhthu,
+                };
+                listLoiNhuan.Add(data);
+            }
+            List<LoiNhuan> newlist = listLoiNhuan.GroupBy(x => x.Ngay)
+            .Select(x => new LoiNhuan()
+            {
+                Ngay = x.Key,
+                DoanhThu = (double)x.Sum(item => (double)item.DoanhThu),
+                GiaVon = (double)x.Sum(item => (double)item.GiaVon)
+            }).ToList();
             return new
             {
                 doanhThu = doanhThu,
                 giaVon = giaVon,
+                listLoiNhuan = newlist,
             };
+        }
+        public class LoiNhuan
+        {
+            public DateTime? Ngay { get; set; }
+            public double? DoanhThu { get; set; }
+            public double? GiaVon { get; set; }
         }
         public double tongPhieuNhap(List<PhieuXuat> phieuNhaps)
         {
@@ -100,6 +135,96 @@ namespace QuanLyNhaHang.Controllers
             double tong = (double)chiTietPhieuNhaps.Sum(ct => ct.Gia);
             return tong;
         }
+        //--------------------------------------------------- báo cáo chỉ tiêu
+        [HttpPost("/BaoCao/BaoCaoChiTieu")]
+        public async Task<dynamic> BaoCaoChiTieu(string fromDay, string toDay)
+        {
+            DateTime FromDay = DateTime.ParseExact(fromDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime ToDay = DateTime.ParseExact(toDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            var data = await context.HoaDon
+              .Where(x => x.Tgxuat != null && (x.Tgxuat.Value.Date >= FromDay && x.Tgxuat.Value.Date <= ToDay))
+              .OrderBy(x => x.Tgxuat)
+              .GroupBy(x => x.Tgxuat.Value.Date)
+              .Select(x => new
+              {
+                  label = x.Key,
+                  doanhthu = x.Sum(x => x.TongTien)
+              })
+              .ToListAsync();
+            var chiTietHoaDons = await context.ChiTietHoaDon
+                .Include(x => x.IdhdNavigation)
+                .ThenInclude(x => x.IdbanNavigation)
+                .Where(x => x.IdhdNavigation.Tgxuat.Value.Date >= FromDay.Date && x.IdhdNavigation.Tgxuat.Value.Date <= ToDay.Date)
+                .ToListAsync();
+            var thucDons = await context.ThucDon
+                .Include(x => x.IdntaNavigation)
+                .Where(x => x.Active == true)
+                .Select(x => new
+                {
+                    label = x.Ten,
+                    soLuong = BaoCaoController.tinhSLThucDon(x.Idtd, chiTietHoaDons),
+                })
+                .ToListAsync();
+            var hangHoas = await context.HangHoa
+                .Include(x => x.IdnhhNavigation)
+                .Where(x => x.Active == true && x.IdnhhNavigation.HangHoa == true)
+                .Select(x => new
+                {
+                    label = x.TenHh,
+                    soLuong = BaoCaoController.tinhSLHangHoa(x.Idhh, chiTietHoaDons),
+                }).ToListAsync();
+            thucDons = thucDons.Concat(hangHoas).ToList();
+            var khus = await context.Khu
+                .Where(x => x.Active == true)
+                .Select(x => new
+                {
+                    label = x.TenKhu,
+                    soLuong =BaoCaoController.tinhDoanhThuKhu(x.Idkhu, chiTietHoaDons),
+                })
+                .ToListAsync();
+            return new
+            {
+                doThiThucDon = thucDons.OrderByDescending(x => x.soLuong),
+                doThiKhu = khus.OrderByDescending(x => x.soLuong)
+,
+            };
+        }
+        public static int tinhSLThucDon(int idtd, List<ChiTietHoaDon> chiTietHoaDons)
+        {
+            int soluong = 0;
+            foreach (ChiTietHoaDon c in chiTietHoaDons)
+            {
+                if (c.Idtd == idtd && c.HangHoa != true)
+                {
+                    soluong += (int)c.Sl;
+                }
+            }
+            return soluong;
+        }
+        public static int tinhSLHangHoa(int idtd, List<ChiTietHoaDon> chiTietHoaDons)
+        {
+            int soluong = 0;
+            foreach (ChiTietHoaDon c in chiTietHoaDons)
+            {
+                if (c.Idtd == idtd && c.HangHoa == true)
+                {
+                    soluong += (int)c.Sl;
+                }
+            }
+            return soluong;
+        }
+        public static double tinhDoanhThuKhu(int idKhu, List<ChiTietHoaDon> chiTietHoaDons)
+        {
+            double doanhThu = 0;
+            foreach (ChiTietHoaDon c in chiTietHoaDons)
+            {
+                if(c.IdhdNavigation.IdbanNavigation.Idkhu == idKhu)
+                {
+                    doanhThu += (double)c.ThanhTien;
+                }
+            }
+            return doanhThu;
+        }
         // -------------------------------------------------- đánh giá hiệu xuất nhân viên
         [HttpGet("/BaoCao/HieuSuatNhanVien")]
         public  IActionResult ViewHieuSuatNhanVien()
@@ -109,9 +234,6 @@ namespace QuanLyNhaHang.Controllers
         [HttpPost("/BaoCao/getDuLieuHieuSuatNhanVien")]
         public async Task<dynamic> getDuLieuHieuSuatNhanVien(string fromDay, string toDay)
         {
-            fromDay = "01-01-2023";
-            toDay = "13-11-2023";
-
             DateTime FromDay = DateTime.ParseExact(fromDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             DateTime ToDay = DateTime.ParseExact(toDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             //var data = await context.NhanVien
@@ -184,6 +306,8 @@ namespace QuanLyNhaHang.Controllers
             })
             .ToList();
             return data1;
+
+
         }
         public float tinhDiemHieuSuatTheoLichLamViecs(List<LichLamViec> lichLamViecs)
         {
@@ -206,7 +330,11 @@ namespace QuanLyNhaHang.Controllers
                 diem += tinhDiemHieuSuatChiTietHoaDon(chiTietHoaDon);
                 i++;
             }
-            diem /= i;
+            if (diem != 0)
+            {
+                diem /= i;
+
+            }
             return diem;
         }
         public int tinhDiemHieuSuatChiTietHoaDon(ChiTietHoaDon chiTietHoaDon)
@@ -217,7 +345,12 @@ namespace QuanLyNhaHang.Controllers
 
             int diem = 0;
             TimeSpan timeSpan = tgPhucVu.Value - tgHoanThanh.Value;
+
             thoiGianHoanThanh = (int)timeSpan.TotalSeconds;
+            if (thoiGianHoanThanh == null)
+            {
+                thoiGianHoanThanh = 1;
+            }
             QlDanhGia qlDanhGia = context.QlDanhGia.FirstOrDefault(x => x.ThoiGianTu <= thoiGianHoanThanh && x.ThoiGianDen >= thoiGianHoanThanh);
             if (qlDanhGia == null)
             {
@@ -228,6 +361,11 @@ namespace QuanLyNhaHang.Controllers
                 diem = (int)qlDanhGia.Diem;
             }
             return diem;
+        }
+        [HttpGet("/BaoCao/BaoCaoChiTieu")]
+        public IActionResult BaoCaoChiTieu()
+        {
+            return View();
         }
         [Route("/download/ChiTietHoaDon/{id:int}")]
         public IActionResult downloadPChiTietHoaDon(int id)

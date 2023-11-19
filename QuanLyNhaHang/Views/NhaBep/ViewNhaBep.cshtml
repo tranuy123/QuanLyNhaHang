@@ -10,14 +10,27 @@
         if (nv != null) return nv;
         else return new ThucDon();
     }
-   
+    HangHoa getHH(int? id)
+    {
+        HangHoa nv = context.HangHoa.Find(id);
+        if (nv != null) return nv;
+        else return new HangHoa();
+    }
     List<ChiTietHoaDon> getListCTHD()
     {
-        return context.ChiTietHoaDon.Include(x=>x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep == null).ToList();
+        return context.ChiTietHoaDon.Include(x=>x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep == null && x.HangHoa != true).ToList();
+    }
+    List<ChiTietHoaDon> getListCTHDHH()
+    {
+        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep == null && x.HangHoa == true).ToList();
     }
     List<ChiTietHoaDon> getListCTHD1()
     {
-        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep != null && x.TghoanThanh==null).ToList();
+        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep != null && x.TghoanThanh==null && x.HangHoa != true).ToList();
+    }
+    List<ChiTietHoaDon> getListCTHD1HH()
+    {
+        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep != null && x.TghoanThanh == null && x.HangHoa == true).ToList();
     }
   
 
@@ -61,6 +74,22 @@
                                 
                             </tr>
                         }
+                        @foreach (ChiTietHoaDon item in getListCTHDHH())
+                        {
+                            i++;
+                            <tr>
+                                <td>@i</td>
+                                <td style="display:none" class="idcthdNB">@item.Idcthd</td>
+                                <td><strong>@getHH(@item.Idtd).TenHh</strong></td>
+                                <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
+                                <td class="trangthaicthd"></td>
+                                <td>@item.Sl</td>
+                                <td class="xacnhan2">
+                                    <button id="xacnhan1" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
+                                </td>
+
+                            </tr>
+                        }
 
                     </tbody>
                 </table>
@@ -94,6 +123,21 @@
                             <tr>
                                 <td>@j</td>
                                 <td><strong>@getTD(@item.Idtd).Ten</strong></td>
+                                <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
+                                <td></td>
+                                <td>@item.Sl</td>
+                                <td class="tdtght">
+                                    <button id="btntght" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
+                                </td>
+                            </tr>
+                        }
+                        @foreach (ChiTietHoaDon item in getListCTHD1HH())
+                        {
+                            j++;
+
+                            <tr>
+                                <td>@j</td>
+                                <td><strong>@getHH(@item.Idtd).TenHh</strong></td>
                                 <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
                                 <td></td>
                                 <td>@item.Sl</td>

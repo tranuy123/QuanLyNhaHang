@@ -9,6 +9,9 @@
         .Include(x=>x.ThucDon)
         .Where(x => x.Active == true).ToList();
     }
+    List<HangHoa> hangHoas = context.HangHoa
+    .Include(x => x.IdnhhNavigation)
+    .Where(x => x.IdnhhNavigation.HangHoa == true && x.Active == true).ToList();
     string macAddress="";
     //foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
     //{
@@ -29,7 +32,7 @@
             networkInterface.OperationalStatus == OperationalStatus.Up)
         {
             // Lấy địa chỉ MAC
-             macAddress = networkInterface.GetPhysicalAddress().ToString();
+            macAddress = networkInterface.GetPhysicalAddress().ToString();
 
         }
     }
@@ -42,9 +45,16 @@
         if (nv != null) return nv;
         else return null;
     }
-    ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd)
+    ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd, bool hangHoa)
     {
-        return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd);
+        if (hangHoa == true)
+        {
+            return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd && x.HangHoa == true);
+        }
+        else
+        {
+            return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd);
+        }
     }
 
 }
@@ -192,6 +202,11 @@
                         }
                         i++;
                     }
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#hanghoa">
+                            <h4>Nước</h4>
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="tab-content" data-aos="fade-up" data-aos-delay="300">
@@ -213,12 +228,12 @@
                                     if (t != null)
                                     {
                                         <div class="col-lg-4 menu-item">
-                                            @if(getCTHDT(macAddress,item.Idtd) == null){
-                                                <a class="add-to-cart" data-idtd="@item.Idtd" data-price="@t.Gia1.Value.ToString("#,###")" data-ipmac="@macAddress"><i class="fa-solid fa-circle-plus fa-2x" style="color:darkblue;float:right;"></i></a>
+                                            @if(getCTHDT(macAddress,item.Idtd,false) == null){
+                                                <a class="add-to-cart" data-idtd="@item.Idtd" data-price="@t.Gia1.Value.ToString("#,###")" data-ipmac="@macAddress" data-hanghoa="0"><i class="fa-solid fa-circle-plus fa-2x" style="color:darkblue;float:right;"></i></a>
                                                 <a class="remove-from-cart d-none" data-idtd="@item.Idtd" data-ipmac="@macAddress"><i class="fa-solid fa-xmark fa-2x" style="color:red;float:right;"></i></a>
                                             }else{
                                                 <a class="add-to-cart d-none"><i class="fa-solid fa-circle-plus fa-2x" style="color:darkblue;float:right;"></i></a>
-                                                <a class="remove-from-cart" data-idtd="@item.Idtd" data-price="@t.Gia1.Value.ToString("#,###")" data-ipmac="@macAddress"><i class="fa-solid fa-xmark fa-2x" style="color:red;float:right;"></i></a>
+                                                <a class="remove-from-cart" data-idtd="@item.Idtd" data-price="@t.Gia1.Value.ToString("#,###")" data-ipmac="@macAddress" data-hanghoa="0"><i class="fa-solid fa-xmark fa-2x" style="color:red;float:right;"></i></a>
                                             }
                                             
                                             <input type="hidden" class="IDTD" value="@item.Idtd" />
@@ -235,6 +250,39 @@
                         </div>
                         j++;
                     }
+                    <div class="tab-pane fade" id="hanghoa">
+
+                        <div class="tab-header text-center">
+                            <p>Menu</p>
+                            <h3>Nước</h3>
+                        </div>
+
+                        <div class="row gy-5">
+                            @foreach (var item in hangHoas)
+                            {
+                                <div class="col-lg-4 menu-item">
+                                    @if (getCTHDT(macAddress, item.Idhh, true) == null)
+                                    {
+                                        <a class="add-to-cart" data-idtd="@item.Idhh" data-price="@item.GiaBan.Value.ToString("#,###")" data-ipmac="@macAddress" data-hanghoa="1"><i class="fa-solid fa-circle-plus fa-2x" style="color:darkblue;float:right;"></i></a>
+                                        <a class="remove-from-cart d-none" data-idtd="@item.Idhh" data-ipmac="@macAddress"><i class="fa-solid fa-xmark fa-2x" style="color:red;float:right;"></i></a>
+                                    }
+                                    else
+                                    {
+                                        <a class="add-to-cart d-none"><i class="fa-solid fa-circle-plus fa-2x" style="color:darkblue;float:right;"></i></a>
+                                        <a class="remove-from-cart" data-idtd="@item.Idhh" data-price="@item.GiaBan.Value.ToString("#,###")" data-ipmac="@macAddress" data-hanghoa="1"><i class="fa-solid fa-xmark fa-2x" style="color:red;float:right;"></i></a>
+                                    }
+
+                                    <input type="hidden" class="IDTD" value="@item.Idhh" />
+                                    <a href="~/ImagesTD/ava.jpg" class="glightbox"><img src="~/ImagesTD/ava.jpg" class="menu-img img-fluid" alt=""></a>
+                                    <h4>@item.TenHh</h4>
+                                    <p class="price">@item.GiaBan.Value.ToString("#,###") VNĐ</p>
+                                </div>
+                                
+                            }
+
+
+                        </div>
+                    </div>
                 </div>
 
             </div>
