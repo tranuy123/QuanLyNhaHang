@@ -18,6 +18,7 @@ namespace QuanLyNhaHang.Controllers
                 .Include(x => x.DinhMuc).Where(x => x.Active == true).ToList();
             ViewBag.HangHoa = context.HangHoa
                 .Include(x => x.IdnhhNavigation)
+                .Include(x => x.IddvtNavigation)
                 .Where(x => x.Active == true && x.IdnhhNavigation.NguyenLieu == true).ToList();    
             return View();
         }
@@ -38,7 +39,8 @@ namespace QuanLyNhaHang.Controllers
                     IdhhNavigation = new HangHoa()
                     {
                         Idhh = x.IdhhNavigation.Idhh,
-                        TenHh = x.IdhhNavigation.TenHh
+                        TenHh = x.IdhhNavigation.TenHh,
+                        IddvtNavigation = x.IdhhNavigation.IddvtNavigation,
                     },
                     SoLuong = x.SoLuong,
                 }).ToListAsync();

@@ -3,7 +3,7 @@
     Layout = null;
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
     var ListCTHD = Model.ChiTietHoaDon.ToList();
-    var TienHang = ListCTHD.Sum(x => x.Sl * x.DonGia);
+    var TienHang = ListCTHD.Sum(x => x.ThanhTien);
     ThucDon getHH(int? id)
     {
 
@@ -142,7 +142,7 @@
                                     <th class="text-center">ĐVT</th>
                                     <th class="text-center">S.LG</th>
                                     <th class="text-center">Đơn giá</th>
-                                   
+                                    <th class="text-center">Tỷ lệ giảm</th>
                                     <th class="text-center">Thành tiền</th>
                                 </tr>
                             </thead>
@@ -165,8 +165,8 @@
                                         <td>phần</td>
                                         <td class="text-end">@toDecimal(ct.Sl)</td>
                                         <td class="text-end">@toDecimal(ct.DonGia)</td>
-                                       
-                                        <td class="text-end">@toDecimal2(ct.DonGia*ct.Sl) VNĐ</td>
+                                        <td class="text-end">@ct.TyLeGiam %</td>
+                                        <td class="text-end">@toDecimal2(ct.ThanhTien) VNĐ</td>
                                     </tr>
                                 }
                                 <tr>

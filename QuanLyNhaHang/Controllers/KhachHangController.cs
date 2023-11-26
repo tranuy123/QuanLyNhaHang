@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyNhaHang.Models;
 using SelectPdf;
@@ -9,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -19,10 +22,29 @@ namespace QuanLyNhaHang.Controllers
         {
             return View("Menu");
         }
+
         public IActionResult menu1()
         {
+
             return View("menu1");
         }
+        //[HttpGet("/KhachHang/{mac}")]
+        //public async Task<IActionResult> menu1Async(string mac)
+        //{
+        //    ViewBag.MAC = mac;
+        //    var claims = new List<Claim>
+        //    {
+        //        new Claim(ClaimTypes.Name, mac),
+        //    };
+
+        //    var claimsIdentity = new ClaimsIdentity(
+        //        claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        //    await HttpContext.SignInAsync(
+        //        CookieAuthenticationDefaults.AuthenticationScheme,
+        //        new ClaimsPrincipal(claimsIdentity));
+        //    return View("menu1");
+        //}
         [Route("/KhachHang/GoiMon")]
         public IActionResult GoiMon()
         {
@@ -196,14 +218,14 @@ namespace QuanLyNhaHang.Controllers
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             var tinhtranghoadon = context.ChiTietHoaDon.FirstOrDefault(x => x.Idhd == id && x.TghoanThanh == null);
-            if (tinhtranghoadon != null)
-            {
-                TempData["ThongBao"] = "Có món ăn trong danh sách vẫn chưa hoàn thành!, chưa thể thanh toán";
+            //if (tinhtranghoadon != null)
+            //{
+            //    TempData["ThongBao"] = "Có món ăn trong danh sách vẫn chưa hoàn thành!, chưa thể thanh toán";
 
-                return RedirectToAction("HoaDon");
-            }
-            else
-            {
+            //    return RedirectToAction("HoaDon");
+            //}
+            //else
+            //{
                 int idnv = int.Parse(User.FindFirstValue(ClaimTypes.Name));
 
                 HoaDon hd = context.HoaDon.Find(id);
@@ -231,7 +253,7 @@ namespace QuanLyNhaHang.Controllers
 
 
 
-            }
+            //}
         }
         [Route("/HoaDonPDF/{id:int}")]
         public IActionResult viewPDF(int id)

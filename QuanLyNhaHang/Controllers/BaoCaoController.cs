@@ -127,7 +127,7 @@ namespace QuanLyNhaHang.Controllers
         }
         public double tongPhieuNhap(List<PhieuXuat> phieuNhaps)
         {
-            double tong = (double)phieuNhaps.Sum(x => x.ChiTietPhieuXuat.Sum(ct => ct.Gia));
+            double tong = (double)phieuNhaps.Sum(x => x.ChiTietPhieuXuat.Sum(ct => ct.Gia * ct.ThucXuat));
             return tong;
         }
         public double tongChiTietPhieuNhap(List<ChiTietPhieuNhap> chiTietPhieuNhaps)

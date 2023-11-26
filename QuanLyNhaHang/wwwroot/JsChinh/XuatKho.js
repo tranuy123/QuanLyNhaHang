@@ -73,7 +73,7 @@ function addChiTietPhieuXuat() {
     }
     var newRow = $(`<tr data-idhh = "${idHangHoa}">
         <td class="first-td-column text-center p-1 td-sticky">
-            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:32px;z-index:2;" />
+            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:40px;z-index:2;" />
             <input type="hidden" name="idHangHoa" value="${idHangHoa}" />
         </td>
         <td class="p-1 td-sticky" style="position: sticky;left: 33px;background-color: #fff !important; z-index:2">
@@ -177,7 +177,7 @@ function themPhieuXuat() {
         DenNgay: null,
     };
     $.ajax({
-        url: '/XuatKho/ThemPhieuXuat', // Đường dẫn đến action xử lý form
+        url: '/XuatKho/ThemPhieuXuatHangHoa', // Đường dẫn đến action xử lý form
         method: 'POST',
         data: JSON.stringify(data),
         contentType: "application/json",

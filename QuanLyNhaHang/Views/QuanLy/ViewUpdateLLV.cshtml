@@ -7,7 +7,7 @@
     }
     List<NhanVien> getListNV()
     {
-        return context.NhanVien.ToList();
+        return context.NhanVien.Where(x => x.Idnnv == 1).ToList();
     }
     List<Ca> getListCa()
     {

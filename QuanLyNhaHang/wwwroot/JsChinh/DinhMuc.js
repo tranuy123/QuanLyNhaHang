@@ -18,12 +18,14 @@
         const dataId = $(this).closest('tr').data('id');
         if (isChecked) {
             const tdSecond = $(this).closest('tr').find('td').eq(1); // Lấy phần tử <td> thứ hai
+            const dvt = $(this).closest('tr').find('td').eq(2); // Lấy phần tử <td> thứ hai
             const col2Content = tdSecond.html(); // Lấy nội dung của phần tử <td> thứ hai
             var newRow = $('<tr data-id="' + dataId + '"></tr>');
             var col1 = $('<td></td>').text(tdSecond.text());
-            var col2 = $('<td><input id="soLuong" class="form-control w-auto" /></td>');
-            var col3 = $('<td class="text-center last-td-column"></td>').append('<a href="#" class="deleterowPrf list-group-item-actions"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x text-red" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg></a>');
-            newRow.append(col1, col2,col3);
+            var col2 = $('<td></td>').text(dvt.text());
+            var col3 = $('<td><input id="soLuong" class="form-control w-50" /></td>');
+            var col4 = $('<td class="text-center last-td-column"></td>').append('<a href="#" class="deleterowPrf list-group-item-actions"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x text-red" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg></a>');
+            newRow.append(col1, col2,col3,col4);
 
             $('#tbodyDVKTDC').append(newRow);
         } else {
@@ -222,6 +224,7 @@ function getRowTableDVKTDC(data) {
     console.log(data);
     return `<tr data-id="${data.idhhNavigation.idhh}">
     <td>${data.idhhNavigation.tenHh}</td>
+    <td>${data.idhhNavigation.iddvtNavigation.tenDvt}</td>
     <td><input id="soLuong" class="form-control w-50" value="${data.soLuong}"/></td>
     <td class="text-center last-td-column"><a href="#" class="deleterowPrf list-group-item-actions"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x text-red" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg></a></td>
 </tr>`;
@@ -229,69 +232,3 @@ function getRowTableDVKTDC(data) {
 $('.deleteallrow').on('click', function () {
     $('#tbodyDVKTDC').empty();
 })
-$('.cbDichVuKyThuat').on('change', function () {
-    var selectedValue = $(this).val();
-    if (selectedValue != '') {
-        var selectedText = $(this).find("option:selected").text();
-        var newRow = $('<tr data-id="' + selectedValue + '"></tr>');
-        var col1 = $('<td></td>').text(selectedText);
-        var col2 = $('<td class="text-center last-td-column"></td>').append('<a href="#" class="deleterowPrf list-group-item-actions"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x text-red" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg></a>');
-        newRow.append(col1, col2);
-
-        $('#tbodyDVKTDC').append(newRow);
-        cleanSelect('.cbDichVuKyThuat');
-    }
-});
-function cleanSelect(nameClass) {
-    var selectElements = document.querySelectorAll(nameClass);
-    selectElements.forEach(function (selectElement) {
-        if (selectElement.tomselect) {
-            selectElement.tomselect.clear();
-        } else {
-            selectElement.selectedIndex = 0;
-        }
-    });
-}
-$('.check-all-DVKT').on('click', function () {
-    const isChecked = $(this).prop('checked');
-    $('#tbodyDVKT input[type="checkbox"]').prop('checked', isChecked);
-
-    if (isChecked) {
-        // Thêm các dòng vào #tbodyDVKTDC nếu checkbox đã được check
-        $('#tbodyDVKT input[type="checkbox"]:checked').each(function () {
-            const dataId = $(this).closest('tr').data('id');
-            const tdSecond = $(this).closest('tr').find('td').eq(1);
-            const col1Content = tdSecond.text();
-            const newRow = $('<tr data-id="' + dataId + '"></tr>');
-            const col1 = $('<td></td>').text(col1Content);
-            const col2 = $('<td class="text-center last-td-column"></td>').append('<a href="#" class="deleterowPrf list-group-item-actions"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x text-red" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M18 6l-12 12"></path><path d="M6 6l12 12"></path></svg></a>');
-            newRow.append(col1, col2);
-            $('#tbodyDVKTDC').append(newRow);
-        });
-    } else {
-        // Xóa các dòng khỏi #tbodyDVKTDC nếu checkbox không được check
-        $('#tbodyDVKTDC').empty();
-    }
-    updateCheckAllDVKTStatus();
-});
-
-
-function updateQuyenButtonLuu() {
-    var isCheck = false;
-    if (_isCapNhatProfile) {
-        if (_qSua) {
-            isCheck = true;
-        }
-    } else {
-        if (_qThem) {
-            isCheck = true;
-        }
-    }
-    if (isCheck) {
-        $('#btnLuuProfile').attr('onclick', 'update()');
-        $('#btnLuuProfile').removeClass('disabled');
-    } else {
-        $('#btnLuuProfile').removeAttr('onclick');
-        $('#btnLuuProfile').addClass('disabled');
-    }
-}

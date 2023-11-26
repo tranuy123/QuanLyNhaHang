@@ -1,5 +1,6 @@
 ﻿using QuanLyNhaHang.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Net.NetworkInformation;
@@ -39,6 +40,14 @@ namespace QuanLyNhaHang.Services
             string date = now.ToString("yyyyMMdd");
             var phieuNhap = context.PhieuXuat.Where(x => x.SoPx.Contains(date)).ToList();
             return $"PX-{date}-{(phieuNhap.Count() + 1).ToString("D2")}";
+        }
+        public static string GetTenHH(int idHH, List<HangHoa> hangHoas)
+        {
+            return hangHoas.FirstOrDefault(x => x.Idhh == idHH).TenHh;
+        }
+        public static string GetTenTD(int idTD, List<ThucDon> thucDons)
+        {
+            return thucDons.FirstOrDefault(x => x.Idtd == idTD).Ten;
         }
     }
 }

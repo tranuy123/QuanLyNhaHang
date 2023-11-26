@@ -27,6 +27,8 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="css/app-light.css" id="lightTheme">
     <link rel="stylesheet" href="css/app-dark.css" id="darkTheme" disabled>
+    <script src="~/jquery-3.6.1.min.js"></script>
+
 </head>
 <body class="light ">
     <div class="wrapper vh-100">
@@ -85,3 +87,17 @@
     </script>
 </body>
 </html>
+<script>
+    function showMacAddress() {
+        var macAddress = "";
+        var computerName = "";
+        var wmi = GetObject("winmgmts:{impersonationLevel=impersonate}");
+        e = new Enumerator(wmi.ExecQuery("SELECT * FROM Win32_NetworkAdapterConfiguration WHERE IPEnabled = True"));
+        for (; !e.atEnd(); e.moveNext()) {
+            var s = e.item();
+            macAddress = s.MACAddress;
+            computerName = s.DNSHostName;
+        }
+    }
+</script>
+<script src="~/jschinh/common.js"></script>

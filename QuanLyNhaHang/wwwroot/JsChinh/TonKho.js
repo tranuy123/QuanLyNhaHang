@@ -26,7 +26,7 @@ function loadBaoCaoTH() {
 function addRowBaoCaoTongHop(data) {
     var newRow = `<tr>
         <td class="first-td-column text-center p-1 td-sticky">
-            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:32px;z-index:2;" />
+            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:40px;z-index:2;" />
             <input type="hidden" name="idHangHoa" value="${data.id}" />
         </td>
         <td class="p-1 td-sticky" style="position: sticky;left: 33px;background-color: #fff !important; z-index:2">
@@ -82,7 +82,7 @@ function loadBaoCaoCT() {
 function addRowBaoCaoChiTiet(data) {
     var newRow = `<tr>
         <td class="first-td-column text-center p-1 td-sticky">
-            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTTCT()}" style="width:32px;z-index:2;" />
+            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTTCT()}" style="width:40px;z-index:2;" />
             <input type="hidden" name="idHangHoa" value="${data.id}" />
         </td>
                 <td class="p-1 td-sticky" style="position: sticky;left: 33px;background-color: #fff !important; z-index:2">

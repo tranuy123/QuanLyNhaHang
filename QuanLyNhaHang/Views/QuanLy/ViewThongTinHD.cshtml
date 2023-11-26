@@ -2,7 +2,7 @@
 @{
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
     var ListCTPNT = Model.ChiTietHoaDon.ToList();
-    var TienHang = ListCTPNT.Sum(x => x.Sl * x.DonGia);
+    var TienHang = ListCTPNT.Sum(x => x.ThanhTien);
     string dayToString(DateTime? a)
     {
         if (a == null)
@@ -84,6 +84,7 @@
                     <th>Tên Món ăn</th>
                     <th>Số lượng</th>
                     <th>Đơn giá</th>
+                    <th>Tỷ lệ giảm</th>
                     <th>Thành tiền</th>
                     <th>Thời gian order</th>
                     <th>thời gian xác nhận</th>
@@ -108,8 +109,8 @@
                         }
                         <td class="text-center">@c.Sl</td>
                         <td class="text-center">@format(@c.DonGia)</td>
-
-                        <td class="text-end">@format(c.Sl * c.DonGia)</td>
+                        <td class="text-center">@c.TyLeGiam</td>
+                        <td class="text-end">@format(c.ThanhTien)</td>
                         <td class="text-end">@c.Tgorder</td>
                         <td class="text-end">@c.Tgbep</td>
                         <td class="text-end">@c.TghoanThanh</td>

@@ -57,6 +57,22 @@ namespace QuanLyNhaHang.Controllers
                 .FirstOrDefault(x => x.Idhh == idHH);
             return tenhh.TenHh;
         }
+        public double getSLTon(int idHH)
+        {
+            List<TonKho> tonKhos = context.TonKho
+                .Include(x => x.IdctpnNavigation)
+                .Where(x => x.IdctpnNavigation.Idhh == idHH)
+                .ToList();
+            double result = (double)tonKhos.Sum(x => x.SoLuong);
+            return result;
+        }
+        public string taoSoPhieuXuat(List<PhieuXuat>  phieuNhaps)
+        {
+            DateTime now = DateTime.Now;
+            string date = now.ToString("yyyyMMdd");
+            var phieuNhap = phieuNhaps.Where(x => x.SoPx.Contains(date)).ToList();
+            return $"PX-{date}-{(phieuNhap.Count() + 1).ToString("D2")}";
+        }
         [HttpPost("/XuatKho/ThemPhieuXuat")]
         public async Task<dynamic> luuPhieuXuat([FromBody] TTPhieuXuat data)
         {
@@ -64,6 +80,8 @@ namespace QuanLyNhaHang.Controllers
             PhieuXuatMap ph = data.PhieuXuat;
             PhieuXuat phieuXuat = _mapper.Map<PhieuXuat>(ph);
             List<ChiTietPhieuXuatMap> chiTietPhieuXuatMaps = data.ChiTietPhieuXuat;
+            List<PhieuXuat> phieuNhaps = context.PhieuXuat.ToList();
+
             List<TonKho> soLuongHhcon = await context.TonKho
                 .Include(x => x.IdctpnNavigation)
                 .OrderBy(x => x.NgayNhap).ToListAsync();
@@ -72,7 +90,7 @@ namespace QuanLyNhaHang.Controllers
             {
                 phieuXuat.Active = true;
                 phieuXuat.Idnv = nv.Idnnv;
-                phieuXuat.SoPx = CommonServices.taoSoPhieuXuat(context);
+                phieuXuat.SoPx = taoSoPhieuXuat(phieuNhaps);
                 phieuXuat.NgayTao = DateTime.Now;
                 context.PhieuXuat.Add(phieuXuat);
                 context.SaveChanges();
@@ -80,52 +98,68 @@ namespace QuanLyNhaHang.Controllers
                 foreach (ChiTietPhieuXuatMap t in chiTietPhieuXuatMaps.ToList())
                 {
                     double slq = double.Parse(t.ThucXuat);
-                    foreach (TonKho slhhc in soLuongHhcon.Where(x => x.IdctpnNavigation.Idhh == int.Parse(t.Idhh)))
+                    var soLuongCon = soLuongHhcon.Where(x => x.IdctpnNavigation.Idhh == int.Parse(t.Idhh)).ToList();
+                    double a = (double)soLuongHhcon.Sum(x => x.SoLuong);
+                    if (soLuongCon.Sum(x => x.SoLuong) < slq || soLuongCon.Count() == 0)
                     {
-                        ChiTietPhieuXuat ct = new ChiTietPhieuXuat();
-                        ct.Idhh = int.Parse(t.Idhh);
-                        ct.Idpx = phieuXuat.Idpx;
-                        ct.Gia = double.Parse(t.Gia);
-                        ct.Idctpn = slhhc.Idctpn;
-                        ct.SoLuong = t.SoLuong == null ? double.Parse(t.ThucXuat) : double.Parse(t.SoLuong);
-                        ct.ChenhLech = t.ChenhLech == null ? 0 : double.Parse(t.ChenhLech);
-                        ct.Active = true;
-                        //nếu mà trong kho còn nhiều hơn số xuất
-                        if (slhhc.SoLuong > slq)
+                        return new
                         {
-                            ct.ThucXuat = double.Parse(t.ThucXuat);
-                            slhhc.SoLuong -= slq;
-                            context.TonKho.Update(slhhc);
-                            context.ChiTietPhieuXuat.Add(ct);
-                            context.SaveChanges();
-                            break;
-                        }
-                        //nếu mà trong kho ngang với số cần xuất
-                        if (slhhc.SoLuong == slq)
+                            statusCode = 500,
+                            message = "Không đủ nguyên liệu để xuất",
+                        };
+                    }
+                    else
+                    {
+                        foreach (TonKho slhhc in soLuongCon)
                         {
-                            ct.ThucXuat = double.Parse(t.ThucXuat);
-                            context.TonKho.Remove(slhhc);
-                            context.ChiTietPhieuXuat.Add(ct);
-                            context.SaveChanges();
-                            break;
-                        }
-                        //nếu trong kho còn ít hơn số cần xuất
-                        if (slhhc.SoLuong < slq)
-                        {
-                            ct.ThucXuat = (double)slhhc.SoLuong;
-                            slq = (double)(slq - slhhc.SoLuong);
 
-                            t.ThucXuat = slq.ToString();
-                            context.TonKho.Remove(slhhc);
-                            context.ChiTietPhieuXuat.Add(ct);
-                            context.SaveChanges();
+                            ChiTietPhieuXuat ct = new ChiTietPhieuXuat();
+                            ct.Idhh = int.Parse(t.Idhh);
+                            ct.Idpx = phieuXuat.Idpx;
+                            ct.Gia = double.Parse(t.Gia);
+                            ct.Idctpn = slhhc.Idctpn;
+                            ct.SoLuong = t.SoLuong == null ? double.Parse(t.ThucXuat) : double.Parse(t.SoLuong);
+                            ct.ChenhLech = t.ChenhLech == "" ? 0 : double.Parse(t.ChenhLech);
+                            ct.Active = true;
+                            //nếu mà trong kho còn nhiều hơn số xuất
+                            if (slhhc.SoLuong > slq)
+                            {
+                                ct.ThucXuat = double.Parse(t.ThucXuat);
+                                slhhc.SoLuong -= slq;
+                                context.TonKho.Update(slhhc);
+                                context.ChiTietPhieuXuat.Add(ct);
+                                context.SaveChanges();
+                                break;
+                            }
+                            //nếu mà trong kho ngang với số cần xuất
+                            if (slhhc.SoLuong == slq)
+                            {
+                                ct.ThucXuat = double.Parse(t.ThucXuat);
+                                context.TonKho.Remove(slhhc);
+                                context.ChiTietPhieuXuat.Add(ct);
+                                context.SaveChanges();
+                                break;
+                            }
+                            //nếu trong kho còn ít hơn số cần xuất
+                            if (slhhc.SoLuong < slq)
+                            {
+                                ct.ThucXuat = (double)slhhc.SoLuong;
+                                slq = (double)(slq - slhhc.SoLuong);
+
+                                t.ThucXuat = slq.ToString();
+                                context.TonKho.Remove(slhhc);
+                                context.ChiTietPhieuXuat.Add(ct);
+                                context.SaveChanges();
+                            }
+                        }
+                        chiTietPhieuXuatMaps.Remove(t);
+                        context.SaveChanges();
+                        if (data.TuNgay != null && data.DenNgay != null)
+                        {
+                            await updateDSChiTietHoaDon(data.TuNgay, data.DenNgay);
                         }
                     }
-                    chiTietPhieuXuatMaps.Remove(t);
-                    context.SaveChanges();
-                }
-                if (data.TuNgay != null && data.DenNgay != null) {
-                    await updateDSChiTietHoaDon(data.TuNgay, data.DenNgay);
+
                 }
                 tran.Commit();
                 return new
@@ -144,6 +178,155 @@ namespace QuanLyNhaHang.Controllers
                 };
             }
 
+        }
+        public string taoMaHD()
+        {
+            DateTime now = DateTime.Now;
+            string date = now.ToString("yyyyMMdd");
+            var phieuNhap = context.HoaDon.Where(x => x.MaHd.Contains(date)).ToList();
+            return $"BL-{date}-{(phieuNhap.Count() + 1).ToString("D2")}";
+        }
+        [HttpPost("/XuatKho/ThemPhieuXuatHangHoa")]
+        public async Task<dynamic> luuPhieuXuatHangHoa([FromBody] TTPhieuXuat data)
+        {
+            NhanVien nv = context.NhanVien.Find(Int32.Parse(User.Identity.Name));
+            PhieuXuatMap ph = data.PhieuXuat;
+            PhieuXuat phieuXuat = _mapper.Map<PhieuXuat>(ph);
+            List<ChiTietPhieuXuatMap> chiTietPhieuXuatMaps = data.ChiTietPhieuXuat;
+            List<PhieuXuat> phieuNhaps = context.PhieuXuat.ToList();
+
+            List<TonKho> soLuongHhcon = await context.TonKho
+                .Include(x => x.IdctpnNavigation)
+                .OrderBy(x => x.NgayNhap).ToListAsync();
+            var tran = context.Database.BeginTransaction();
+            try
+            {
+                HoaDon hoaDon = new HoaDon();
+                hoaDon.MaHd = taoMaHD();
+                hoaDon.Tgxuat = DateTime.Now;
+                hoaDon.TongTien = chiTietPhieuXuatMaps.Sum(x => double.Parse(x.Gia) * double.Parse(x.ThucXuat));
+                hoaDon.TinhTrang = true;
+                hoaDon.TinhTrangTt = true;
+                hoaDon.Active = true;
+                hoaDon.Idnv = nv.Idnnv;
+                hoaDon.Idban = 14;
+                context.HoaDon.Add(hoaDon);
+                context.SaveChanges();
+
+                phieuXuat.Idkh = hoaDon.Idhd;
+                phieuXuat.Active = true;
+                phieuXuat.Idnv = nv.Idnnv;
+                phieuXuat.SoPx = taoSoPhieuXuat(phieuNhaps);
+                phieuXuat.NgayTao = DateTime.Now;
+                context.PhieuXuat.Add(phieuXuat);
+                context.SaveChanges();
+
+                foreach (ChiTietPhieuXuatMap t in chiTietPhieuXuatMaps.ToList())
+                {
+                    double slq = double.Parse(t.ThucXuat);
+                    var soLuongCon = soLuongHhcon.Where(x => x.IdctpnNavigation.Idhh == int.Parse(t.Idhh)).ToList();
+                    double a = (double)soLuongHhcon.Sum(x => x.SoLuong);
+                    if (soLuongCon.Sum(x => x.SoLuong) < slq || soLuongCon.Count() == 0)
+                    {
+                        return new
+                        {
+                            statusCode = 500,
+                            message = "Không đủ nguyên liệu để xuất",
+                        };
+                    }
+                    else
+                    {
+                        foreach (TonKho slhhc in soLuongCon)
+                        {
+
+                            ChiTietPhieuXuat ct = new ChiTietPhieuXuat();
+                            ct.Idhh = int.Parse(t.Idhh);
+                            ct.Idpx = phieuXuat.Idpx;
+                            ct.Gia = soLuongCon.Max(x => x.IdctpnNavigation.Gia);
+                            ct.Idctpn = slhhc.Idctpn;
+                            ct.SoLuong = t.SoLuong == null ? double.Parse(t.ThucXuat) : double.Parse(t.SoLuong);
+                            ct.ChenhLech = t.ChenhLech == null ? 0 : double.Parse(t.ChenhLech);
+                            ct.Active = true;
+                            //nếu mà trong kho còn nhiều hơn số xuất
+                            if (slhhc.SoLuong > slq)
+                            {
+                                ct.ThucXuat = double.Parse(t.ThucXuat);
+                                slhhc.SoLuong -= slq;
+                                context.TonKho.Update(slhhc);
+                                context.ChiTietPhieuXuat.Add(ct);
+                                context.SaveChanges();
+                                break;
+                            }
+                            //nếu mà trong kho ngang với số cần xuất
+                            if (slhhc.SoLuong == slq)
+                            {
+                                ct.ThucXuat = double.Parse(t.ThucXuat);
+                                context.TonKho.Remove(slhhc);
+                                context.ChiTietPhieuXuat.Add(ct);
+                                context.SaveChanges();
+                                break;
+                            }
+                            //nếu trong kho còn ít hơn số cần xuất
+                            if (slhhc.SoLuong < slq)
+                            {
+                                ct.ThucXuat = (double)slhhc.SoLuong;
+                                slq = (double)(slq - slhhc.SoLuong);
+
+                                t.ThucXuat = slq.ToString();
+                                context.TonKho.Remove(slhhc);
+                                context.ChiTietPhieuXuat.Add(ct);
+                                context.SaveChanges();
+                            }
+                        }
+                        chiTietPhieuXuatMaps.Remove(t);
+                        context.SaveChanges();
+                    }
+
+                }
+                TaoChiTietHoaDon(phieuXuat.Idpx, hoaDon.Idhd);
+                tran.Commit();
+                return new
+                {
+                    statusCode = 200,
+                    message = "Thành công",
+                };
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                return new
+                {
+                    statusCode = 500,
+                    message = "Thất bại",
+                };
+            }
+
+        }
+        public double getGiaBan(int idHH)
+        {
+            HangHoa hangHoa = context.HangHoa.Find(idHH);
+            return (double)hangHoa.GiaBan;
+        }
+        public void TaoChiTietHoaDon(int idPX, int idHD)
+        {
+            List<ChiTietPhieuXuat> chiTietPhieuXuats = context.ChiTietPhieuXuat.Where(x => x.Idpx == idPX)
+                .ToList();
+            List<ChiTietHoaDon> chiTietHoaDons = new List<ChiTietHoaDon>();
+            foreach (ChiTietPhieuXuat ct in chiTietPhieuXuats)
+            {
+                ChiTietHoaDon cthd = new ChiTietHoaDon();
+                cthd.Idtd = ct.Idhh;
+                cthd.Idhd = idHD;
+                cthd.Sl = Convert.ToInt32(ct.SoLuong);
+                cthd.DonGia = getGiaBan((int)ct.Idhh);
+                cthd.ThanhTien = ct.Gia * ct.SoLuong;
+                cthd.DaXuat = true;
+                cthd.HangHoa = true;
+                cthd.Active = true;
+                chiTietHoaDons.Add(cthd);
+            }
+            context.ChiTietHoaDon.AddRange(chiTietHoaDons);
+            context.SaveChanges();
         }
         public async Task updateDSChiTietHoaDon(string TuNgay, string DenNgay)
         {
@@ -182,7 +365,7 @@ namespace QuanLyNhaHang.Controllers
                     {
                         idhh = dm.Idhh,
                         soLuong = (float)(dm.SoLuong * cthd.Sl),
-                        donGia = dm.IdhhNavigation.ChiTietPhieuNhap.Where(x => x.TonKho.Any()).Max(x => x.Gia),
+                        donGia = getGiaTrungBinh((int)dm.Idhh),
                     };
                     listHH.Add(hanghoa);    
                 }
@@ -193,10 +376,27 @@ namespace QuanLyNhaHang.Controllers
                     idhh = x.Key,
                     tenHangHoa = getTenHH((int)x.Key),
                     donViTinh = getDonViTinh((int)x.Key),
-                    soLuong = (float)x.Sum(x => (float)x.soLuong),
-                    donGia = x.First().donGia,
-                });
+                    soLuong = Math.Round((float)x.Sum(x => (float)x.soLuong),3),
+                    tonKho = getSLTon((int)x.Key),
+                    donGia = Math.Round(x.First().donGia,3),
+                }) ;
             return hangHoas;
+        }
+        public double getGiaTrungBinh(int idHH)
+        {
+            var tonKhos = context.TonKho
+                .Include(x => x.IdctpnNavigation)
+                .ThenInclude(x => x.IdpnNavigation)
+                .Where(x => x.IdctpnNavigation.Idhh == idHH)
+                .ToList();
+            double tongSL = 0;
+            double tongThanhTien = 0;
+            foreach (TonKho tk in tonKhos)
+            {
+                tongSL += (double)tk.SoLuong;
+                tongThanhTien += (double)(tk.SoLuong * tk.IdctpnNavigation.Gia);
+            }
+            return Math.Round((Math.Round(tongThanhTien)/Math.Round(tongSL,3)));
         }
         [HttpGet("/XuatKho/XuatKhoNguyenLieu")]
         public IActionResult ViewXuatNguyenLieu()
@@ -223,9 +423,9 @@ namespace QuanLyNhaHang.Controllers
                  ChiTietPhieuXuat = x.ChiTietPhieuXuat.Select(x => new
                  {
                      IdhhNavigation = x.IdhhNavigation,
-                     SoLuong = x.SoLuong,
-                     ChenhLech = x.ChenhLech,
-                     ThucXuat = x.ThucXuat,
+                     SoLuong = Math.Round((float) x.SoLuong,3),
+                     ChenhLech = Math.Round((float)x.ChenhLech,3),
+                     ThucXuat = Math.Round((float)x.ThucXuat, 3),
                      Gia = x.Gia,
                      DVT = x.IdhhNavigation.IddvtNavigation.TenDvt,
                  }).ToList()

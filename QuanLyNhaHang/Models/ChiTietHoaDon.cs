@@ -14,6 +14,7 @@ namespace QuanLyNhaHang.Models
         public int? Idhd { get; set; }
         public int? Sl { get; set; }
         public double? DonGia { get; set; }
+        public int? TyLeGiam { get; set; }
         public double? ThanhTien { get; set; }
         public DateTime? Tgorder { get; set; }
         public DateTime? Tgbep { get; set; }

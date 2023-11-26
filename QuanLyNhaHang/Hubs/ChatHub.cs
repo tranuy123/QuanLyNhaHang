@@ -8,15 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-
+using AutoMapper.Configuration;
 
 namespace SignalRChat.Hubs
 {
     public class ChatHub : Hub
     {
-        
-
         public async Task SendMessage(string id)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
@@ -109,6 +106,7 @@ namespace SignalRChat.Hubs
                             ct.DonGia = ctt.DonGia;
                             ct.Sl = ctt.Sl;
                             ct.DonGia = ctt.DonGia;
+                            ct.TyLeGiam = 0;
                             ct.HangHoa = ctt.HangHoa;
                             ct.Active = true;
                             ct.Idca = ca;
@@ -149,6 +147,7 @@ namespace SignalRChat.Hubs
                             ct.Idtd = ctt.Idtd;
                             ct.DonGia = ctt.DonGia;
                             ct.Sl = ctt.Sl;
+                            ct.TyLeGiam = 0;
                             ct.HangHoa = ctt.HangHoa;
                             ct.DonGia = ctt.DonGia;
                             ct.Active = true;
@@ -267,45 +266,84 @@ namespace SignalRChat.Hubs
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             var tinhtranghoadon = context.ChiTietHoaDon.FirstOrDefault(x => x.Idhd == int.Parse(IDHD) && x.TghoanThanh == null);
-            if (tinhtranghoadon != null)
+            using var tran = context.Database.BeginTransaction();
+            try
             {
-                var HD = context.HoaDon
-                .Where(x => x.TinhTrang == false && x.TinhTrangTt == null && x.Tgxuat == null)
-                .Select(x => new
-                {
-                    x.Idhd,
-                    x.IdbanNavigation.TenBan,
-                    x.IdbanNavigation.IdkhuNavigation.TenKhu,
-                    x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation.TenSanh,
-                    x.TongTien,
-                })
-                .ToList();
-                int tt = 0;
-                var ipmac = context.HoaDon.Include(x => x.IdbanNavigation).FirstOrDefault(x => x.Idhd == int.Parse(IDHD)).IdbanNavigation.Ipmac;
-                await Clients.All.SendAsync("GiveHD", HD, tt, ipmac);
-            }
-            else
-            {
-                HoaDon hd = context.HoaDon.FirstOrDefault(x => x.Idhd == int.Parse(IDHD));
-                hd.TinhTrang = false;
-                context.HoaDon.Update(hd);
-                context.SaveChanges();
-                var HD = context.HoaDon
-                .Where(x => x.TinhTrang == false && x.TinhTrangTt == null)
-                .Select(x => new
-                {
-                    x.Idhd,
-                    x.IdbanNavigation.TenBan,
-                    x.IdbanNavigation.IdkhuNavigation.TenKhu,
-                    x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation.TenSanh,
-                    x.TongTien,
-                })
-                .ToList();
+                    HoaDon hd = context.HoaDon.FirstOrDefault(x => x.Idhd == int.Parse(IDHD));
+                    List<HangHoa> hangHoas = context.HangHoa.Where(x => x.Active == true).ToList();
+                    List<ThucDon> thucDons = context.ThucDon.Where(x => x.Active == true).ToList();
+                    hd.TinhTrang = false;
+                    context.HoaDon.Update(hd);
+                    context.SaveChanges();
+                    var HD = context.HoaDon
+                    .Where(x => x.TinhTrang == false && x.TinhTrangTt == null && x.Tgxuat == null && x.Idhd == int.Parse(IDHD))
+                    .Select(x => new
+                    {
+                        x.Idhd,
+                        x.IdbanNavigation.TenBan,
+                        x.IdbanNavigation.IdkhuNavigation.TenKhu,
+                        x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation.TenSanh,
+                        x.TongTien,
+                        ChiTietHoaDon = x.ChiTietHoaDon.Select(ct => new
+                        {
+                            IdCTHD = ct.Idcthd,
+                            Ten = ct.HangHoa == true ? CommonServices.GetTenHH((int)ct.Idtd, hangHoas) : CommonServices.GetTenTD((int)ct.Idtd, thucDons),
+                            SoLuong = ct.Sl,
+                            DonGia = ct.DonGia,
+                            ThanhTien = ct.Sl * ct.DonGia,
+                        }).ToList()
+                        //ChiTietHoaDon = x.ChiTietHoaDon.Select(y => new
+                        //{
+                        //    TenHH = GetTenHH((int)y.Idtd),
+                        //    TenTD = GetTenTD((int)y.Idtd),
+                        //    SoLuong = y.Sl,
+                        //    DonGia = y.DonGia,
+                        //}).ToList(),
+                    })
+                    .ToList();
+                
+                //int tt = tinhtranghoadon != null ? 0 : 1;
                 int tt = 1;
 
                 var ipmac = context.HoaDon.Include(x => x.IdbanNavigation).FirstOrDefault(x => x.Idhd == int.Parse(IDHD)).IdbanNavigation.Ipmac;
+                var item = HD.First();
+                tran.Commit();
+                await Clients.All.SendAsync("GiveHD", item, tt, ipmac);
 
-                await Clients.All.SendAsync("GiveHD", HD, tt, ipmac);
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                Console.WriteLine(ex.Message);
+            }
+        }
+        public async Task SendHHD(string IDHD)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            var tinhtranghoadon = context.ChiTietHoaDon.FirstOrDefault(x => x.Idhd == int.Parse(IDHD) && x.TghoanThanh == null);
+            var ipmac = context.HoaDon.Include(x => x.IdbanNavigation).FirstOrDefault(x => x.Idhd == int.Parse(IDHD)).IdbanNavigation.Ipmac;
+            using var tran = context.Database.BeginTransaction();
+            try
+            {
+                HoaDon hd = context.HoaDon.FirstOrDefault(x => x.Idhd == int.Parse(IDHD));
+                hd.TinhTrang = null;
+                hd.Tgxuat = null;
+                hd.TinhTrangTt = null;
+                context.HoaDon.Update(hd);
+                context.SaveChanges();
+                tran.Commit();
+                var data = new
+                {
+                    ipmac = ipmac,
+                    idHD = int.Parse(IDHD),
+                };
+                await Clients.All.SendAsync("GiveHHD", data);
+
+            }
+            catch (Exception ex)
+            {
+                tran.Rollback();
+                Console.WriteLine(ex.Message);
             }
         }
         public async Task SendXNTT(string id)
@@ -320,12 +358,19 @@ namespace SignalRChat.Hubs
             var ipmac = context.HoaDon.Include(x => x.IdbanNavigation).FirstOrDefault(x => x.Idhd == int.Parse(id)).IdbanNavigation.Ipmac;
             await Clients.All.SendAsync("NhanXNTT", ipmac);
         }
+        public async Task SendHuyHDXNNT(string id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            //ChiTietHoaDon ct = context.ChiTietHoaDon.FirstOrDefault(x => x.Idcthd == int.Parse(id));
+            var ipmac = context.HoaDon.Include(x => x.IdbanNavigation).FirstOrDefault(x => x.Idhd == int.Parse(id)).IdbanNavigation.Ipmac;
+            await Clients.All.SendAsync("HuyHDXNNT", ipmac);
+        }
         public async Task SendXNNT(string id)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             //ChiTietHoaDon ct = context.ChiTietHoaDon.FirstOrDefault(x => x.Idcthd == int.Parse(id));
             HoaDon ct = context.HoaDon.Find(int.Parse(id));
-            ct.TinhTrangTt = true;
+            ct.TinhTrangTt = true;  
             context.HoaDon.Update(ct);
             context.SaveChanges();
             List<ChiTietHoaDon> chiTietHoaDons = context.ChiTietHoaDon

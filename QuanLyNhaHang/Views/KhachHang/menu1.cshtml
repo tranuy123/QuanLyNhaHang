@@ -1,4 +1,5 @@
 ﻿@using System.Net.NetworkInformation
+@using QuanLyNhaHang.Services;
 
 @{
     Layout = null;
@@ -12,30 +13,8 @@
     List<HangHoa> hangHoas = context.HangHoa
     .Include(x => x.IdnhhNavigation)
     .Where(x => x.IdnhhNavigation.HangHoa == true && x.Active == true).ToList();
-    string macAddress="";
-    //foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
-    //{
-    //    // Only consider Ethernet network interfaces
-    //    if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet &&
-    //        nic.OperationalStatus == OperationalStatus.Up)
-    //    {
-    //        macAddress = nic.GetPhysicalAddress().ToString();
-    //        break;
-    //    }
-    //}
-    NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+    string macAddress = CommonServices.getDiaChiMac();
 
-    foreach (NetworkInterface networkInterface in networkInterfaces)
-    {
-        // Lọc ra các card mạng không phải là loopback và đã kích hoạt
-        if (networkInterface.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
-            networkInterface.OperationalStatus == OperationalStatus.Up)
-        {
-            // Lấy địa chỉ MAC
-            macAddress = networkInterface.GetPhysicalAddress().ToString();
-
-        }
-    }
     ViewBag.IDMAC = macAddress;
     var IDkhu = context.Ban.Include(x => x.IdkhuNavigation).FirstOrDefault(x => x.Ipmac == macAddress);
     var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
@@ -273,7 +252,7 @@
                                     }
 
                                     <input type="hidden" class="IDTD" value="@item.Idhh" />
-                                    <a href="~/ImagesTD/ava.jpg" class="glightbox"><img src="~/ImagesTD/ava.jpg" class="menu-img img-fluid" alt=""></a>
+                                    <a href="~/ImagesTD/@item.Avatar" class="glightbox"><img src="~/ImagesTD/@item.Avatar" class="menu-img img-fluid" alt=""></a>
                                     <h4>@item.TenHh</h4>
                                     <p class="price">@item.GiaBan.Value.ToString("#,###") VNĐ</p>
                                 </div>
@@ -297,10 +276,10 @@
                 <div class="col-lg-3 col-md-6 d-flex">
                     <i class="bi bi-geo-alt icon"></i>
                     <div>
-                        <h4>Address</h4>
+                        <h4>Địa chỉ</h4>
                         <p>
-                            A108 Adam Street <br>
-                            New York, NY 535022 - US<br>
+                            136 Âu cơ <br>
+                            phường 12 quận Tân Bình<br>
                         </p>
                     </div>
 
@@ -309,10 +288,10 @@
                 <div class="col-lg-3 col-md-6 footer-links d-flex">
                     <i class="bi bi-telephone icon"></i>
                     <div>
-                        <h4>Reservations</h4>
+                        <h4>Liên hệ</h4>
                         <p>
-                            <strong>Phone:</strong> +1 5589 55488 55<br>
-                            <strong>Email:</strong> info@example.com<br>
+                            <strong>SĐT:</strong> +84 589 554 885<br>
+                            <strong>Email:</strong> nhahangtranuy@gmail.com<br>
                         </p>
                     </div>
                 </div>
@@ -320,16 +299,16 @@
                 <div class="col-lg-3 col-md-6 footer-links d-flex">
                     <i class="bi bi-clock icon"></i>
                     <div>
-                        <h4>Opening Hours</h4>
+                        <h4>Giờ mở cửa</h4>
                         <p>
-                            <strong>Mon-Sat: 11AM</strong> - 23PM<br>
-                            Sunday: Closed
+                            <strong>Th2-Th7: 11AM</strong> - 23PM<br>
+                            Chủ nhật: đóng cửa.
                         </p>
                     </div>
                 </div>
 
                 <div class="col-lg-3 col-md-6 footer-links">
-                    <h4>Follow Us</h4>
+                    <h4>Theo dõi chúng tôi</h4>
                     <div class="social-links d-flex">
                         <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
                         <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
@@ -343,14 +322,10 @@
 
         <div class="container">
             <div class="copyright">
-                &copy; Copyright <strong><span>Yummy</span></strong>. All Rights Reserved
+                &copy; Copyright <strong><span>Nhà Hàng Trần Uy</span></strong>
             </div>
             <div class="credits">
-                <!-- All the links in the footer should remain intact. -->
-                <!-- You can delete the links only if you purchased the pro version. -->
-                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/yummy-bootstrap-restaurant-website-template/ -->
-                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                Designed by <a href="#">COL</a>
             </div>
         </div>
 

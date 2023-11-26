@@ -5,27 +5,38 @@
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
     List<HoaDon> getListHD()
     {
-        return context.HoaDon.Include(x => x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation).Where(x => x.TinhTrang == false && x.TinhTrangTt == null && x.Tgxuat == null).ToList();
+        return context.HoaDon
+        .Include(x => x.ChiTietHoaDon).Include(x => x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation).Where(x => x.TinhTrang == false && x.TinhTrangTt == null && x.Tgxuat == null).ToList();
     }
     List<HoaDon> getListHDTT()
     {
-        return context.HoaDon.Include(x => x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation).Where(x =>x.TinhTrang ==true && x.TinhTrangTt == false).ToList();
+        return context.HoaDon
+        .Include(x => x.ChiTietHoaDon).Include(x => x.IdbanNavigation.IdkhuNavigation.IdsanhNavigation).Where(x => x.TinhTrang == true && x.TinhTrangTt == false).ToList();
     }
- string toDecimal(double? d)
+    string toDecimal(double? d)
     {
         return d.Value.ToString("#,##0.00");
+    }
+    ThucDon getThucDon(int? idTD)
+    {
+        return context.ThucDon.FirstOrDefault(x => x.Idtd == idTD);
+    }
+    HangHoa getHangHoa(int? idHH)
+    {
+        return context.HangHoa.FirstOrDefault(x => x.Idhh == idHH);
     }
 
 }
 
-<div class="row" style="width:100%">
+<div class="row" style="width:100%" id="viewThanhToan">
     <!-- simple table -->
     <div class="col-md-6 my-4">
         <div class="card shadow">
             <div class="card-body">
                 <h5 class="card-title">Xác nhận thanh toán</h5>
+                <input type="hidden" id="VAITRO" value="THUNGAN" />
                 <p class="card-text"></p>
-                <table class="table table-hover table-bordered text-center display nowrapr" id="" width="100%">
+                <table class="table table-hover table-bordered text-center display nowrapr" id="tableXNTT" width="100%">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -44,7 +55,7 @@
                         {
 
                             i++;
-                            <tr>
+                            <tr class="accordion-toggle collapsed" id="c-2474-@item.Idhd" data-toggle="collapse" data-parent="#c-2474-@item.Idhd" href="#collap-2474-@item.Idhd" aria-expanded="false">
                                 <td>@i</td>
                                 <td style="display:none" class="" id="IDBAN">@item.Idban</td>
                                 <td>@item.IdbanNavigation.TenBan</td>
@@ -53,13 +64,43 @@
                                     <td >@item.IdbanNavigation.IdkhuNavigation.IdsanhNavigation.TenSanh</td>
 
                                 
-                                    <td >@toDecimal(@item.TongTien)</td>
+                                    <td name="tongTien" >@toDecimal(@item.TongTien)</td>
 
                                     <td class="xacnhanTT">
                                     <input type="hidden" id="inputIDHDTT" value="@item.Idhd" />
-                                    <a id="IDHDTT" href="/download/hoadon/@item.Idhd" class="btn btn-primary" value="@item.Idhd">Xác nhận</a>
+                                    <a id="IDHDTT" class="btn btn-primary IDHDTT text-white" value="@item.Idhd">Xác nhận</a>
                                     </td>
                                 
+                            </tr>
+                            <tr id="collap-2474-@item.Idhd" class="in p-3 bg-light collapse" style="">
+                                <td colspan="8">
+                                    @{
+                                        int stt = 0;
+                                    }
+                                    @foreach(ChiTietHoaDon ct in item.ChiTietHoaDon){
+                                        stt++;
+                                        <dl class="row mb-0 mt-1">
+                                        <dt class="col-sm-1">@stt
+                                        <input readonly autocomplete="off" type="hidden" class="w-100 form-control form-table" value="@ct.Idcthd" name="IDCTHD" />
+                                        <input readonly autocomplete="off" type="hidden" class="w-100 form-control form-table" value="@item.Idhd" name="IDHD"/>
+                                        </dt>
+                                        @if(ct.HangHoa == true){
+                                                <dd class="col-sm-3">@getHangHoa(ct.Idtd).TenHh</dd>
+
+                                            }
+                                        else
+                                        {
+                                                <dd class="col-sm-3">@getThucDon(ct.Idtd).Ten</dd>
+
+                                            }
+                                        <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="@ct.Sl" name="soLuong" /></dt>
+                                        <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="@ct.DonGia" name="donGia" /></dt>
+                                            <dd class="col-sm-2"><input min="0" max="100" autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value="@ct.TyLeGiam" name="giamGia" /></dd>
+                                        <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="@(ct.ThanhTien)" style="width:55px;" name="thanhTien" /></dt>
+
+                                    </dl>
+                                    }
+                                </td>
                             </tr>
                         }
 
@@ -93,7 +134,7 @@
                         {
 
                             j++;
-                            <tr>
+                            <tr class="accordion-toggle collapsed" id="c-2474-@item.Idhd" data-toggle="collapse" data-parent="#c-2474-@item.Idhd" href="#collap-2474-@item.Idhd" aria-expanded="false">
                                 <td>@j</td>
                                 <td style="display:none" class=""></td>
                                 <td>@item.IdbanNavigation.TenBan</td>
@@ -105,13 +146,51 @@
                                 <td>@toDecimal(@item.TongTien)</td>
 
 
-                                <td class="xacnhanNT">
-                                    <input type="hidden" id="inputIDHDNT" value="@item.Idhd" />
+                                <td class="xacnhanNT p-0 d-flex justify-content-center align-items-center">
 
-                                    <button id="IDHDNT" class="btn btn-primary" value="@item.Idhd">Xác nhận</button>
+                                    <a id="IDHDNT" href="/download/hoadon/@item.Idhd" class="btn btn-primary IDHDNT">
+                                        Xác nhận                                     
+                                        <input type="hidden" id="inputIDHDNT" value="@item.Idhd" />
+                                    </a>
+                                    <a id="huyHD" class="btn btn-danger huyHD text-white" value="@item.Idhd">Hủy</a>
+
                                 </td>
 
                             </tr>
+                            <tr id="collap-2474-@item.Idhd" class="in p-3 bg-light collapse" style="">
+                                <td colspan="8">
+                                    @{
+                                        int stt = 0;
+                                    }
+                                    @foreach (ChiTietHoaDon ct in item.ChiTietHoaDon)
+                                    {
+                                        stt++;
+                                        <dl class="row mb-0 mt-1">
+                                            <dt class="col-sm-1">
+                                                @stt
+                                                <input readonly autocomplete="off" type="hidden" class="w-100 form-control form-table" value="@ct.Idcthd" name="IDCTHD" />
+                                                <input readonly autocomplete="off" type="hidden" class="w-100 form-control form-table" value="@item.Idhd" name="IDHD" />
+                                            </dt>
+                                            @if (ct.HangHoa == true)
+                                            {
+                                                <dd class="col-sm-3">@getHangHoa(ct.Idtd).TenHh</dd>
+
+                                            }
+                                            else
+                                            {
+                                                <dd class="col-sm-3">@getThucDon(ct.Idtd).Ten</dd>
+
+                                            }
+                                            <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="@ct.Sl" name="soLuong" /></dt>
+                                            <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="@ct.DonGia" name="donGia" /></dt>
+                                            <dd class="col-sm-2"><input readonly min="0" max="100" autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value="@ct.TyLeGiam" name="giamGia" /></dd>
+                                            <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="@ct.ThanhTien" style="width:55px;" name="thanhTien" /></dt>
+
+                                        </dl>
+                                    }
+                                </td>
+                            </tr>
+
                         }
                         
                     </tbody>
@@ -122,58 +201,7 @@
 </div> <!-- end section -->
 
 
-<script>
-
-
-
-
-
-
-    $('#dataTable-1').DataTable(
-        {
-            autoWidth: true,
-            "lengthMenu": [
-                [16, 32, 64, -1],
-                [16, 32, 64, "All"]
-            ]
-        });
-</script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
-
-
-
-
-        //    $(function () {
-        //        $("#TableTGBEP").on("click", ".xacnhan2", function () {
-        //            var ipmac = $('#IDMAC').val();
-        //        var id = $(this).find('#xacnhan1').val();
-
-        //            var thiss = $(this);
-
-        //            $.ajax({
-        //                type: "post",
-        //                url: "/XacNhanMon",
-        //                data: "id=" + id,
-        //                success: function (result) {
-        //                $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
-        //                 });
-        //                $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
-        //                });
-        //                },
-        //                error: function () {
-        //                    alert("Fail");
-        //                }
-        //            });
-        //        });
-        //})
-
-</script>
-
-
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
-
+<script src="~/jschinh/thungan.js"></script>
 

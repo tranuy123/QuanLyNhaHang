@@ -20,17 +20,15 @@ namespace QuanLyNhaHang.Controllers
             return View();
         }
         [HttpPost("/TonKho/BaoCaoTongHop")]
-        public async Task<dynamic> getBaoCaoTongHop(int idNhomHang, int idHangHoa, string tuNgay, string denNgay)
+        public async Task<dynamic> getBaoCaoTongHop(int idNhomHang, int idHangHoa)
         {
             try
             {
-                DateTime FromDay = DateTime.ParseExact(tuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
-                DateTime ToDay = DateTime.ParseExact(denNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+
                 var tonKho = await context.TonKho
                     .Include(x => x.IdctpnNavigation)
                     .ThenInclude(x => x.IdhhNavigation)
-                    .Where(x => (x.NgayNhap.Value.Date >= FromDay.Date && x.NgayNhap.Value.Date <= ToDay)
-                                && (idNhomHang == 0 || x.IdctpnNavigation.IdhhNavigation.Idnhh == idNhomHang)
+                    .Where(x => (idNhomHang == 0 || x.IdctpnNavigation.IdhhNavigation.Idnhh == idNhomHang)
                                 && (idHangHoa == 0 || x.IdctpnNavigation.Idhh == idHangHoa))
                     .ToListAsync();
                 var tonkho1 = tonKho.GroupBy(x => x.IdctpnNavigation.Idhh)
@@ -39,8 +37,8 @@ namespace QuanLyNhaHang.Controllers
                         Id = x.Key,
                         MaHang = getMaHang((int)x.Key),
                         TenHang = getTenHang((int)x.Key),
-                        TongSL = x.Sum(x => x.SoLuong),
-                        TongTien = x.Sum(x => x.IdctpnNavigation.Gia * x.SoLuong)
+                        TongSL = Math.Round((float)x.Sum(x => x.SoLuong),3),
+                        TongTien = Math.Round((float)x.Sum(x => x.IdctpnNavigation.Gia * x.SoLuong),3)
 
                     })
                     .ToList();
@@ -85,12 +83,12 @@ namespace QuanLyNhaHang.Controllers
                 TenHang = x.IdctpnNavigation.IdhhNavigation.TenHh,
                 NgaySX = x.IdctpnNavigation.Nsx.Value.ToString("dd-MM-yyyy"),
                 HanSD = x.IdctpnNavigation.Hsd.Value.ToString("dd-MM-yyyy"),
-                SoLuongNhap = x.IdctpnNavigation.SoLuong,
-                SoLuongXuat = getSoLuongXuat((int)x.Idctpn),
-                SoLuongTon = x.SoLuong,
+                SoLuongNhap = Math.Round((float)x.IdctpnNavigation.SoLuong,3),
+                SoLuongXuat = Math.Round(getSoLuongXuat((int)x.Idctpn),3),
+                SoLuongTon = Math.Round((float)x.SoLuong,3),
                 DonViTinh = x.IdctpnNavigation.IdhhNavigation.IddvtNavigation.TenDvt,
                 GiaNhap = x.IdctpnNavigation.Gia,
-                ThanhTien = x.IdctpnNavigation.Gia * x.SoLuong,
+                ThanhTien = Math.Round((float)(x.IdctpnNavigation.Gia * x.SoLuong), 3),
             }) ;
         }
         public double getSoLuongXuat(int idCTPN)

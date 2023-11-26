@@ -69,7 +69,7 @@ namespace QuanLyNhaHang.Controllers
                     {
                         idhh = dm.Idhh,
                         soLuong = (float)(dm.SoLuong * cthd.Sl),
-                        donGia = dm.IdhhNavigation.ChiTietPhieuNhap.Where(x => x.TonKho.Any()).Max(x => x.Gia),
+                        donGia = getGiaTrungBinh((int)dm.Idhh),
                     };
                     listHH.Add(hanghoa);
                 }
@@ -80,11 +80,27 @@ namespace QuanLyNhaHang.Controllers
                     TenHangHoa = getTenHH((int)x.Key),
                     TonKho = getTonKho((int)x.Key),
                     DonViTinh = getDonViTinh((int)x.Key),
-                    SoLuong = (float)x.Sum(x => (float)x.soLuong),
+                    SoLuong = Math.Round((float)x.Sum(x => (float)x.soLuong), 3),
                     DonGia = x.First().donGia,
                 }).ToList();
 
             return hangHoas;
+        }
+        public double getGiaTrungBinh(int idHH)
+        {
+            var tonKhos = context.TonKho
+                .Include(x => x.IdctpnNavigation)
+                .ThenInclude(x => x.IdpnNavigation)
+                .Where(x => x.IdctpnNavigation.Idhh == idHH)
+                .ToList();
+            double tongSL = 0;
+            double tongThanhTien = 0;
+            foreach (TonKho tk in tonKhos)
+            {
+                tongSL += (double)tk.SoLuong;
+                tongThanhTien += (double)(tk.SoLuong * tk.IdctpnNavigation.Gia);
+            }
+            return Math.Round((Math.Round(tongThanhTien) / Math.Round(tongSL, 3)));
         }
         public double getTonKho(int idhh)
         {

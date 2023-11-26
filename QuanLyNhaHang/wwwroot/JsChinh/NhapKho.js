@@ -66,7 +66,7 @@ function AddRowPhieuNhapKho() {
     console.log(GanSTT());
 var newRow = $(`<tr>
         <td class="first-td-column text-center p-1 td-sticky">
-            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:32px;z-index:2;" />
+            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:40px;z-index:2;" />
             <input type="hidden" name="idHangHoa" value="${idHangHoa}" />
         </td>
         <td class="p-1 td-sticky" style="position: sticky;left: 33px;background-color: #fff !important; z-index:2">
@@ -182,3 +182,96 @@ $('#tBody-ThemChiTietPhieuNhap').on('change', 'input[name="soLuong"], input[name
         TinhTongTien();
     }
 });
+
+//////////////////////////////////////// tab xem phiếu
+var _fromDay = null;
+var _toDay = null;
+var _soPhieu = null;
+function getDSXKNL() {
+    //for (var i = 1; i <= 7; i++) {
+    //    addRowTableXKNL(i);
+    //}
+    _fromDay = $('#fromDay').val();
+    _toDay = $('#toDay').val();
+    _soPhieu = $('#soPhieuLS').val();
+
+    $.ajax({
+        url: '/NhapKho/LichSuNhap', // Đường dẫn đến action xử lý form
+        method: 'POST',
+        data: {
+            TuNgay: _fromDay,
+            DenNgay: _toDay,
+            maPhieu: _soPhieu,
+        },
+        success: function (response) {
+            $('#tbody-XemPhieuNhap').empty();
+            $('#TienThanhToanTabLS').val('');
+            response.forEach(function (data, i) {
+                addRowTableXKNL(data, i);
+            });
+            /*TinhTongTienPhieuNhap();*/
+            //if (response.statusCode == 200) {
+            //    $('#tbodyChiTietPhieuNhap').empty();
+            //    $('#TienThanhToan').val('');
+
+            //}
+            //showToast(response.message, response.statusCode);
+        }
+    });
+}
+function addRowTableXKNL(data, i) {
+    var newRow = ` <tr class="accordion-toggle collapsed" id="c-2474${i}" data-toggle="collapse" data-parent="#c-2474${i}" href="#collap-2474${i}" aria-expanded="false">
+                                <td>${formatDay(data.ngayTao)}</td>
+                                <td>${data.nhaCungCap}</td>
+                                <td>${data.soPx}</td>
+                                <td>${data.soLuongHH} </td>
+                                <td> <input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.tongTien} id="tongTienXuat" name="tongTienXuat"/></td>
+                                <td>
+                                    <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="text-muted sr-only">Thao Tác</span>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">In</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr id="collap-2474${i}" class="in p-3 bg-light collapse" style="">
+                                <td colspan="8">
+                            `;
+    data.chiTietPhieuNhap.forEach(function (data, index) {
+        var i = index + 1;
+        newRow += `<dl class="row mb-0 mt-1">
+                                        <dt class="col-sm-1">${i}</dt>
+                                        <dd class="col-sm-1">${data.idhhNavigation.maHh}</dd>
+                                        <dt class="col-sm-1">${data.idhhNavigation.tenHh}</dt>
+                                        <dt class="col-sm-1">${data.dvt}</dt>
+                                        <dd class="col-sm-1">${data.soLuong}</dd>
+                                        <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.gia}/></dt>
+                                        <dd class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.soLuong * data.gia}/></dd>
+                                    </dl>
+                                `;
+    });
+    newRow += `
+    </td>
+    </tr>`;
+    $('#tbody-XemPhieuNhap').append(newRow);
+    formatNumberInput();
+    TinhTongTienPhieuNhapTabXem();
+
+}
+function TinhTongTienPhieuNhapTabXem() {
+    var tongTien = 0;
+    $('#tbody-XemPhieuNhap tr').each(function () {
+        var check = $(this).find('input[name="tongTienXuat"]').val();
+        if (check != undefined) {
+            var thanhTien = parseInt($(this).find('input[name="tongTienXuat"]').val().replace(/,/g, ''));
+            if (!isNaN(thanhTien)) {
+                tongTien += thanhTien;
+            }
+        }
+
+
+    });
+    $('#TienThanhToanTabLS').val(formatTotal(tongTien));
+}

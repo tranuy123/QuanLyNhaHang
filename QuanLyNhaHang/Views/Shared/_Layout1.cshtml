@@ -67,6 +67,15 @@
                     <!-- <img src="assets/img/logo.png" alt=""> -->
                     <h1>Yummy<span>.</span></h1>
                 </a>
+            <div class="toast fade hide" id="toast" style="position: absolute; top: 0; right: 0;z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="mr-auto">Thông báo</strong>
+                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="toast-body text-white mb-3" id="toastContent"></div>
+            </div>
             <div class="toast toastHD bg-success" style="position: absolute; top: 0; right: 0;z-index: 99999;">
                 <div class="toast-header">
                     <strong class="mr-auto">Thông báo</strong>
@@ -178,6 +187,7 @@
         </header><!-- End Header -->
 
         <main role="main" class="main-content">
+        <input type="hidden" id="VAITRO" value="KHACHHANG" />
             <div class="container-fluid">
                 <div class="row justify-content-center">
                     <div class="col-12">
@@ -196,6 +206,7 @@
             <div id="caption"></div>
     
     </div> <!-- .wrapper -->
+    <script src="~/jschinh/common.js"></script>
     <script src="~/js/signalr/dist/browser/signalr.js"></script>
     <script src="~/js/chat.js"></script>
     <script src="~/js/jquery.min.js"></script>

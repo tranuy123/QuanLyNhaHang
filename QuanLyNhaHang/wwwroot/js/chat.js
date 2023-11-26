@@ -230,43 +230,50 @@ $(document).ready(function () {
     });
 });
 //------------------------------------------------------------
-connection.on("GiveHD", function (hoadon,tt,ipmac) {
+connection.on("GiveHD", function (item,tt,ipmac) {
     var btnsendYCTT = $('.btn-sendYCTT');
     var IPMAC = $("#IDMAC").val();
     var tbody = $("#tbodyXNTT");
+    var newRow = `<tr class="accordion-toggle collapsed" id="c-2474-${item.idhd}" data-toggle="collapse" data-parent="#c-2474-${item.idhd}" href="#collap-2474-${item.idhd}" aria-expanded="false">
+    <td>${GanSTTXNTT()}</td>
+    <td style="display:none" class=""></td> 
+    <td>${item.tenBan}</td>
+    <td>${item.tenKhu}</td>
+    <td>${item.tenSanh}</td>
+    <td name="tongTien">${item.tongTien.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+    <td class="xacnhanTT">
+        <input type="hidden" id="inputIDHDTT" value="${item.idhd}" />
+        <a id="IDHDTT" class="btn btn-primary IDHDTT text-white"" value="${item.idhd}">Xác nhận</a>
+    </td>
+</tr>
+<tr id="collap-2474-${item.idhd}" class="in p-3 bg-light collapse" style="">
+    <td colspan="8">
+        `;
 
-    // Remove all existing rows from tbody
-    tbody.empty();
-
-    // Add new rows to tbody
-    $.each(hoadon, function (index, item) {
-
-        var tr = $(`<tr>
-                    <td>${(index+1)}</td>
-                    <td style="display:none" class=""></td>
-                    <td>${item.tenBan}</td>
-                    <td>${item.tenKhu}</td>
-
-                    <td>${item.tenSanh}</td>
-
-
-                    <td>${item.tongTien.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-
-                    <td class="xacnhanTT">
-                    <input type="hidden" id="inputIDHDTT" value="${item.idhd}" />
-
-                   <a id="IDHDTT" href="/download/hoadon/${item.idhd}" class="btn btn-primary" value="${item.idhd}">Xác nhận</a>
-                    </td>
-
-                    </tr>`);
-        
-        tbody.append(tr);
+    item.chiTietHoaDon.forEach(function (data, index) {
+        var i = index + 1;
+        newRow += `<dl class="row mb-0 mt-1">
+        <dt class="col-sm-1">${i}
+             <input readonly autocomplete="off" type="hidden" class="w-100 form-control form-table" value="${data.idCTHD}" name="IDCTHD" />
+             <input readonly autocomplete="off" type="hidden" class="w-100 form-control form-table" value="${item.idhd}" name="IDHD"/>
+        </dt>
+        <dd class="col-sm-3">${data.ten}</dd>
+        <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="${data.soLuong}" name="soLuong" /></dt>
+        <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="${data.donGia}" name="donGia" /></dt>
+        <dd class="col-sm-2"><input min="0" max="100" autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" min="0" max="100" name="giamGia" /></dd>
+        <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" value="${data.thanhTien}" style="width:55px;" name="thanhTien" /></dt>
+    </dl>`;
     });
+
+    newRow += `</td></tr>`;
+
+    tbody.append(newRow);
+    formatNumberInput();
     if (ipmac == IPMAC) {
         if (tt == 1) {
             $('.toastTT').toast('show');
             btnsendYCTT.prop('disabled', true);
-
+            $('.btn-sendHYCTT').prop('disabled', false);
         } else {
             $('.toastTTTB').toast('show');
         }
@@ -274,11 +281,43 @@ connection.on("GiveHD", function (hoadon,tt,ipmac) {
 
 });
 
+function GanSTTXNTT() {
+    var stt = $('#tbodyXNTT tr.accordion-toggle').length;
 
+    return Number(Number(stt) + 1);
+}
 $(document).ready(function () {
     $(document).on('click', '.btn-sendYCTT', function () {
         var IDHD = $(this).val();
         connection.invoke("SendHD", IDHD).catch(function (err) {
+            console.log(err);
+
+            return console.error(err.toString());
+        });
+    });
+});
+//------------------------------------------------------
+connection.on("GiveHHD", function (data) {
+    console.log(data);
+    var trHHD = $('#tbodyXNTT tr#c-2474-' + data.idHD + '');
+    trHHD.remove();
+    var trHHDC = $('#tbodyXNTT tr#collap-2474-' + data.idHD + '');
+    trHHDC.remove();
+    var IPMAC = $("#IDMAC").val();
+    console.log(data.ipmac);
+    console.log(IPMAC);
+    if ((data.ipmac).trim() == IPMAC.trim()) {
+    $('.btn-sendHYCTT').prop('disabled', true);
+    $('.btn-sendYCTT').prop('disabled', false);
+        showToast("Thành công", 200);
+
+    }
+    
+});
+$(document).ready(function () {
+    $(document).on('click', '.btn-sendHYCTT', function () {
+        var IDHD = $(this).val();
+        connection.invoke("SendHHD", IDHD).catch(function (err) {
             console.log(err);
 
             return console.error(err.toString());
@@ -291,30 +330,57 @@ connection.on("NhanXNTT", function (ipmac) {
     var IPMAC = $("#IDMAC").val();
     if (IPMAC == ipmac) {
         $('.toastXNTT').toast('show');
-
+        $('.btn-sendHYCTT').prop('disabled', true);
     }
    
-    $("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
-    });
-    $("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
-    });
+    //$("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
+    //});
+    //$("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
+    //});
 
 });
 
 $(document).ready(function () {
-    $(document).on('click', '.xacnhanTT', function () {
+    $(document).on('click', 'a.IDHDTT', function () {
 
-        var id = $(this).find('#inputIDHDTT').val();
+        var id = $(this).closest('tr').find('input#inputIDHDTT').val();
+        console.log(id);
         connection.invoke("SendXNTT", id).catch(function (err) {
             return console.error(err.toString());
         });
     });
 });
 //--------------------------------------------------------------
-connection.on("NhanXNNT", function (ipmac) {
+connection.on("HuyHDXNNT", function (ipmac) {
 
     var IPMAC = $("#IDMAC").val();
     if (IPMAC == ipmac) {
+        $('.btn-sendHYCTT').prop('disabled', false);
+    }
+
+    //$("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
+    //});
+    //$("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
+    //});
+
+});
+
+$(document).ready(function () {
+    $(document).on('click', 'a.huyHD', function () {
+
+        var id = $(this).closest('tr').find('input#inputIDHDNT').val();
+        console.log(id);
+        connection.invoke("SendHuyHDXNNT", id).catch(function (err) {
+            return console.error(err.toString());
+        });
+    });
+});
+//--------------------------------------------------------------
+connection.on("NhanXNNT", function (ipmac) {
+    var vaitro = $('#VAITRO').val();
+    var IPMAC = $("#IDMAC").val();
+    if (IPMAC == ipmac && vaitro == 'KHACHHANG') {
+        console.log(123);
         $('.toastXNNT').toast('show');
         window.location.href = "/KhachHang/menu1";
 
@@ -329,9 +395,10 @@ connection.on("NhanXNNT", function (ipmac) {
 });
 
 $(document).ready(function () {
-    $(document).on('click', '.xacnhanNT', function () {
+    $(document).on('click', 'a.IDHDNT', function () {
 
-        var id = $(this).find('#inputIDHDNT').val();
+        var id = $(this).closest('tr').find('input#inputIDHDNT').val();
+        console.log(id);
         connection.invoke("SendXNNT", id).catch(function (err) {
             return console.error(err.toString());
         });

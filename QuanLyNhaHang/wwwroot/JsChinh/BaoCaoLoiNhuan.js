@@ -28,8 +28,8 @@ function baoCaoLoiNhuan() {
             buildBarChart(doanhThuData, giaVonData);
             $('#tbodyBaoCaoLoiNhuan:not(#tongTien)').empty();
             data.listLoiNhuan.forEach(function (data, i) {
-                
-                addRowTableBCLN(data,i);
+
+                addRowTableBCLN(data, i);
             });
             TinhTongDoanhThu();
             TinhTongGiaVon();
@@ -80,11 +80,12 @@ function buildBarChart(doanhThuData, giaVonData) {
             x: {
                 beginAtZero: true,
             },
-            y: {
+            y: [{
                 beginAtZero: true,
-            },
+            }],
         },
     };
+
 
     var ctx = document.getElementById('myBarChart').getContext('2d');
     _myChart = new Chart(ctx, {

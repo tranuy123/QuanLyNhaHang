@@ -132,8 +132,8 @@ function renderDoThiThucDon(labels, values) {
             borderWidth: 1
         }]
     };
-    console.log(doanhThuData);
-    _myChartK = new Chart(ctx, {
+    // Khởi tạo biểu đồ
+    var _myChartK = new Chart(ctx, {
         type: 'bar',
         data: doanhThuData,
         options: {
@@ -142,11 +142,19 @@ function renderDoThiThucDon(labels, values) {
                     beginAtZero: true,
                     ticks: {
                         callback: function (value, index, values) {
-                            return formatCurrency(value); // Định dạng các giá trị trên trục y thành kiểu tiền tệ
+                            return formatCurrencyVN(value); // Sử dụng hàm formatCurrency để định dạng giá trị
                         }
                     }
                 }
             }
         }
+    });
+}
+function formatCurrencyVN(value) {
+    console.log(value);
+    // Sử dụng toLocaleString để định dạng số thành tiền tệ
+    return value.toLocaleString('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
     });
 }

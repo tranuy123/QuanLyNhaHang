@@ -25,14 +25,15 @@ function formatNumberInput() {
     // Áp dụng inputmask cho các phần tử có lớp 'formatted-number' và giá trị khác 0
     $(".formatted-number").each(function () {
         var value = $(this).val();
-        console.log(value);
         $(this).inputmask({
             alias: "numeric",
             groupSeparator: ",",
             autoGroup: true,
-            digits: 0,
-            allowMinus: false,
-            digitsOptional: false,
+            //autoDigits : true,
+            digits: 4, // Số chữ số sau dấu thập phân
+            allowMinus: true,
+            radixPoint: ".", // Dấu thập phân
+            rightAlign: false, // Căn giữa giá trị trong ô input
             // Định dạng đặc biệt nếu giá trị là 0
             onBeforeMask: function (value, opts) {
                 if (value === "0") {
@@ -41,9 +42,10 @@ function formatNumberInput() {
                 return value;
             },
         });
-
+        $(this).css("text-align", "right");
     });
 }
+
 
 function showToast(message, statusCode) {
     var backgrounColor;
@@ -76,3 +78,18 @@ function queryStringToData(queryString) {
     }
     return jsonData;
 }
+function getMACAddress() {
+    // Sử dụng chrome.runtime.getBackgroundPage để truy cập background page
+    chrome.runtime.getBackgroundPage(function (backgroundPage) {
+        // Lấy plugin Network Information
+        const networkInformation = backgroundPage.chrome.webNavigation.getNavigation().getNetworkInformation();
+
+        // Lấy địa chỉ MAC
+        const macAddress = networkInformation.macAddress;
+
+        // Hiển thị địa chỉ MAC
+        console.log(macAddress);
+    });
+}
+
+// Gọi hàm để lấy địa chỉ MAC

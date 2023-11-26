@@ -4,24 +4,29 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="col-md-2 mb-2 col-lg-2">
-        <input class="form-control"
-               type="text"
-               name="fromDay"
-               id="fromDay"
-               value="@DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)"
-               placeholder="Từ ngày" />
+    <div class="row">
+        <div class="col-md-2 mb-2 col-lg-2">
+            <input class="form-control"
+                   type="text"
+                   name="fromDay"
+                   id="fromDay"
+                   value="@DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)"
+                   placeholder="Từ ngày" />
+        </div>
+        <label class="col-sm-1 col-lg-1 col-form-label">Đến ngày</label>
+        <div class="col-lg-2 col-sm-2">
+            <input class="form-control"
+                   type="text"
+                   name="toDay"
+                   id="toDay"
+                   value="@DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)"
+                   placeholder="Tới ngày" />
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary" id="doanhThuTheoThang" onclick="HieuSuatNhanVien()"> Hiệu suất nhân viên</button>
+        </div>
     </div>
-    <label class="col-sm-1 col-lg-1 col-form-label">Đến ngày</label>
-    <div class="col-lg-2 col-sm-2">
-        <input class="form-control"
-               type="text"
-               name="toDay"
-               id="toDay"
-               value="@DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)"
-               placeholder="Tới ngày" />
-    </div>
-    <button id="doanhThuTheoThang" onclick="HieuSuatNhanVien()"> Hiệu suất nhân viên</button>
+   
     <canvas id="employeePerformanceChart"></canvas>
 
 </body>

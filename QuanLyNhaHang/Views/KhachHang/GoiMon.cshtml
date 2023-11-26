@@ -69,13 +69,13 @@
                         <thead>
                           <tr>
                             
-                            <th>ID</th>
+                            <th>Ảnh minh họa</th>
                             <th>Tên</th>
                             <th>Đơn Giá</th>
-                            <th class="w-25">Số lượng</th>
+                            <th>Số lượng</th>
                             <th>ĐVT</th>
                             <th>Thành tiền</th>
-                            <th>Action</th>
+                            <th>Hủy</th>
                           </tr>
                         </thead>
                         <tbody id="tbodyNTA" >
@@ -112,7 +112,7 @@
                                     <td>
                                     <p class="dongia mb-0 text-muted" id="tdDonGia"><strong>@toDecimal(@item.DonGia)</strong></p>
                                     </td>
-                                    <td class="w-15"><input class="form-control" type="number" min="0" id="SL" value="@item.Sl"/></td>
+                                    <td><input class="form-control text-end" style="width:60px" type="number" min="0" id="SL" maxlength="3" value="@item.Sl"/></td>
                                     <td>Dĩa</td>
                                 <td class="text-muted" id="tdThanhTien"><strong>@toDecimal((item.Sl * item.DonGia))</strong></td>
                                     <td><button class="HuyHoaDonTam btn btn-secondary"> Hủy chọn món </button>
@@ -159,7 +159,7 @@
                                 <td>Dĩa</td>
                                 <td class="text-muted" id="tdThanhTien"><strong>@toDecimal((item.Sl * item.DonGia))</strong></td>
                                 <td>
-                                    <button class="HuyHoaDonTam btn btn-secondary"> Hủy chọn món </button>
+                                    <button class="HuyHoaDonTam btn btn-danger"> Hủy chọn món </button>
                                 </td>
                                 <td style="display:none" class="NTA"><input type="text" value="3" /></td>
                             </tr>
@@ -172,7 +172,7 @@
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td><input class="form-control" name="tongtien" id="total"/></td>
+                                    <td><input class="form-control text-end" name="tongtien" id="total"/></td>
                                     @if(KiemTraTT.Count()> 0 ){
                                         <td><button class="btn-addcthd btn btn-primary"> Xác nhận </button></td>
 

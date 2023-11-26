@@ -40,13 +40,13 @@
                                         <th class="text-center w-1 py-1"></th>
                                         <th class="text-center">Tên món ăn</th>
                                     </tr>
-                                </thead>
+                                </thead>    
                                 <tbody id="tbody-ThucDon">
                                     @foreach (ThucDon cls in ViewBag.ThucDon)
                                     {
                                         <tr data-id="@cls.Idtd">
                                             <td class="text-center w-1">
-                                                <input type="text" value="1" class="form-control formatted-number" name="soLuong" />
+                                                <input type="text" value="1" class="form-control" name="soLuong" />
                                             </td>
                                             <td>@cls.Ten</td>
                                         </tr>

@@ -25,7 +25,7 @@ function addChiTietPhieuXuat() {
     }
     var newRow = $(`<tr data-idhh = "${idHangHoa}">
         <td class="first-td-column text-center p-1 td-sticky">
-            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:32px;z-index:2;" />
+            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:40px;z-index:2;" />
             <input type="hidden" name="idHangHoa" value="${idHangHoa}" />
         </td>
         <td class="p-1 td-sticky" style="position: sticky;left: 33px;background-color: #fff !important; z-index:2">
@@ -77,7 +77,7 @@ function clearFormThemChiTietPhieuNhap() {
 function TinhTongTienPhieuXuat() {
     var tongTien = 0;
     $('#tbodyChiTietPhieuXuat tr').each(function () {
-        var thanhTien = parseInt($(this).find('input[name="thanhTien"]').val().replace(/,/g, ''));
+        var thanhTien = parseFloat($(this).find('input[name="thanhTien"]').val().replace(/,/g, ''));
         if (!isNaN(thanhTien)) {
             tongTien += thanhTien;
         }
@@ -101,7 +101,7 @@ function themPhieuXuat() {
     var dataPhieuNhapMaster = new FormData();
     var rows = $('#tbodyChiTietPhieuXuat tr');
     if (rows.length == 0) {
-        showToast("Vui lòng thêm thông tin phiếu nhập", 500);
+        showToast("Vui lòng thêm thông tin phiếu xuất", 500);
         return;
     }
     rows.each(function () {
@@ -177,7 +177,7 @@ function getDSNguyenLieu() {
 function processDataNguyenLieu(data) {
     var newRow = $(`<tr data-idhh = "${data.idhh}">
         <td class="first-td-column text-center p-1 td-sticky">
-            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:32px;z-index:2;" />
+            <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTT()}" style="width:40px;z-index:2;" />
             <input type="hidden" name="idHangHoa" value="${data.idhh}" />
         </td>
         <td class="p-1 td-sticky" style="position: sticky;left: 33px;background-color: #fff !important; z-index:2">
@@ -188,6 +188,9 @@ function processDataNguyenLieu(data) {
         </td>
           <td class="p-1">
             <input autocomplete="off" t type="text" class="w-100 form-control form-table formatted-number" style="width:80px;" value="${data.donGia}" name="donGia" />
+        </td>
+        <td class="p-1">
+            <input autocomplete="off" t type="text" class="w-100 form-control form-table formatted-number" style="width:80px;" value="${data.tonKho}" name="tonKho" />
         </td>
         <td class="p-1">
             <input autocomplete="off" type="text" readonly class="w-100 form-control form-table formatted-number" style="width:55px;" value="${data.soLuong}" name="soLuong" />
@@ -201,28 +204,27 @@ function processDataNguyenLieu(data) {
             <input autocomplete="off" type="text" readonly class="w-100 form-control form-table formatted-number" style="width:100px;" value="${data.soLuong * data.donGia}" name="thanhTien" />
         </td>
                 <td class="p-1">
-            <input autocomplete="off" type="text" readonly class="w-100 form-control form-table" style="width:100px;" value="0" name="chenhLech" />
-        </td>
-        <td class="text-center p-1 last-td-column">
-            <button type="button" class="btn btn-icon btn-sm text-red remove-phieuXuatCt">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                    <path d="M18 6l-12 12"></path>
-                    <path d="M6 6l12 12"></path>
-                </svg>
-            </button>
+            <input autocomplete="off" type="text" readonly class="w-100 form-control form-table formatted-number" style="width:100px;" value="0" name="chenhLech" />
         </td>
     </tr>`)
+    if (data.soLuong > data.tonKho) {
+        newRow.find('input[name="thucXuat"]').addClass('text-danger');
+    }
     $('#tbodyChiTietPhieuXuat').append(newRow);
     formatNumberInput();
 }
 $('#tbodyChiTietPhieuXuat').on('input', 'input[name="thucXuat"]', function () {
     var tr = $(this).closest('tr');
-
-    var soLuong = parseInt(tr.find('input[name="soLuong"]').val().replace(/,/g, ''));
-    var thucXuat = parseInt(tr.find('input[name="thucXuat"]').val().replace(/,/g, ''));
-    var donGia = parseInt(tr.find('input[name ="donGia"]').val().replace(/,/g, ''));
+    var tonKho = parseFloat(tr.find('input[name="tonKho"]').val().replace(/,/g, ''));
+    var soLuong = parseFloat(tr.find('input[name="soLuong"]').val().replace(/,/g, ''));
+    var thucXuat = parseFloat(tr.find('input[name="thucXuat"]').val().replace(/,/g, ''));
+    var donGia = parseFloat(tr.find('input[name ="donGia"]').val().replace(/,/g, ''));
     if (!isNaN(thucXuat) && !isNaN(donGia)) { // Kiểm tra xem giá trị soLuong và donGia có phải là số hợp lệ
+        if (thucXuat > tonKho) {
+            tr.find('input[name="thucXuat"]').addClass('text-danger');
+        } else {
+            tr.find('input[name="thucXuat"]').removeClass('text-danger');
+        }
         tr.find('input[name="thanhTien"]').val(formatTotal(thucXuat * donGia));
         tr.find('input[name="chenhLech"]').val(thucXuat - soLuong);
         TinhTongTienPhieuXuat();
@@ -319,7 +321,7 @@ function TinhTongTienPhieuXuatTabXem() {
     $('#tbody-XemPhieuXuat tr').each(function () {
         var check = $(this).find('input[name="tongTienXuat"]').val();
         if (check != undefined) {
-            var thanhTien = parseInt($(this).find('input[name="tongTienXuat"]').val().replace(/,/g, ''));
+            var thanhTien = parseFloat($(this).find('input[name="tongTienXuat"]').val().replace(/,/g, ''));
             if (!isNaN(thanhTien)) {
                 tongTien += thanhTien;
             }

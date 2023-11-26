@@ -6,6 +6,7 @@ using QuanLyNhaHang.Models.Mapping;
 using QuanLyNhaHang.Services;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -86,7 +87,44 @@ namespace QuanLyNhaHang.Controllers
                 };
             }
         }
-
+        [HttpPost("/NhapKho/LichSuNhap")]
+        public async Task<dynamic> LichSuNhap(string TuNgay, string DenNgay, string maPhieu)
+        {
+            DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            var PhieuNhaps = await context.PhieuNhap
+                .Where(x => (x.NgayNhap.Value.Date >= tuNgay.Date && x.NgayNhap.Value.Date <= denNgay.Date)
+                && (maPhieu == "" || maPhieu == null || x.SoPn == maPhieu))
+             .Select(x => new
+             {
+                 SoPx = x.SoPn,
+                 NgayTao = x.NgayNhap,
+                 IdnvNavigation = x.IdnvNavigation,
+                 GhiChu = x.GhiChu,
+                 TongTien = x.ChiTietPhieuNhap.Sum(x => x.SoLuong * x.Gia),
+                 NhaCungCap = x.IdnccNavigation.TenNcc,
+                 SoLuongHH = x.ChiTietPhieuNhap.Count(),
+                 ChiTietPhieuNhap = x.ChiTietPhieuNhap.Select(x => new
+                 {
+                     IdhhNavigation = x.IdhhNavigation,
+                     SoLuong = x.SoLuong,
+                     Gia = x.Gia,
+                     DVT = x.IdhhNavigation.IddvtNavigation.TenDvt,
+                 }).ToList()
+             })
+            .ToListAsync();
+            //var ketqua = PhieuNhaps.Select(x => new
+            //{
+            //    PhieuNhap = x,
+            //    ChiTietPhieuNhap = GetChiTietPhieuNhaps(x.Idpx),
+            //}).ToList();
+            return Ok(PhieuNhaps);
+        }
+        public List<ChiTietPhieuNhap> GetChiTietPhieuNhaps(int id)
+        {
+            List<ChiTietPhieuNhap> chiTietPhieuNhaps = context.ChiTietPhieuNhap.Where(x => x.Idpn == id).ToList();
+            return chiTietPhieuNhaps;
+        }
         public class TTPhieuNhap
         {
             public PhieuNhapMap PhieuNhap { get; set; }

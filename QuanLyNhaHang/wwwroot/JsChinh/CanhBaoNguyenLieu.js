@@ -4,7 +4,7 @@
 var _fromDay = null;
 var _toDay = null;
 var _soPhieu = null;
-$('#tbody-ThucDon').on('input', 'input[name="soLuong"]', function () {
+$('#tbody-ThucDon').on('change', 'input[name="soLuong"]', function () {
     getDSXKNL();
 });
 function getDSXKNL() {
@@ -48,8 +48,8 @@ function addRowCBNL(hh) {
                 <td>${hh.donViTinh}</td>
                 <td><input type="text" readonly class="form-control formatted-number" value="${hh.tonKho}" /></td>
                 <td><input type="text" readonly class="form-control formatted-number" name="soLuong" value="${hh.soLuong}" /></td>
-                <td><input type="text" readonly class="form-control formatted-number" value="${hh.donGia}" /></td>
-                <td><input type="text" readonly class="form-control formatted-number" value="${hh.donGia * hh.soLuong}" name="thanhTien" /></td>
+                <td><input type="text" readonly class="form-control formatted-number" value="${Math.round(hh.donGia)}" /></td>
+                <td><input type="text" readonly class="form-control formatted-number" value="${Math.round(hh.donGia * hh.soLuong)}" name="thanhTien" /></td>
     </tr>`)
     if (hh.soLuong > hh.tonKho) {
         newRow.find('input[name="soLuong"]').addClass('text-danger');
