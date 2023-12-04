@@ -3,7 +3,7 @@
 
 @{
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
-  
+
     ThucDon getTD(int? id)
     {
         ThucDon nv = context.ThucDon.Find(id);
@@ -18,7 +18,7 @@
     }
     List<ChiTietHoaDon> getListCTHD()
     {
-        return context.ChiTietHoaDon.Include(x=>x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep == null && x.HangHoa != true).ToList();
+        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep == null && x.HangHoa != true).ToList();
     }
     List<ChiTietHoaDon> getListCTHDHH()
     {
@@ -26,13 +26,13 @@
     }
     List<ChiTietHoaDon> getListCTHD1()
     {
-        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep != null && x.TghoanThanh==null && x.HangHoa != true).ToList();
+        return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep != null && x.TghoanThanh == null && x.HangHoa != true).ToList();
     }
     List<ChiTietHoaDon> getListCTHD1HH()
     {
         return context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.Tgbep != null && x.TghoanThanh == null && x.HangHoa == true).ToList();
     }
-  
+
 
 }
 
@@ -43,7 +43,7 @@
             <div class="card-body">
                 <h5 class="card-title">Xác nhận món</h5>
                 <p class="card-text"></p>
-                <table class="table table-hover table-bordered text-center display nowrapr TableTGBEP" id="TableTGBEP">
+                <table class="table table-hover table-bordered text-center display nowrapr TableTGBEP" id="TableTGBEPHH">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -54,37 +54,38 @@
                             <th>action</th>
                         </tr>
                     </thead>
-                    <tbody id="tbodyNB">
+                    <tbody id="tbodyNBHH">
                         @{
                             int i = 0;
                         }
-                        @foreach (ChiTietHoaDon item in getListCTHD())
+                        @foreach (ChiTietHoaDon item in getListCTHDHH())
                         {
                             i++;
                             <tr>
                                 <td>@i</td>
                                 <td style="display:none" class="idcthdNB">@item.Idcthd</td>
-                                <td><strong>@getTD(@item.Idtd).Ten</strong></td>
-                                <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>                               
-                                <td class="trangthaicthd"></td>                              
+                                <td><strong>@getHH(@item.Idtd).TenHh</strong></td>
+                                <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
+                                <td class="trangthaicthd"></td>
                                 <td>@item.Sl</td>
-                                <td class="xacnhan2">
-                                   <button id="xacnhan1" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
+                                <td class="xacnhan2HH">
+                                    <button id="xacnhan1" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
                                 </td>
-                                
+
                             </tr>
                         }
+
                     </tbody>
                 </table>
             </div>
         </div>
-    </div> 
+    </div>
     <div class="col-md-6 my-4">
         <div class="card shadow">
             <div class="card-body">
                 <h5 class="card-title">xác nhận hoàn thành món</h5>
                 <p class="card-text"></p>
-                <table class="table table-bordered table-hover mb-0" id="TableTGHoanThanh">
+                <table class="table table-bordered table-hover mb-0" id="TableTGHoanThanhHH">
                     <thead>
                         <tr>
                             <th>STT</th>
@@ -99,17 +100,17 @@
                         @{
                             int j = 0;
                         }
-                        @foreach (ChiTietHoaDon item in getListCTHD1())
+                        @foreach (ChiTietHoaDon item in getListCTHD1HH())
                         {
                             j++;
 
                             <tr>
                                 <td>@j</td>
-                                <td><strong>@getTD(@item.Idtd).Ten</strong></td>
+                                <td><strong>@getHH(@item.Idtd).TenHh</strong></td>
                                 <td>@item.IdhdNavigation.IdbanNavigation.TenBan</td>
                                 <td></td>
                                 <td>@item.Sl</td>
-                                <td class="tdtght">
+                                <td class="tdtghtHH">
                                     <button id="btntght" class="btn btn-primary" value="@item.Idcthd">Xác nhận</button>
                                 </td>
                             </tr>
@@ -122,55 +123,55 @@
 </div> <!-- end section -->
 
 
-    <script>
-
-    
+<script>
 
 
 
 
-        $('#dataTable-1').DataTable(
-            {
-                autoWidth: true,
-                "lengthMenu": [
-                    [16, 32, 64, -1],
-                    [16, 32, 64, "All"]
-                ]
-            });
-    </script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-   
 
 
-    //    $(function () {
-    //        $("#TableTGBEP").on("click", ".xacnhan2", function () {
-    //            var ipmac = $('#IDMAC').val();
-    //        var id = $(this).find('#xacnhan1').val();
+    $('#dataTable-1').DataTable(
+        {
+            autoWidth: true,
+            "lengthMenu": [
+                [16, 32, 64, -1],
+                [16, 32, 64, "All"]
+            ]
+        });
+</script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
 
-    //            var thiss = $(this);
 
-    //            $.ajax({
-    //                type: "post",
-    //                url: "/XacNhanMon",
-    //                data: "id=" + id,
-    //                success: function (result) {
-    //                $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
-    //                 });
-    //                $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
-    //                });
-    //                },
-    //                error: function () {
-    //                    alert("Fail");
-    //                }
-    //            });
-    //        });
-    //})
-       
-    </script>
+
+
+        //    $(function () {
+        //        $("#TableTGBEP").on("click", ".xacnhan2", function () {
+        //            var ipmac = $('#IDMAC').val();
+        //        var id = $(this).find('#xacnhan1').val();
+
+        //            var thiss = $(this);
+
+        //            $.ajax({
+        //                type: "post",
+        //                url: "/XacNhanMon",
+        //                data: "id=" + id,
+        //                success: function (result) {
+        //                $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
+        //                 });
+        //                $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
+        //                });
+        //                },
+        //                error: function () {
+        //                    alert("Fail");
+        //                }
+        //            });
+        //        });
+        //})
+
+</script>
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
 

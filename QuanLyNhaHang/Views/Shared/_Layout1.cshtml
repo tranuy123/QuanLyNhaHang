@@ -1,4 +1,10 @@
-﻿
+﻿@using System.Security.Claims;
+@{
+    // ClaimsPrincipal principal = User as ClaimsPrincipal; // Thay thế bằng cách lấy đối tượng ClaimsPrincipal thích hợp
+
+    // // Tìm Claim có kiểu là ClaimTypes.Dns
+    // Claim mac = principal?.FindFirst(ClaimTypes.Dns);
+}
 <!doctype html>
 <html lang="en">
   <head>
@@ -36,7 +42,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="~/favicon.ico">
-    <title>Tiny Dashboard - A Bootstrap Dashboard Template</title>
+    <title>Nhà hàng Trần Y</title>
     <!-- Simple bar CSS -->
     <link rel="stylesheet" href="~/css/simplebar.css">
     <!-- Fonts CSS -->
@@ -65,7 +71,7 @@
                 <a href="index.html" class="logo d-flex align-items-center me-auto me-lg-0">
                     <!-- Uncomment the line below if you also wish to use an image logo -->
                     <!-- <img src="assets/img/logo.png" alt=""> -->
-                    <h1>Yummy<span>.</span></h1>
+                <h1>Yummy <span>.</span></h1>
                 </a>
             <div class="toast fade hide" id="toast" style="position: absolute; top: 0; right: 0;z-index: 99999;" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">

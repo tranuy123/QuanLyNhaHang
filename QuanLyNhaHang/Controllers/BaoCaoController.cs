@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
+using QuanLyNhaHang.Services;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -134,6 +135,78 @@ namespace QuanLyNhaHang.Controllers
         {
             double tong = (double)chiTietPhieuNhaps.Sum(ct => ct.Gia);
             return tong;
+        }
+        //--------------------------------------------------- báo cáo chênh lệch
+        [HttpGet("/BaoCao/ViewBaoCaoChenhLech")]
+        public IActionResult BaoCaoChenhLech()
+        {
+            return View();
+        }
+        [HttpPost("/BaoCao/BaoCaoChenhLech")]
+        public async Task<dynamic> dataBaoCaoChenhLech(string fromDay, string toDay)
+        {
+            DateTime FromDay = DateTime.ParseExact(fromDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime ToDay = DateTime.ParseExact(toDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            List<ChiTietPhieuXuat> chiTietPhieuXuats = context.ChiTietPhieuXuat
+                .Include(x => x.IdpxNavigation)
+                .Where(x => x.IdpxNavigation.NgayTao.Value.Date >= FromDay && x.IdpxNavigation.NgayTao.Value.Date <= ToDay && x.ChenhLech != 0)
+                .ToList();
+            var chenhLech = chiTietPhieuXuats.GroupBy(x => x.Idhh)
+                .Select(x => new
+                {
+                    Idhh = x.Key,
+                    label = CommonServices.GetTenHH((int) x.Key, context.HangHoa.Where(x => x.Active == true).ToList()),
+                    soLuong = getChenhLech(x.ToList()),
+                    donViTinh = getDonViTinh((int)x.Key),
+                }).ToList();
+            var hangHoas = context.ThucDon
+                .Include(x => x.DinhMuc)
+                .ThenInclude(x => x.IdhhNavigation)
+                .ThenInclude(x => x.IddvtNavigation)
+                .Where(x => x.Active == true)
+                .Select(x => new
+                {
+                    DinhMuc = x.DinhMuc.Select(dm => new 
+                    {
+                        Idhh = dm.Idhh,
+                        MaHh = dm.IdhhNavigation.MaHh,
+                        TenHh = dm.IdhhNavigation.TenHh,
+                        dvt = dm.IdhhNavigation.IddvtNavigation.TenDvt,
+                        SoLuong = dm.SoLuong,
+                        ChenhLech = chenhLech.FirstOrDefault().soLuong,
+                    }).ToList(),
+                    Ten = x.Ten,
+                    MaTd = x.MaTd
+                }).ToList();
+            var hangs = new List<dynamic>();
+            foreach (var h in hangHoas)
+            {
+                if (h.DinhMuc.Any(x => chenhLech.Any(cl => cl.Idhh == x.Idhh)))
+                {
+                    hangs.Add(h);
+                }
+            }
+            return new {
+                dataDoThi = chenhLech,
+                dataTable = hangs
+            };
+
+        }
+        public double getChenhLech(List<ChiTietPhieuXuat> chiTietPhieuXuats)
+        {
+            List<ChiTietPhieuXuat> chiTiets = chiTietPhieuXuats
+                .GroupBy(chiTiet => chiTiet.Idpx) // Nhóm theo Idpx
+                .Select(group => group.First())
+                .ToList();
+
+            return (double)chiTiets.Sum(x => x.ChenhLech);
+        }
+        public string getDonViTinh(int idHH)
+        {
+            HangHoa dvt = context.HangHoa
+                .Include(x => x.IddvtNavigation)
+                .FirstOrDefault(x => x.Idhh == idHH);
+            return dvt.IddvtNavigation.TenDvt;
         }
         //--------------------------------------------------- báo cáo chỉ tiêu
         [HttpPost("/BaoCao/BaoCaoChiTieu")]

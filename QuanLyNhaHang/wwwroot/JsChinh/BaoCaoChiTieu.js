@@ -19,6 +19,8 @@ function baoCaoChiTieu() {
             _valuesTD = [];
             _labelsK = [];
             _valuesK = [];
+            $('#tbodyTD').empty();
+            $('#tbodyK').empty();
             // Chuyển dữ liệu từ JSON sang mảng để cấu hình đồ thị
             data.doThiThucDon.forEach(function (item,i) {
                 _labelsTD.push(item.label); // Định dạng ngày tháng
@@ -30,6 +32,7 @@ function baoCaoChiTieu() {
                 _valuesK.push(item.soLuong);
                 addRowTableK(item, i);
             });
+
             // Xóa biểu đồ cũ trước khi vẽ biểu đồ mới
             if (_myChartTD !== null) {
                 _myChartTD.destroy();
@@ -119,7 +122,8 @@ function renderDoThiThucDon(labels, values) {
             }
         }
     });
-} function renderDoThiKhu(labels, values) {
+}
+function renderDoThiKhu(labels, values) {
     var ctx = document.getElementById('doThiKhu').getContext('2d');
 
     var doanhThuData = {

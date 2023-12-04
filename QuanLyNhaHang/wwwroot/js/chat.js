@@ -11,20 +11,18 @@ connection.start().then(function () {
 
 
 ////----------------------------------------------------------------------------------------------
-connection.on("HienThiCTHD", function (chitiethoadon, ipmac, tongtien, idban,tb) {
+connection.on("HienThiCTHD", function (chitiethoadon, chitiethoadonHH, ipmac, tongtien, idban,tb) {
     var li = $("<li></li>").text(`says ${ipmac} and ${tongtien} and ${idban}`);
     $("#messagesList").append(li);
     var IPMAC = $("#IDMAC").val();
     var tbody = $("#tbodyNB");
+    var tbodyHH = $("#tbodyNBHH");
 
     // Remove all existing rows from tbody
     tbody.empty();
-
+    tbodyHH.empty();
     // Add new rows to tbody
     $.each(chitiethoadon, function (index, item) {
-        console.log(item.idtd);
-        console.log(item.idcthd);
-        console.log(chitiethoadon)
         var tr = $("<tr>");
         tr.append("<td>" + (index + 1) + "</td>");
         tr.append('<td style="display:none" class="idcthdNB">' + item.idcthd + '</td>');
@@ -37,7 +35,23 @@ connection.on("HienThiCTHD", function (chitiethoadon, ipmac, tongtien, idban,tb)
         
         tbody.append(tr);
     });
+    $.each(chitiethoadonHH, function (index, item) {
+
+        var tr = $("<tr>");
+        tr.append("<td>" + (index + 1) + "</td>");
+        tr.append('<td style="display:none" class="idcthdNB">' + item.idcthd + '</td>');
+        tr.append("<td>" + item.ten + "</td>");
+        tr.append('<td><strong>' + item.tenBan + '</strong></td>')
+        tr.append("<td></td>");
+        tr.append("<td>" + item.sl + "</td>");
+        tr.append('<td class="xacnhan2HH"><button id="xacnhan1" class="btn btn-primary" value=' + item.idcthd + '">Xác nhận</button></td > ');
+
+
+        tbodyHH.append(tr);
+    });
     $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
+    });
+    $("#TableTGBEPHH").load(location.href + " #TableTGBEPHH>*", function () {
     });
     if (tb == 1) {
         if (ipmac == IPMAC) {
@@ -121,11 +135,14 @@ connection.on("ReceiveMessageNB", function (id) {
     });
     $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
      });
-     
+    $("#TableTGHoanThanhHH").load(location.href + " #TableTGHoanThanhHH>*", function () {
+    });
+    $("#TableTGBEPHH").load(location.href + " #TableTGBEPHH>*", function () {
+    });
 });
 
 $(document).ready(function () {
-    $(document).on('click','.xacnhan2', function () {
+    $(document).on('click','.xacnhan2,.xacnhan2HH', function () {
 
         var id = $(this).find('#xacnhan1').val();
         connection.invoke("SendMessageNB", id).catch(function (err) {
@@ -161,12 +178,14 @@ connection.on("ReceviPhucVu", function (listCTHDPV) {
     }
     $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
     });
+    $("#TableTGHoanThanhHH").load(location.href + " #TableTGHoanThanhHH>*", function () {
+    });
 });
 
 
 
 $(document).ready(function () {
-    $(document).on('click', '.tdtght', function () {
+    $(document).on('click', '.tdtght, .tdtghtHH', function () {
 
         var id = $(this).find('#btntght').val();
 
@@ -212,7 +231,8 @@ connection.on("HienThiCTHD1", function (chitiethoadon) {
     });
     $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
     });
-
+    $("#TableTGBEPHH").load(location.href + " #TableTGBEPHH>*", function () {
+    });
     $(".tableHD").load(location.href + " .tableHD>*", function () {
     });
     $('.toastHD').toast('show');
@@ -289,6 +309,18 @@ function GanSTTXNTT() {
 $(document).ready(function () {
     $(document).on('click', '.btn-sendYCTT', function () {
         var IDHD = $(this).val();
+        var tbody = $(this).closest('tbody');
+        var tr = tbody.find('tr.accordion-toggle');
+        var trWithDisabledButton = tbody.find('tr.accordion-toggle').filter(function () {
+            return $(this).find('td button.btn-huy:disabled').length > 0;
+        });
+        console.log(trWithDisabledButton.length , tr.length);
+        if (trWithDisabledButton.length != tr.length) {
+            showToast("Có món ăn chưa được hoàn thành, vui lòng chờ hoặc hủy món ăn để được thanh toán", 500)
+            return;
+        }
+
+// Bây giờ `trWithDisabledButton` sẽ chứa tất cả các `tr` có button `disabled`.
         connection.invoke("SendHD", IDHD).catch(function (err) {
             console.log(err);
 

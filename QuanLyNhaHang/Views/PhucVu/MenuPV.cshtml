@@ -24,20 +24,20 @@
 }
 <div class="card-body">
                       <div class="toolbar">
-        <a href="/PhucVu/GoiMonPV/@ViewBag.idb" class="btn btn-primary"> Gọi món </a>
+     
                         <form class="form">
                           <div class="form-row">
+                <div class="col-auto">   <a href="/PhucVu/GoiMonPV/@ViewBag.idb" class="btn btn-primary"> Gọi món </a></div>
                             <div class="form-group col-auto mr-auto">
                               <label class="my-1 mr-2 sr-only" for="inlineFormCustomSelectPref1">Show</label>
-                    <select class="custom-select mr-sm-2" id="nhomTA" onchange="loadNhomThucAnPV()">
+                            <select class="custom-select mr-sm-2" id="nhomTA" onchange="loadNhomThucAnPV()">
                                 <option selected value=""> -- Nhóm thức ăn --</option>
                                 <option value="0">Tất cả</option>
-                        @foreach (NhomThucAn item in getListNTA())
-                        {
-                                       <option value="@item.Idnta">@item.TenNta</option>
-                        }
-
-                              </select>
+                                @foreach (NhomThucAn item in getListNTA())
+                                {
+                                               <option value="@item.Idnta">@item.TenNta</option>
+                                }
+                    </select>
                             </div>
                             <div class="form-group col-auto">
                               <label for="search" class="sr-only">Search</label>

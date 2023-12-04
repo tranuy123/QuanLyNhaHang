@@ -29,12 +29,12 @@ namespace QuanLyNhaHang.Controllers
             return View("menu1");
         }
         //[HttpGet("/KhachHang/{mac}")]
-        //public async Task<IActionResult> menu1Async(string mac)
+        //public async Task<IActionResult> menu1(string mac)
         //{
         //    ViewBag.MAC = mac;
         //    var claims = new List<Claim>
         //    {
-        //        new Claim(ClaimTypes.Name, mac),
+        //        new Claim(ClaimTypes.Dns, mac),
         //    };
 
         //    var claimsIdentity = new ClaimsIdentity(

@@ -1,5 +1,6 @@
 ﻿@{
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+
     NhanVien nv = context.NhanVien.Find(Int32.Parse(User.Identity.Name));
 }
 <!DOCTYPE html>
@@ -217,6 +218,12 @@
                         </a>
                     </li>
                             <li class="nav-item w-100">
+                                <a class="nav-link" href="/BaoCao/ViewBaoCaoChenhLech">
+                                    <i class="fe fe-layers fe-16"></i>
+                                    <span class="ml-3 item-text">Báo cáo chênh lệch</span>
+                                </a>
+                            </li>
+                            <li class="nav-item w-100">
                                 <a class="nav-link" href="/BaoCao/BaoCaoChiTieu">
                                     <i class="fe fe-layers fe-16"></i>
                                     <span class="ml-3 item-text">Báo cáo chỉ tiêu</span>
@@ -289,6 +296,15 @@
                         <a class="nav-link" href="/ThuNgan/Index">
                             <i class="fe fe-layers fe-16"></i>
                             <span class="ml-3 item-text">Thu ngân</span>
+                        </a>
+                    </li>
+                }
+                @if (User.IsInRole("5"))
+                {
+                    <li class="nav-item w-100">
+                        <a class="nav-link" href="/KhoHang/KhoHang">
+                            <i class="fe fe-layers fe-16"></i>
+                            <span class="ml-3 item-text">Kho hàng</span>
                         </a>
                     </li>
                 }

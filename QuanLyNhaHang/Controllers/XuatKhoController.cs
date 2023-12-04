@@ -417,16 +417,22 @@ namespace QuanLyNhaHang.Controllers
                  NgayTao = x.NgayTao,
                  IdnvNavigation = x.IdnvNavigation,
                  GhiChu = x.GhiChu,
-                 TongTien = x.ChiTietPhieuXuat.Sum(x => x.SoLuong * x.Gia),
-                 TongChenhLech = x.ChiTietPhieuXuat.Sum(x => x.ChenhLech),
+                 TongTien = XuatKhoController.getTongTien(x.ChiTietPhieuXuat.ToList()),
+                 TongChenhLech = x.ChiTietPhieuXuat
+                    .Sum(x => x.ChenhLech),
+
                  SoLuongHH = x.ChiTietPhieuXuat.Count(),
                  ChiTietPhieuXuat = x.ChiTietPhieuXuat.Select(x => new
                  {
-                     IdhhNavigation = x.IdhhNavigation,
+                     IdhhNavigation = new HangHoa()
+                     {
+                         MaHh = x.IdhhNavigation.MaHh,
+                         TenHh = x.IdhhNavigation.TenHh,
+                     },
                      SoLuong = Math.Round((float) x.SoLuong,3),
                      ChenhLech = Math.Round((float)x.ChenhLech,3),
                      ThucXuat = Math.Round((float)x.ThucXuat, 3),
-                     Gia = x.Gia,
+                     Gia = Math.Round((float)x.Gia,3),
                      DVT = x.IdhhNavigation.IddvtNavigation.TenDvt,
                  }).ToList()
              })
@@ -437,6 +443,15 @@ namespace QuanLyNhaHang.Controllers
             //    ChiTietPhieuXuat = GetChiTietPhieuXuats(x.Idpx),
             //}).ToList();
             return Ok(phieuXuats);
+        }
+        public static double getTongTien(List<ChiTietPhieuXuat> chiTietPhieuXuats)
+        {
+            double tongTien = 0;
+            foreach (ChiTietPhieuXuat ct in chiTietPhieuXuats)
+            {
+                tongTien += (float)(Math.Round((float)ct.ThucXuat,3) * Math.Round((float)ct.Gia,3));
+            }
+            return (double)Math.Round(tongTien,3);
         }
         public List<ChiTietPhieuXuat> GetChiTietPhieuXuats(int id)
         {

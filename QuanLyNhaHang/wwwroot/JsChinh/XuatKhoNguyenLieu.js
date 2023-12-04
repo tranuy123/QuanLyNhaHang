@@ -278,9 +278,9 @@ function getDSXKNL() {
 function addRowTableXKNL(data, i) {
     var newRow = ` <tr class="accordion-toggle collapsed" id="c-2474${i}" data-toggle="collapse" data-parent="#c-2474${i}" href="#collap-2474${i}" aria-expanded="false">
                                 <td>${formatDay(data.ngayTao)}</td>
-                                <td>${data.soPx}</td>
+                                <td colspan="2">${data.soPx}</td>
                                 <td>${data.soLuongHH} </td>
-                                <td> <input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.tongTien} id="tongTienXuat" name="tongTienXuat"/></td>
+                                <td colspan="2"> <input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.tongTien} id="tongTienXuat" name="tongTienXuat"/></td>
                                 <td>${data.tongChenhLech}</td>
                                 <td>
                                     <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -291,26 +291,32 @@ function addRowTableXKNL(data, i) {
                                     </div>
                                 </td>
                             </tr>
-                            <tr id="collap-2474${i}" class="in p-3 bg-light collapse" style="">
-                                <td colspan="8">
+                            <tr id="collap-2474${i}" class="in p-3 bg-blue-lt collapse fw-bold table-primary">
+                            <td class="text-center p-1">#</td>
+                            <td class="text-center p-1">Mã HH</td>
+                            <td class="text-center p-1 col-3">Tên HH</td>
+                            <td class="text-center p-1">ĐVT</td>
+                            <td class="text-center p-1">Số lượng xuất</td>
+                            <td class="text-center p-1">Giá</td>
+                            <td class="text-center p-1">Chênh lệch</td>
+                            <td colspan="2" class="text-center p-1">Thành tiền</td>
+                                </tr>
                             `;
     data.chiTietPhieuXuat.forEach(function (data, index) {
-        var i = index + 1;
-        newRow += `<dl class="row mb-0 mt-1">
-                                        <dt class="col-sm-1">${i}</dt>
-                                        <dd class="col-sm-1">${data.idhhNavigation.maHh}</dd>
-                                        <dt class="col-sm-1">${data.idhhNavigation.tenHh}</dt>
-                                        <dt class="col-sm-1">${data.dvt}</dt>
-                                        <dd class="col-sm-1">${data.thucXuat}</dd>
-                                        <dt class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.gia}/></dt>
-                                        <dd class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.thucXuat * data.gia}/></dd>
-                                        <dt class="col-sm-2 text-truncate">${data.chenhLech}</dt>
-                                    </dl>
+        var j = index + 1;
+        newRow += `
+        <tr id="collap-2474${i}" class="in p-3 bg-light collapse table-secondary" style="">
+                                        <td class="col-sm-1">${j}</td>
+                                        <td class="col-sm-1">${data.idhhNavigation.maHh}</td>
+                                        <td class="col-sm-1">${data.idhhNavigation.tenHh}</td>
+                                        <td class="col-sm-1">${data.dvt}</td>
+                                        <td class="col-sm-1">${data.thucXuat}</td>
+                                        <td class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.gia}/></td>
+                                        <td class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.thucXuat * data.gia}/></td>
+                                        <td class="col-sm-2 text-truncate">${data.chenhLech}</td>
+     </tr>
                                 `;
     });
-    newRow += `
-    </td>
-    </tr>`;
     $('#tbody-XemPhieuXuat').append(newRow);
     formatNumberInput();
     TinhTongTienPhieuXuatTabXem();

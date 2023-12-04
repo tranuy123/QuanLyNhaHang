@@ -71,7 +71,7 @@ namespace SignalRChat.Hubs
             {
                 var chitiethoadon = context.ChiTietHoaDon
                 .Include(x => x.IdhdNavigation.IdbanNavigation)
-                .Where(x => x.Tgbep == null)
+                .Where(x => x.Tgbep == null && x.HangHoa != true)
                 .Select(x => new
                 {
                     x.Idcthd,
@@ -82,8 +82,21 @@ namespace SignalRChat.Hubs
                     x.Sl
                 })
                 .ToList();
+                var chitiethoadonHH = context.ChiTietHoaDon
+                    .Include(x => x.IdhdNavigation.IdbanNavigation)
+                    .Where(x => x.Tgbep == null && x.HangHoa == true)
+                    .Select(x => new
+                    {
+                        x.Idcthd,
+                        x.Idtd,
+                        Ten = CommonServices.GetTenHH((int)x.Idtd, context.HangHoa.Where(x => x.Active == true).ToList()),
+                        x.IdhdNavigation.IdbanNavigation.TenBan,
+                        x.TrangThaiOrder,
+                        x.Sl
+                    })
+                    .ToList();
                 int tb = 0;
-                await Clients.All.SendAsync("HienThiCTHD", chitiethoadon, ipmac, tongtien, idban,tb);
+                await Clients.All.SendAsync("HienThiCTHD", chitiethoadon,chitiethoadonHH, ipmac, tongtien, idban,tb);
             }
             else
             {
@@ -178,19 +191,32 @@ namespace SignalRChat.Hubs
 
                 var chitiethoadon = context.ChiTietHoaDon
                 .Include(x => x.IdhdNavigation.IdbanNavigation)
-                .Where(x => x.Tgbep == null)
+                .Where(x => x.Tgbep == null && x.HangHoa != true)
                 .Select(x => new
                 {
                     x.Idcthd,
                     x.Idtd,
-                    x.IdtdNavigation.Ten,
+                    Ten = x.IdtdNavigation.Ten,
+                    x.IdhdNavigation.IdbanNavigation.TenBan,
+                    x.TrangThaiOrder,
+                    x.Sl
+                })
+                .ToList();
+                var chitiethoadonHH = context.ChiTietHoaDon
+                .Include(x => x.IdhdNavigation.IdbanNavigation)
+                .Where(x => x.Tgbep == null && x.HangHoa == true)
+                .Select(x => new
+                {
+                    x.Idcthd,
+                    x.Idtd,
+                    Ten = CommonServices.GetTenHH((int)x.Idtd, context.HangHoa.Where(x => x.Active == true).ToList()),
                     x.IdhdNavigation.IdbanNavigation.TenBan,
                     x.TrangThaiOrder,
                     x.Sl
                 })
                 .ToList();
                 int tb = 1;
-                await Clients.All.SendAsync("HienThiCTHD", chitiethoadon, ipmac, tongtien, idban,tb);
+                await Clients.All.SendAsync("HienThiCTHD", chitiethoadon, chitiethoadonHH, ipmac, tongtien, idban,tb);
             }  
         }
 
@@ -214,7 +240,7 @@ namespace SignalRChat.Hubs
                     .Select(x => new {
                         x.Idcthd,
                         x.Idtd,
-                        x.IdtdNavigation.Ten,
+                        Ten = x.HangHoa != true ? x.IdtdNavigation.Ten : CommonServices.GetTenHH((int)x.Idtd, context.HangHoa.Where(x => x.Active == true).ToList()),
                         x.IdhdNavigation.IdbanNavigation.TenBan,
                         x.TrangThaiOrder,
                         x.IdhdNavigation.IdbanNavigation.Idkhu,
