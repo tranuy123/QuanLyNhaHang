@@ -32,7 +32,7 @@
         }
         else
         {
-            return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd);
+            return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd && x.HangHoa != true);
         }
     }
 

@@ -34,7 +34,7 @@ namespace QuanLyNhaHang.Controllers
         {
             return View("ThucDon");
         }
-        
+
         public IActionResult ViewInsertThucDon()
         {
             return View("ViewInsertTD");
@@ -1212,5 +1212,152 @@ namespace QuanLyNhaHang.Controllers
             TempData["ThongBao"] = "Khôi phục thành công!";
             return RedirectToAction("ViewDonViTinh");
         }
-    }
+        /////////////////////////////////////// View Nhan vien
+        public IActionResult ViewNhanVien()
+        {
+            return View("ViewNhanVien");
+        }
+        public IActionResult ViewInsertNhanVien()
+        {
+            return View("ViewInsertNhanVien");
+        }
+        [Route("/QuanLy/InsertNhanVien")]
+        public IActionResult InsertNhanVien(NhanVien nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            var check = context.TaiKhoan.FirstOrDefault(x => x.TenTk == nsx.IdtkNavigation.TenTk);
+            if (nsx.Idnnv == 0)
+            {
+                TempData["ThongBao"] = "Vui lòng chọn nhóm nhân viên!";
+                return View("ViewInsertNhanVien");
+            }
+            if (nsx.IdtkNavigation.Idvt == 0)
+            {
+                TempData["ThongBao"] = "Vui lòng chọn vai trò!";
+                return View("ViewInsertNhanVien");
+            }
+            if (check != null)
+            {
+                TempData["ThongBao"] = "Tên tài khoản đã tồn tại!";
+                return View("ViewInsertNhanVien");
+            }
+            TaiKhoan tk = new TaiKhoan();
+            tk.TenTk = nsx.IdtkNavigation.TenTk;
+            tk.Pass = nsx.IdtkNavigation.Pass;
+            tk.Idvt = nsx.IdtkNavigation.Idvt;
+            tk.Active = nsx.IdtkNavigation.Active;
+            context.SaveChanges();
+            var maNV = context.NhanVien.Count();
+            nsx.Idtk = tk.Idtk;
+            nsx.MaMv = "NV" + maNV.ToString("D5");
+            nsx.Active = true;
+            context.NhanVien.Add(nsx);
+            context.SaveChanges();
+            return RedirectToAction("ViewNhanVien");
+
+        }
+        [Route("/QuanLy/deleteNhanVien/{id}")]
+        public IActionResult DeleteNhanVien(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhanVien nsx = context.NhanVien.Find(id);
+            nsx.Active = false;
+
+            context.NhanVien.Update(nsx);
+            context.SaveChanges();
+            return RedirectToAction("ViewNhanVien");
+        }
+        [Route("/QuanLy/ViewUpdateNhanVien/{id}")]
+        public IActionResult ViewUpdateNhanVien(int id)
+
+        {
+            ViewData["Title"] = "Cập nhập thông tin nhân viên";
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhanVien nsx = context.NhanVien
+                .Include(x => x.IdnnvNavigation)
+                .Include(x => x.IdtkNavigation)
+                .ThenInclude(x => x.IdvtNavigation).FirstOrDefault(x => x.Idnv == id);
+            return View(nsx);
+        }
+        public IActionResult UpdateNhanVien(NhanVien nsx)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            var check = context.TaiKhoan.FirstOrDefault(x => x.TenTk == nsx.IdtkNavigation.TenTk && x.Idtk != nsx.Idtk);
+            if (nsx.Idnnv == 0)
+            {
+                TempData["ThongBao"] = "Vui lòng chọn nhóm nhân viên!";
+                return View("ViewUpdateNhanVien");
+            }
+            if (nsx.IdtkNavigation.Idvt == 0)
+            {
+                TempData["ThongBao"] = "Vui lòng chọn vai trò!";
+                return View("ViewUpdateNhanVien");
+            }
+            if (check != null)
+            {
+                TempData["ThongBao"] = "Tên tài khoản đã tồn tại!";
+                return View("ViewUpdateNhanVien");
+            }
+            NhanVien n = context.NhanVien.Find(nsx.Idnv);
+            n.Ten = nsx.Ten;
+            n.GioiTinh = nsx.GioiTinh;
+            n.Tuoi = nsx.Tuoi;
+            n.DiaChi = nsx.DiaChi;
+            n.Sdt = nsx.Sdt;
+            n.QueQuan = nsx.QueQuan;
+            n.Email = nsx.Email;
+            n.Idnnv = nsx.Idnnv;
+            TaiKhoan tk = context.TaiKhoan.Find(nsx.Idtk);
+            tk.TenTk = nsx.IdtkNavigation.TenTk;
+            tk.Pass = nsx.IdtkNavigation.Pass;
+            tk.Idvt = nsx.IdtkNavigation.Idvt;
+            context.NhanVien.Update(n);
+            context.TaiKhoan.Update(tk);
+            context.SaveChanges();
+            return RedirectToAction("ViewNhanVien");
+        }
+        [HttpPost("/loadViewNhanVien")]
+        public IActionResult loadViewNhanVien(bool active)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            if (active)
+            {
+                ViewBag.NSX = context.NhanVien.Where(x => x.Active == true).ToList();
+            }
+            else
+            {
+                ViewBag.NSX = context.NhanVien.ToList();
+            }
+            return PartialView("ViewDivNhanVien");
+        }
+        [Route("/QuanLy/khoiphucNhanVien/{id}")]
+        public IActionResult khoiphucNhanVien(int id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            NhanVien dvt = context.NhanVien.Find(id);
+
+            dvt.Active = true;
+
+            context.NhanVien.Update(dvt);
+            context.SaveChanges();
+            TempData["ThongBao"] = "Khôi phục thành công!";
+            return RedirectToAction("ViewNhanVien");
+        }
+        [HttpPost("DanhMuc/NhanVien/api/getModelsCB")]
+        public async Task<dynamic> getModelsCBNV(string key)
+        {
+
+            var models = await context.NhanVien.Where(x => (key == "" ? true : ((x.MaMv != null && x.MaMv.ToLower().Contains(key.ToLower())) ||
+                                               (x.Ten != null && x.Ten.ToLower().Contains(key.ToLower())))) &&
+                                                x.Active == true).Select(x => new
+                                                {
+                                                    Id = x.Idnv,
+                                                    Ma = x.MaMv,
+                                                    Ten = x.Ten,
+                                                }).ToListAsync();
+            return models;
+
+        }
+    } 
+    
 }

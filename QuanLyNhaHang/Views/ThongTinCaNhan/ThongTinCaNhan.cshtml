@@ -1,0 +1,137 @@
+﻿@model QuanLyNhaHang.Models.NhanVien
+
+@{
+    QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+    List<VaiTro> vaiTros = context.VaiTro.Where(x => x.Active == true).ToList();
+    List<NhomNhanVien> nhomNhanViens = context.NhomNhanVien.Where(x => x.Active == true).ToList();
+}
+@if (TempData["ThongBao"] != null)
+{
+    <script type="text/javascript" charset="utf-8">
+        window.onload = function () {
+            alert("@Html.Raw(@TempData["ThongBao"])");
+        };
+    </script>
+}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-10 col-xl-8">
+        <h2 class="h3 mb-4 page-title">Cập nhập thông tin nhân viên</h2>
+        <div class="my-4">
+            <form action="/ThongTinCaNhan/updateThongTinCaNhan" method="post" enctype="multipart/form-data">
+                <div class="row mt-5 align-items-center">
+                    <div class="col-md-3 text-center mb-5">
+                        
+                        <div class="col-auto avatar avatar-xl">
+                            <img src="@(Model.Image == null ? "/ImagesTD/ava.jpg" :  "/ImagesTD/" + Model.Image)" class="avatar avatar-xl" id="previewImage">
+                        </div>
+                        <div class="col-auto"> <input type="file" name="Avt" class="form-control" id="fileAvatar" placeholder="Chọn file avatar"></div>
+                    </div>
+                    <div class="col">
+                        <div class="row align-items-center">
+                            <div class="col-md-7">
+                                <h4 class="mb-1">@Model.Ten</h4>
+                                <p class="small mb-0 text-muted">Mã nhân viên : @Model.MaMv</p>
+                                <input asp-for="@Model.MaMv" type="hidden" class="form-control">
+
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-md-7">
+                                <p class="text-muted">Giới tính : @(Model.GioiTinh == true ? "Nam" : "Nữ") </p>
+                                <p class="small mb-0 text-muted">Số Điện thoại : @Model.Sdt</p>
+                                <p class="small mb-0 text-muted">Email : @Model.Email</p>
+                                <p class="small mb-0 text-muted">Địa chỉ : @Model.DiaChi</p>
+                                <p class="small mb-0 text-muted">Quê quán : @Model.QueQuan</p>
+                            </div>
+                            <div class="col">
+                                @* <p class="small mb-0 text-muted">@Model.Sdt</p>
+                                <p class="small mb-0 text-muted">@Model.Email</p>
+                                <p class="small mb-0 text-muted">@Model.DiaChi</p>
+                                <p class="small mb-0 text-muted">@Model.QueQuan</p> *@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="firstname">Họ và Tên</label>
+                        <input asp-for="@Model.Idnv" type="hidden" id="firstname" class="form-control">
+                        <input asp-for="@Model.Ten" type="text" id="firstname" class="form-control" placeholder="Họ và tên">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="lastname">Ngày sinh</label>
+                        <input asp-for="@Model.Tuoi" type="text" id="lastname" class="form-control" placeholder="Ngày sinh">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="inputState5">Giới tính</label>
+                        <select id="inputState5" class="form-control" asp-for="@Model.GioiTinh" required>
+                            <option value="true">Nam</option>
+                            <option value="false">Nữ</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="inputCompany5">Quê quán</label>
+                        <input asp-for="@Model.QueQuan" type="text" class="form-control" id="inputCompany5" placeholder="Quê quán">
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="inputZip5">SDT</label>
+                        <input asp-for="@Model.Sdt" type="number" class="form-control" id="inputZip5" placeholder="Sdt">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputAddress5">Địa chỉ</label>
+                    <input asp-for="@Model.DiaChi" type="text" class="form-control" id="inputAddress5" placeholder="Địa chỉ">
+                </div>
+
+                <div class="form-group">
+                    <label for="inputEmail4">Email</label>
+                    <input asp-for="@Model.Email" type="email" class="form-control" id="inputEmail4" placeholder="Email">
+                </div>
+
+                <hr class="my-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="inputPassword4">Tên tài khoản</label>
+                            <input asp-for="@Model.IdtkNavigation.Active" type="hidden" value="true" class="form-control">
+                            <input asp-for="@Model.Idtk" type="hidden" class="form-control">
+
+                            <input asp-for="@Model.IdtkNavigation.TenTk" type="text" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassword5">Mật khẩu</label>
+                            <input asp-for="@Model.IdtkNavigation.Pass" type="text" class="form-control" id="inputPassword5">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group col-md-6">
+                            <label for="inputState5">Vai trò</label>
+                            <select asp-for="@Model.IdtkNavigation.Idvt" id="inputState5" class="form-control" required>
+                                <option selected value="0"> -- Vai trò -- </option>
+                                @foreach (VaiTro vt in vaiTros)
+                                {
+                                    <option value="@vt.Idvt">@vt.TenVt</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="inputState5">Nhóm nhân viên</label>
+                            <select asp-for="@Model.Idnnv" id="inputState5" class="form-control" required>
+                                <option selected value="0"> -- Nhóm nhân viên -- </option>
+                                @foreach (NhomNhanVien vt in nhomNhanViens)
+                                {
+                                    <option value="@vt.Idnnv">@vt.TenNnv</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </form>
+        </div> <!-- /.card-body -->
+    </div> <!-- /.col-12 -->
+</div>
+<script src="~/jschinh/thongtincanhan.js"></script>

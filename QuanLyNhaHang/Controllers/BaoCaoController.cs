@@ -151,8 +151,8 @@ namespace QuanLyNhaHang.Controllers
                 .Include(x => x.IdpxNavigation)
                 .Where(x => x.IdpxNavigation.NgayTao.Value.Date >= FromDay && x.IdpxNavigation.NgayTao.Value.Date <= ToDay && x.ChenhLech != 0)
                 .ToList();
-            var chenhLech = chiTietPhieuXuats.GroupBy(x => x.Idhh)
-                .Select(x => new
+            List<ChenhLech> chenhLech = chiTietPhieuXuats.GroupBy(x => x.Idhh)
+                .Select(x => new ChenhLech()
                 {
                     Idhh = x.Key,
                     label = CommonServices.GetTenHH((int) x.Key, context.HangHoa.Where(x => x.Active == true).ToList()),
@@ -173,7 +173,7 @@ namespace QuanLyNhaHang.Controllers
                         TenHh = dm.IdhhNavigation.TenHh,
                         dvt = dm.IdhhNavigation.IddvtNavigation.TenDvt,
                         SoLuong = dm.SoLuong,
-                        ChenhLech = chenhLech.FirstOrDefault().soLuong,
+                        ChenhLech = BaoCaoController.getSLChenhLech(chenhLech, (int)dm.Idhh),
                     }).ToList(),
                     Ten = x.Ten,
                     MaTd = x.MaTd
@@ -192,6 +192,25 @@ namespace QuanLyNhaHang.Controllers
             };
 
         }
+        public class ChenhLech
+        {
+            public int? Idhh { get; set; }   
+            public string label { get; set; }
+            public double soLuong { get; set; }
+            public string donViTinh { get; set; }
+        }
+        public static double getSLChenhLech(List<ChenhLech> chenhLech, int idHH)
+        {
+            double sl = 0;
+            foreach (ChenhLech cl in chenhLech)
+            {
+                if (cl.Idhh == idHH)
+                {
+                    sl = cl.soLuong;
+                }
+            }
+            return sl;
+        }
         public double getChenhLech(List<ChiTietPhieuXuat> chiTietPhieuXuats)
         {
             List<ChiTietPhieuXuat> chiTiets = chiTietPhieuXuats
@@ -199,7 +218,7 @@ namespace QuanLyNhaHang.Controllers
                 .Select(group => group.First())
                 .ToList();
 
-            return (double)chiTiets.Sum(x => x.ChenhLech);
+            return Math.Round((double)chiTiets.Sum(x => x.ChenhLech), 3);
         }
         public string getDonViTinh(int idHH)
         {
@@ -346,7 +365,8 @@ namespace QuanLyNhaHang.Controllers
                 .ThenInclude(x => x.IdcaNavigation)
                 .ThenInclude(x => x.ChiTietHoaDon)
                 .ThenInclude(x => x.IdhdNavigation)
-                .Where(x => x.LichLamViec.Any(llv => llv.IdcaNavigation.ChiTietHoaDon.Any(ct => ct.IdhdNavigation.Tgxuat.Value.Date >= FromDay && ct.IdhdNavigation.Tgxuat.Value.Date <= ToDay)))
+                .Include(x => x.IdtkNavigation)
+                .Where(x => x.IdtkNavigation.Idvt == 1 && x.LichLamViec.Any(llv => llv.IdcaNavigation.ChiTietHoaDon.Any(ct => ct.IdhdNavigation.Tgxuat.Value.Date >= FromDay && ct.IdhdNavigation.Tgxuat.Value.Date <= ToDay)))
                 .Select(x => new NhanVien()
                 {
                     Ten = x.Ten,

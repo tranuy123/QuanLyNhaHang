@@ -13,14 +13,23 @@
     }
     int idban = ViewBag.idb;
     var ipmac = context.Ban.FirstOrDefault(x => x.Idban == idban).Ipmac;
-    ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd)
+    ChiTietHoaDonTam getCTHDT(string ipmac, int? idtd, bool hangHoa)
     {
-        return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd);
+        if (hangHoa == true)
+        {
+            return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd && x.HangHoa == true);
+        }
+        else
+        {
+            return context.ChiTietHoaDonTam.FirstOrDefault(x => x.Ipmac == ipmac && x.Idtd == idtd && x.HangHoa != true);
+        }
     }
     string toDecimal(double? d)
     {
         return d.Value.ToString("#,##0.00");
     }
+    List<HangHoa> hangHoas = context.HangHoa
+    .Include(x => x.IdnhhNavigation).Where(x => x.Active == true && x.IdnhhNavigation.HangHoa == true).ToList();
 }
 <div class="card-body">
                       <div class="toolbar">
@@ -63,12 +72,12 @@
         <tbody id="tbodyNTAPV">
             @foreach (Gia item in ViewBag.menuPV)
             {
-                if (getCTHDT(ipmac, item.Idtd) != null)
+                if (getCTHDT(ipmac, item.Idtd,false) != null)
                 {
 
 
 
-                    <tr>
+                    <tr data-hanghoa="0">
 
                         <td>
                             <div class="avatar avatar-md">
@@ -103,7 +112,7 @@
                 }
                 else
                 {
-                    <tr>
+                    <tr data-hanghoa="0">
 
                         <td>
                             <div class="avatar avatar-md">
@@ -135,20 +144,54 @@
                     </tr>
                 }
             }
+            @foreach (HangHoa item in hangHoas)
+            {
+                <tr data-hanghoa="1">
 
+                    <td>
+                        <div class="avatar avatar-md">
+                            @if (item.Avatar == null)
+                            {
+                                <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                                     src="~/ImagesTD/camon.png" />
+                            }
+                            else
+                            {
+                                <img class="modal-image" style="width: auto; height: 200px;object-fit: contain;"
+                                     src="~/ImagesTD/@item.Avatar" />
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        <strong>@item.TenHh</strong>
+                    </td>
+                    <td style="display:none"><input class='inputDisabled text-center' value=@item.Idhh type=text></td>
+                    <td style="display:none"><input class='inputDisabled text-center' value=@toDecimal(@item.GiaBan) type=text></td>
+
+                    <td>
+                        <strong> @toDecimal(@item.GiaBan)</strong>
+                    </td>
+                    <td class="w-25"><small class="text-muted"></small></td>
+                    @if (getCTHDT(ipmac, item.Idhh, true) != null)
+                    {
+                        <td>
+                            <button class="HuyaddTDPV btn btn-secondary"> hủy chọn món </button>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <button class="addTDPV btn btn-info"> Thêm món </button>
+                        </td>
+                    }
+                </tr>
+
+            }
         </tbody>
     </table>
                  <input type="hidden" id="IDB" value="@ViewBag.idb" />
-                 <input  id="IPMAC" value="@ipmac"/>
-                      <nav aria-label="Table Paging" class="mb-0 text-muted">
-                        <ul class="pagination justify-content-center mb-0">
-                          <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                          <li class="page-item"><a class="page-link" href="#">1</a></li>
-                          <li class="page-item active"><a class="page-link" href="#">2</a></li>
-                          <li class="page-item"><a class="page-link" href="#">3</a></li>
-                          <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                        </ul>
-                      </nav>
+                 <input type="hidden"  id="IPMAC" value="@ipmac"/>
+
                     </div>
 
 <script>
@@ -175,11 +218,12 @@
             var idtd = $(this).parents('tr').find("td:eq(2) input[type='text']").val();
             var DonGia = $(this).parents('tr').find("td:eq(3) input[type='text']").val();
             var thiss = $(this);
-
+            var hangHoa = $(this).closest('tr').data('hanghoa');
+            console.log(hangHoa);
             $.ajax({
                 type: "post",
                 url: "/addHoaDonPV",
-                data: "IPMAC=" + ipmac + "&IDTD=" + idtd + "&DonGia=" + DonGia,
+                data: "IPMAC=" + ipmac + "&IDTD=" + idtd + "&DonGia=" + DonGia + "&HangHoa=" + hangHoa,
                 success: function (result) {
                     $("#myTablePV").load(location.href + " #myTablePV>*", function () {
                         // callback function

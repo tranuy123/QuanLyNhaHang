@@ -115,7 +115,8 @@
                                     <td><input class="form-control text-end" style="width:60px" type="number" min="0" id="SL" maxlength="3" value="@item.Sl"/></td>
                                     <td>Dĩa</td>
                                 <td class="text-muted" id="tdThanhTien"><strong>@toDecimal((item.Sl * item.DonGia))</strong></td>
-                                    <td><button class="HuyHoaDonTam btn btn-secondary"> Hủy chọn món </button>
+                                <td>
+                                    <button class="HuyHoaDonTam btn btn-danger"> Hủy chọn món </button>
                                     </td>
                                 <td style="display:none" class="NTA"><input type="text" value="@getTD(item.Idtd).Idnta" /></td>
                                   </tr>

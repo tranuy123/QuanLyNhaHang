@@ -298,8 +298,8 @@ function addRowTableXKNL(data, i) {
                             <td class="text-center p-1">ĐVT</td>
                             <td class="text-center p-1">Số lượng xuất</td>
                             <td class="text-center p-1">Giá</td>
-                            <td class="text-center p-1">Chênh lệch</td>
-                            <td colspan="2" class="text-center p-1">Thành tiền</td>
+                            <td class="text-center p-1">Thành tiền</td>
+                            <td colspan="2" class="text-center p-1">Chênh lệch</td>
                                 </tr>
                             `;
     data.chiTietPhieuXuat.forEach(function (data, index) {

@@ -63,7 +63,7 @@ namespace QuanLyNhaHang.Controllers
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             ViewBag.idb = idb;
             ViewBag.IPMAC = context.Ban.FirstOrDefault(x => x.Idban == idb).Ipmac;
-            ViewBag.HoaDonPV = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null)).ToList();
+            ViewBag.HoaDonPV = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).Where(x => x.HangHoa != true && x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null)).ToList();
             return View("HoaDonPV");
         }
         [HttpPost("/loadNhomThucAnPV")]
@@ -89,7 +89,7 @@ namespace QuanLyNhaHang.Controllers
             return PartialView();
         }
         [HttpPost("/addHoaDonPV")]
-        public string addHoaDonPV(string IPMAC, int IDTD, float DonGia)
+        public string addHoaDonPV(string IPMAC, int IDTD, float DonGia, int HangHoa)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             ChiTietHoaDonTam ct = new ChiTietHoaDonTam();
@@ -98,6 +98,7 @@ namespace QuanLyNhaHang.Controllers
             ct.Idtd = IDTD;
             ct.DonGia = DonGia;
             ct.Sl = 1;
+            ct.HangHoa = HangHoa == 1 ? true : false;
             context.ChiTietHoaDonTam.Add(ct);
             context.SaveChanges();
 
