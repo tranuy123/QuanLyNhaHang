@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
     formatNumberInput();
-//    loadBaoCaoTH();
+    loadBaoCaoTH();
 });
 function loadBaoCaoTH() {
     var idNhomHang = $('select[name="nhomHang"]').val();

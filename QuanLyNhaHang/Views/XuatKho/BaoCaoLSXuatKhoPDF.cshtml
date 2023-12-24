@@ -1,4 +1,5 @@
-﻿@model List<HoaDon>
+﻿@using static QuanLyNhaHang.Controllers.XuatKhoController;
+@model List<HoaDon>
 @{
     Layout = null;
     QuanLyNhaHangContext context = new QuanLyNhaHangContext();
@@ -88,7 +89,7 @@
                             <b>BÁO CÁO</b>
                         </h4>
                         <h4 class="text-center" style="color: black">
-                            <b>Doanh thu</b>
+                            <b>Lịch sử xuất kho</b>
                         </h4>
                         <div class="row justify-content-between">
                             <label class="col-lg-6 col-form-label p-0">Từ: @ViewBag.tungay</label>
@@ -104,11 +105,11 @@
                                style="width: 100%">
                             <thead>
                                 <tr>
+                                    <th class="text-center">STT</th>
                                     <th class="text-center">Ngày tạo</th>
-                                    <th class="text-center">Số hóa đơn</th>
-                                    <th class="text-center">Tên sảnh</th>
-                                    <th class="text-center">Tên khu</th>
-                                    <th class="text-center">Tên bàn</th>
+                                    <th class="text-center">Số PX</th>
+                                    <th class="text-center">Ghi chú</th>
+                                    <th class="text-center">∑ Số lượng HH</th>
                                     <th class="text-center">∑ Tiền</th>
                                
                                 </tr>
@@ -117,30 +118,29 @@
                                 @{
                                     double tongTH = 0;
                                     double tongThanhToan = 0;
+                                    int stt = 1;
                                 }
-                                @foreach (HoaDon pn in Model)
+                                @foreach (LSXuatKho pn in ViewBag.PhieuXuat)
                                 {
                                     <tr>
-                                        @{
-                                            var ListCTPNT = pn.ChiTietHoaDon.ToList();
-                                            var TienHang = Math.Round(ListCTPNT.Sum(x => x.Sl * x.DonGia).Value, 2);
-                                            tongTH += TienHang;
-                                        }
-                                        <td class="text-center">@pn.Tgxuat.Value.ToString("dd-MM-yy")</td>
-                                        <td class="text-center">@pn.MaHd</td>
-                                        <td class="text-start">@pn.IdbanNavigation.IdkhuNavigation.IdsanhNavigation.TenSanh</td>
-                                        <td class="text-start">@pn.IdbanNavigation.IdkhuNavigation.TenKhu</td>
-                                        <td class="text-start">@pn.IdbanNavigation.TenBan</td>
+                                        <td class="text-center">@stt</td>
+                                        <td class="text-center">@pn.NgayTao</td>
+                                        <td class="text-center">@pn.SoPx</td>
+                                        <td class="text-start">@pn.GhiChu</td>
+                                        <td class="text-end">@pn.SoLuongHH</td>
 
 
-                                        <td class="text-end">@toDecimal(TienHang)</td>
+                                        <td class="text-end">@toDecimal(pn.TongTien)</td>
                                  
                                     </tr>
+                                    stt++;
+                                    tongTH += @pn.SoLuongHH;
+                                    tongThanhToan += @pn.TongTien;
                                 }
                             </tbody>
                             <tfoot>
                                 <tr style="background-color:lightgray">
-                                    <td colspan="5"><b>Tổng:</b></td>
+                                    <td colspan="4"><b>Tổng:</b></td>
                                     <td class="text-end">@toDecimal(tongTH)</td>
                                     <td class="text-end">@toDecimal(tongThanhToan)</td>
                                 </tr>

@@ -480,8 +480,17 @@ namespace QuanLyNhaHang.Controllers
             //}).ToList();
             return Ok(phieuXuats);
         }
+        public class LSXuatKho
+        {
+            public string SoPx { get; set; }
+            public DateTime? NgayTao { get; set; }
+            public string GhiChu { get; set; }
+            public double TongTien { get; set; }
+            public int SoLuongHH { get; set; }
+
+        }
         [HttpPost("/download/BaoCaoLSXuatKho")]
-        public IActionResult downloadBaoCaoLSXuatKho(int nhomHang, int hangHoa)
+        public IActionResult downloadBaoCaoLSXuatKho(string fromDay, string toDay, string soPhieuLS, bool TieuHuy)
         {
             var fullView = new HtmlToPdf();
             fullView.Options.WebPageWidth = 1280;
@@ -490,7 +499,7 @@ namespace QuanLyNhaHang.Controllers
             fullView.Options.MarginBottom = 20;
             fullView.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
 
-            var url = Url.Action("viewBaoCaoLSXuatKhoPDF", "XuatKho", new { idNhomHang = nhomHang, idHangHoa = hangHoa });
+            var url = Url.Action("viewBaoCaoLSXuatKhoPDF", "XuatKho", new { TuNgay = fromDay, DenNgay = toDay, maPhieu = soPhieuLS, TieuHuy = TieuHuy });
 
             var currentUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}" + url;
 
@@ -499,27 +508,27 @@ namespace QuanLyNhaHang.Controllers
             var pdfBytes = pdf.Save();
             return File(pdfBytes, "application/pdf", "BaoCaoLSXuatKho.pdf");
         }
-        public IActionResult viewBaoCaoLSXuatKhoPDF(int idNhomHang, int idHangHoa)
+        public IActionResult viewBaoCaoLSXuatKhoPDF(string TuNgay, string DenNgay, string maPhieu, bool TieuHuy)
         {
-            var tonKho = context.TonKho
-                .Include(x => x.IdctpnNavigation)
-                .ThenInclude(x => x.IdhhNavigation)
-                .Where(x => (idNhomHang == 0 || x.IdctpnNavigation.IdhhNavigation.Idnhh == idNhomHang)
-                            && (idHangHoa == 0 || x.IdctpnNavigation.Idhh == idHangHoa))
-                .ToList();
-            List<BaoCaoTonKho> tonkho1 = tonKho.GroupBy(x => x.IdctpnNavigation.Idhh)
-                .Select(x => new BaoCaoTonKho
-                {
-                    Id = (int)x.Key,
-                    MaHang = getMaHang((int)x.Key),
-                    TenHang = getTenHang((int)x.Key),
-                    TongSL = Math.Round((float)x.Sum(x => x.SoLuong), 3),
-                    TongTien = Math.Round((float)x.Sum(x => x.IdctpnNavigation.Gia * x.SoLuong), 3)
-
-                })
-                .ToList();
-            ViewBag.TonKho = tonkho1;
-            return View("BaoCaoTonKhoPDF");
+            DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            List<LSXuatKho> phieuXuats = context.PhieuXuat
+                .Where(x => (x.NgayTao.Value.Date >= tuNgay.Date && x.NgayTao.Value.Date <= denNgay.Date)
+                && (maPhieu == "" || maPhieu == null || x.SoPx == maPhieu)
+                && (TieuHuy == false || x.TieuHuy == TieuHuy))
+             .Select(x => new LSXuatKho
+             {
+                 SoPx = x.SoPx,
+                 NgayTao = x.NgayTao,
+                 GhiChu = x.GhiChu,
+                 TongTien = XuatKhoController.getTongTien(x.ChiTietPhieuXuat.ToList()),
+                 SoLuongHH = x.ChiTietPhieuXuat.Count(),
+             })
+            .ToList();
+            ViewBag.tuNgay = tuNgay.Date;
+            ViewBag.denNgay = denNgay.Date;  
+            ViewBag.PhieuXuat = phieuXuats;
+            return View("BaoCaoLSXuatKhoPDF");
 
         }
         public static double getTongTien(List<ChiTietPhieuXuat> chiTietPhieuXuats)
