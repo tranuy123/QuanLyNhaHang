@@ -58,7 +58,7 @@ namespace QuanLyNhaHang.Controllers
         }
         [HttpPost("DinhMuc/LuuDinhMuc")]
 
-        public async Task<dynamic> luuProfileCt([FromBody] DinhMucData data)
+        public async Task<dynamic> LuuDinhMuc([FromBody] DinhMucData data)
         {
             int idPRF = data.IdPRF;
             List<DinhMuc> idDVKT = data.IdDVKT;

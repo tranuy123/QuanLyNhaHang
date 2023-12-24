@@ -918,7 +918,7 @@ namespace QuanLyNhaHang.Controllers
             n.TenNhh = nsx.TenNhh;
             n.NguyenLieu = nsx.NguyenLieu;
             n.HangHoa = nsx.HangHoa;
-
+            n.SoNgayCanhBao = nsx.SoNgayCanhBao;
 
             context.NhomHangHoa.Update(n);
             context.SaveChanges();

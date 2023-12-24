@@ -253,6 +253,7 @@ $(document).ready(function () {
 connection.on("GiveHD", function (item,tt,ipmac) {
     var btnsendYCTT = $('.btn-sendYCTT');
     var IPMAC = $("#IDMAC").val();
+    var IPMACPV = $("#IPMACPV").val();
     var tbody = $("#tbodyXNTT");
     var newRow = `<tr class="accordion-toggle collapsed" id="c-2474-${item.idhd}" data-toggle="collapse" data-parent="#c-2474-${item.idhd}" href="#collap-2474-${item.idhd}" aria-expanded="false">
     <td>${GanSTTXNTT()}</td>
@@ -289,7 +290,7 @@ connection.on("GiveHD", function (item,tt,ipmac) {
 
     tbody.append(newRow);
     formatNumberInput();
-    if (ipmac == IPMAC) {
+    if (ipmac == IPMAC || IPMACPV == ipmac) {
         if (tt == 1) {
             $('.toastTT').toast('show');
             btnsendYCTT.prop('disabled', true);
@@ -314,7 +315,6 @@ $(document).ready(function () {
         var trWithDisabledButton = tbody.find('tr.accordion-toggle').filter(function () {
             return $(this).find('td button.btn-huy:disabled').length > 0;
         });
-        console.log(trWithDisabledButton.length , tr.length);
         if (trWithDisabledButton.length != tr.length) {
             showToast("Có món ăn chưa được hoàn thành, vui lòng chờ hoặc hủy món ăn để được thanh toán", 500)
             return;
@@ -330,20 +330,24 @@ $(document).ready(function () {
 });
 //------------------------------------------------------
 connection.on("GiveHHD", function (data) {
-    console.log(data);
+    var IPMACPV = $("#IPMACPV").val();
     var trHHD = $('#tbodyXNTT tr#c-2474-' + data.idHD + '');
     trHHD.remove();
     var trHHDC = $('#tbodyXNTT tr#collap-2474-' + data.idHD + '');
     trHHDC.remove();
     var IPMAC = $("#IDMAC").val();
-    console.log(data.ipmac);
-    console.log(IPMAC);
     if ((data.ipmac).trim() == IPMAC.trim()) {
-    $('.btn-sendHYCTT').prop('disabled', true);
-    $('.btn-sendYCTT').prop('disabled', false);
+        $('.btn-sendHYCTT').prop('disabled', true);
+        $('.btn-sendYCTT').prop('disabled', false);
         showToast("Thành công", 200);
-
     }
+
+    if ((data.ipmac).trim() == IPMACPV.trim()) {
+        $('.btn-sendHYCTT').prop('disabled', true);
+        $('.btn-sendYCTT').prop('disabled', false);
+        showToast("Thành công", 200);
+    };
+
     
 });
 $(document).ready(function () {
@@ -360,11 +364,15 @@ $(document).ready(function () {
 connection.on("NhanXNTT", function (ipmac) {
    
     var IPMAC = $("#IDMAC").val();
+    var IPMACPV = $("#IPMACPV").val();
     if (IPMAC == ipmac) {
         $('.toastXNTT').toast('show');
         $('.btn-sendHYCTT').prop('disabled', true);
     }
-   
+    if (IPMACPV == ipmac) {
+        $('.btn-sendHYCTT').prop('disabled', true);
+        showToast("Thành công", 200);
+    };
     //$("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
     //});
     //$("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
@@ -386,6 +394,10 @@ $(document).ready(function () {
 connection.on("HuyHDXNNT", function (ipmac) {
 
     var IPMAC = $("#IDMAC").val();
+    var IPMACPV = $("#IPMACPV").val();
+    if (IPMACPV == ipmac) {
+        $('.btn-sendHYCTT').prop('disabled', false);
+    }
     if (IPMAC == ipmac) {
         $('.btn-sendHYCTT').prop('disabled', false);
     }

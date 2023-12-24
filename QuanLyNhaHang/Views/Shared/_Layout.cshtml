@@ -74,7 +74,10 @@
         .table{
             color:black !important;
         }
-      
+
+        .tableHD thead th{
+            color: #f2eded !important;
+        }
     </style>
  
 
@@ -279,18 +282,18 @@
                     <li class="nav-item w-100">
                         <a class="nav-link" href="/DinhMuc/DinhMuc">
                             <i class="fe fe-layers fe-16"></i>
-                            <span class="ml-3 item-text">Định mức món ăn</span>
+                            <span class="ml-3 item-text">Định mức nguyên liệu</span>
                         </a>
                     </li>
                     <li class="nav-item w-100">
                         <a class="nav-link" href="/CanhBaoNguyenLieu/CanhBaoNguyenLieu">
                             <i class="fe fe-layers fe-16"></i>
-                            <span class="ml-3 item-text">Cảnh báo nguyên liệu</span>
+                            <span class="ml-3 item-text">Dự trù nhập kho</span>
                         </a>
                     </li>
 
                 }
-                @if (User.IsInRole("3"))
+                @if (User.IsInRole("4"))
                 {
                     <li class="nav-item w-100">
                         <a class="nav-link" href="/ThuNgan/Index">

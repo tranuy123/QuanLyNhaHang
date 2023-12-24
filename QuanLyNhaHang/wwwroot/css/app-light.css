@@ -1,4 +1,4 @@
-/* card */
+﻿/* card */
 /* form */
 /* table */
 /* paging */
@@ -70,7 +70,11 @@ body {
 
 [tabindex="-1"]:focus:not(:focus-visible) {
   outline: 0 !important; }
-
+.checkbox-container {
+    transform: scale(2); /* Điều chỉnh giá trị để làm cho checkbox lớn hơn */
+    display: flex;
+    align-items: center;
+}
 hr {
   box-sizing: content-box;
   height: 0;

@@ -14,7 +14,7 @@
     var TinhTrangXNHD = context.HoaDon.Where(x => x.TinhTrang == false && x.Idban == idb && x.TinhTrangTt == null);
     var TinhTrangXNHD1 = context.HoaDon.Where(x => x.TinhTrang == true && x.Idban == idb && x.TinhTrangTt == false);
     var cthd = context.ChiTietHoaDon.Include(x => x.IdhdNavigation.IdbanNavigation).FirstOrDefault(x => x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null));
-
+    var IPMACPV = ViewBag.IPMAC;
     var idhd = cthd != null ? cthd.Idhd : 0;
     var tongtien = cthd != null ? cthd.IdhdNavigation.TongTien : 0;
     List<ChiTietHoaDon> getListCTHDHH()
@@ -31,12 +31,13 @@
 <div class="row" style="width:100%">
     <div class="col-md-12 my-4">
         <h2 class="h4 mb-1">Hóa đơn của bạn</h2>
+        <input type="hidden" id="IPMACPV" value="@IPMACPV"/>
         <p class="mb-3">Child rows with additional detailed information</p>
         <div class="card shadow">
             <div class="card-body">
                 <!-- table -->
 
-                <table class="table table-hover table-borderless border-v tableHD">
+                <table class="table tableHD table-hover table-borderless border-v tableHD">
                     <thead class="thead-dark">
                         <tr>
                             <th>STT</th>

@@ -1,19 +1,16 @@
 ﻿$(document).ready(function () {
-    formatNumberInput()
+    formatNumberInput();
+//    loadBaoCaoTH();
 });
 function loadBaoCaoTH() {
     var idNhomHang = $('select[name="nhomHang"]').val();
     var idHangHoa = $('select[name="hangHoa"]').val();
-    var tuNgay = $('#tuNgay').val();
-    var denNgay = $('#denNgay').val();
     $.ajax({
         url: '/TonKho/BaoCaoTongHop', // Đường dẫn đến action xử lý form
         method: 'POST',
         data: {
             idNhomHang: idNhomHang,
             idHangHoa: idHangHoa,
-            tuNgay: tuNgay,
-            denNgay: denNgay,
         },
         success: function (response) {
             $('#tBody-BaoCaoTongHop').empty();
@@ -50,7 +47,7 @@ function GanSTT() {
     return Number(Number(stt) + 1);
 }
 function GanSTTCT() {
-    var stt = $('#tBody-BaoCaoTongHop tr').length;
+    var stt = $('#tBody-BaoCaoChiTiet tr').length;
 
     return Number(Number(stt) + 1);
 }
@@ -80,7 +77,7 @@ function loadBaoCaoCT() {
     });
 }
 function addRowBaoCaoChiTiet(data) {
-    var newRow = `<tr>
+    var newRow = $(`<tr>
         <td class="first-td-column text-center p-1 td-sticky">
             <input autocomplete="off" type="text" class="form-control form-table text-center stt" readonly value="${GanSTTCT()}" style="width:40px;z-index:2;" />
             <input type="hidden" name="idHangHoa" value="${data.id}" />
@@ -122,7 +119,13 @@ function addRowBaoCaoChiTiet(data) {
         <td class="p-1">
             <input autocomplete="off" t type="text" class="w-100 form-control form-table formatted-number" style="width:80px;" value="${formatTotal(data.thanhTien)}" name="donGia" />
         </td>
-    </tr>`;
+    </tr>`);
+    if (data.canhBao) {
+        newRow.addClass('text-danger');
+
+        // Thêm lớp 'text-danger' cho tất cả ô input trong hàng
+        newRow.find('input').addClass('text-danger');
+    }
     $('#tBody-BaoCaoChiTiet').append(newRow);
 }
 function offTab1() {

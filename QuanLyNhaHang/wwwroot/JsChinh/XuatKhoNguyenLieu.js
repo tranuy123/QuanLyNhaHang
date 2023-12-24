@@ -1,7 +1,11 @@
 ﻿var _tuNgay = null;
 var _denNgay = null;
 $(document).ready(function () {
-    formatNumberInput()
+    formatNumberInput();
+    getDSNguyenLieu();
+    $("#tieuHuy").on("click", function () {
+        getDSNguyenLieu();
+    });
 });
 function addChiTietPhieuXuat() {
     var tenHangHoa = $('#groupTTChiTiet select[name="idHangHoa"]').text();
@@ -129,7 +133,8 @@ function themPhieuXuat() {
         PhieuXuat: queryStringToData(dataPhieuNhapMaster),
         ChiTietPhieuXuat: tableData,
         TuNgay: _tuNgay,
-        DenNgay: _denNgay
+        DenNgay: _denNgay,
+        TieuHuy: $('#tieuHuy').prop('checked')
     };
     $.ajax({
         url: '/XuatKho/ThemPhieuXuat', // Đường dẫn đến action xử lý form
@@ -156,7 +161,8 @@ function getDSNguyenLieu() {
         method: 'POST',
         data: {
             TuNgay: _tuNgay,
-            denNgay: _denNgay,
+            DenNgay: _denNgay,
+            TieuHuy: $('#tieuHuy').prop('checked'),
         },
         success: function (response) {
             $('#tbodyChiTietPhieuXuat').empty();
@@ -258,6 +264,7 @@ function getDSXKNL() {
             TuNgay: _fromDay,
             DenNgay: _toDay,
             maPhieu: _soPhieu,
+            TieuHuy: $('#tieuHuyLS').prop('checked'),
         },
         success: function (response) {
             $('#tbody-XemPhieuXuat').empty();

@@ -276,8 +276,8 @@ namespace QuanLyNhaHang.Controllers
                 .ToListAsync();
             return new
             {
-                doThiThucDon = thucDons.OrderByDescending(x => x.soLuong),
-                doThiKhu = khus.OrderByDescending(x => x.soLuong)
+                doThiThucDon = thucDons.Where(x => x.soLuong != 0).OrderByDescending(x => x.soLuong),
+                doThiKhu = khus.Where(x => x.soLuong != 0).OrderByDescending(x => x.soLuong)
 ,
             };
         }

@@ -5,12 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyNhaHang.Models;
 using QuanLyNhaHang.Models.Mapping;
 using QuanLyNhaHang.Services;
+using SelectPdf;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using static QuanLyNhaHang.Controllers.TonKhoController;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -84,10 +86,11 @@ namespace QuanLyNhaHang.Controllers
 
             List<TonKho> soLuongHhcon = await context.TonKho
                 .Include(x => x.IdctpnNavigation)
-                .OrderBy(x => x.NgayNhap).ToListAsync();
+                .OrderBy(x => x.IdctpnNavigation.Hsd).ToListAsync();
             var tran = context.Database.BeginTransaction();
             try
             {
+                phieuXuat.TieuHuy = data.TieuHuy;
                 phieuXuat.Active = true;
                 phieuXuat.Idnv = nv.Idnnv;
                 phieuXuat.SoPx = taoSoPhieuXuat(phieuNhaps);
@@ -102,11 +105,16 @@ namespace QuanLyNhaHang.Controllers
                     double a = (double)soLuongHhcon.Sum(x => x.SoLuong);
                     if (soLuongCon.Sum(x => x.SoLuong) < slq || soLuongCon.Count() == 0)
                     {
-                        return new
-                        {
-                            statusCode = 500,
-                            message = "Không đủ nguyên liệu để xuất",
-                        };
+                            if (data.TieuHuy == false)
+                            {
+
+                                return new
+                                {
+                                    statusCode = 500,
+                                    message = "Không đủ nguyên liệu để xuất",
+                                };
+                            }
+
                     }
                     else
                     {
@@ -154,9 +162,11 @@ namespace QuanLyNhaHang.Controllers
                         }
                         chiTietPhieuXuatMaps.Remove(t);
                         context.SaveChanges();
-                        if (data.TuNgay != null && data.DenNgay != null)
-                        {
-                            await updateDSChiTietHoaDon(data.TuNgay, data.DenNgay);
+                        if (data.TieuHuy == false) {
+                            if (data.TuNgay != null && data.DenNgay != null)
+                            {
+                                await updateDSChiTietHoaDon(data.TuNgay, data.DenNgay);
+                            } 
                         }
                     }
 
@@ -197,7 +207,7 @@ namespace QuanLyNhaHang.Controllers
 
             List<TonKho> soLuongHhcon = await context.TonKho
                 .Include(x => x.IdctpnNavigation)
-                .OrderBy(x => x.NgayNhap).ToListAsync();
+                .OrderBy(x => x.IdctpnNavigation.Hsd).ToListAsync();
             var tran = context.Database.BeginTransaction();
             try
             {
@@ -213,6 +223,7 @@ namespace QuanLyNhaHang.Controllers
                 context.HoaDon.Add(hoaDon);
                 context.SaveChanges();
 
+                phieuXuat.TieuHuy = false;
                 phieuXuat.Idkh = hoaDon.Idhd;
                 phieuXuat.Active = true;
                 phieuXuat.Idnv = nv.Idnnv;
@@ -231,7 +242,7 @@ namespace QuanLyNhaHang.Controllers
                         return new
                         {
                             statusCode = 500,
-                            message = "Không đủ nguyên liệu để xuất",
+                            message = "Không đủ hàng hóa để xuất",
                         };
                     }
                     else
@@ -323,6 +334,11 @@ namespace QuanLyNhaHang.Controllers
                 cthd.DaXuat = true;
                 cthd.HangHoa = true;
                 cthd.Active = true;
+                cthd.Tgorder = DateTime.Now;    
+                cthd.Tgbep = DateTime.Now;
+                cthd.TghoanThanh = DateTime.Now;    
+                cthd.TgphucVu = DateTime.Now;
+
                 chiTietHoaDons.Add(cthd);
             }
             context.ChiTietHoaDon.AddRange(chiTietHoaDons);
@@ -345,7 +361,7 @@ namespace QuanLyNhaHang.Controllers
 
         }
         [HttpPost("/XuatKho/getDSXuatKho")]
-        public async Task<dynamic> getDSXuatKho(string TuNgay, string DenNgay)
+        public async Task<dynamic> getDSXuatKho(string TuNgay, string DenNgay, string TieuHuy)
         {
             DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
@@ -367,7 +383,7 @@ namespace QuanLyNhaHang.Controllers
                         soLuong = (float)(dm.SoLuong * cthd.Sl),
                         donGia = getGiaTrungBinh((int)dm.Idhh),
                     };
-                    listHH.Add(hanghoa);    
+                    listHH.Add(hanghoa);
                 }
             }
             var hangHoas = listHH.GroupBy(x => x.idhh)
@@ -376,10 +392,29 @@ namespace QuanLyNhaHang.Controllers
                     idhh = x.Key,
                     tenHangHoa = getTenHH((int)x.Key),
                     donViTinh = getDonViTinh((int)x.Key),
-                    soLuong = Math.Round((float)x.Sum(x => (float)x.soLuong),3),
+                    soLuong = Math.Round((float)x.Sum(x => (float)x.soLuong), 3),
                     tonKho = getSLTon((int)x.Key),
-                    donGia = Math.Round(x.First().donGia,3),
-                }) ;
+                    donGia = Math.Round(x.First().donGia, 3),
+                });
+            // nếu là tiêu hủy hàng hoá
+            if (TieuHuy == "true") {
+              var hangHoasHuy = context.TonKho
+                    .Include(x => x.IdctpnNavigation)
+                    .ThenInclude(x => x.IdhhNavigation)
+                    .ThenInclude(x => x.IddvtNavigation)
+                    .Where(x => x.IdctpnNavigation.Hsd.Value.Date <= DateTime.Now.Date)
+                    .AsEnumerable()
+                    .Select(x => new
+                    {
+                        idhh = x.IdctpnNavigation.Idhh,
+                        tenHangHoa = x.IdctpnNavigation.IdhhNavigation.TenHh,
+                        donViTinh = x.IdctpnNavigation.IdhhNavigation.IddvtNavigation.TenDvt,
+                        soLuong = Math.Round((float)x.SoLuong, 3),
+                        tonKho = getSLTon((int)x.IdctpnNavigation.Idhh),
+                        donGia = Math.Round((double)x.IdctpnNavigation.Gia, 3),
+                    });
+                return hangHoasHuy;
+            }
             return hangHoas;
         }
         public double getGiaTrungBinh(int idHH)
@@ -404,13 +439,14 @@ namespace QuanLyNhaHang.Controllers
             return View("PhieuXuatNguyenLieu");
         }
         [HttpPost("/XuatKho/LichSuXuat")]
-        public async Task<dynamic> LichSuXuat(string TuNgay, string DenNgay, string maPhieu)
+        public async Task<dynamic> LichSuXuat(string TuNgay, string DenNgay, string maPhieu, bool TieuHuy)
         {
             DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             var phieuXuats = await context.PhieuXuat
                 .Where(x => (x.NgayTao.Value.Date >= tuNgay.Date && x.NgayTao.Value.Date <= denNgay.Date)
-                && (maPhieu == "" || maPhieu == null || x.SoPx == maPhieu))
+                && (maPhieu == "" || maPhieu == null || x.SoPx == maPhieu)
+                && (TieuHuy == false || x.TieuHuy == TieuHuy))
              .Select(x => new
              {
                  SoPx = x.SoPx,
@@ -444,6 +480,48 @@ namespace QuanLyNhaHang.Controllers
             //}).ToList();
             return Ok(phieuXuats);
         }
+        [HttpPost("/download/BaoCaoLSXuatKho")]
+        public IActionResult downloadBaoCaoLSXuatKho(int nhomHang, int hangHoa)
+        {
+            var fullView = new HtmlToPdf();
+            fullView.Options.WebPageWidth = 1280;
+            fullView.Options.PdfPageSize = PdfPageSize.A4;
+            fullView.Options.MarginTop = 20;
+            fullView.Options.MarginBottom = 20;
+            fullView.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+
+            var url = Url.Action("viewBaoCaoLSXuatKhoPDF", "XuatKho", new { idNhomHang = nhomHang, idHangHoa = hangHoa });
+
+            var currentUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}" + url;
+
+            var pdf = fullView.ConvertUrl(currentUrl);
+
+            var pdfBytes = pdf.Save();
+            return File(pdfBytes, "application/pdf", "BaoCaoLSXuatKho.pdf");
+        }
+        public IActionResult viewBaoCaoLSXuatKhoPDF(int idNhomHang, int idHangHoa)
+        {
+            var tonKho = context.TonKho
+                .Include(x => x.IdctpnNavigation)
+                .ThenInclude(x => x.IdhhNavigation)
+                .Where(x => (idNhomHang == 0 || x.IdctpnNavigation.IdhhNavigation.Idnhh == idNhomHang)
+                            && (idHangHoa == 0 || x.IdctpnNavigation.Idhh == idHangHoa))
+                .ToList();
+            List<BaoCaoTonKho> tonkho1 = tonKho.GroupBy(x => x.IdctpnNavigation.Idhh)
+                .Select(x => new BaoCaoTonKho
+                {
+                    Id = (int)x.Key,
+                    MaHang = getMaHang((int)x.Key),
+                    TenHang = getTenHang((int)x.Key),
+                    TongSL = Math.Round((float)x.Sum(x => x.SoLuong), 3),
+                    TongTien = Math.Round((float)x.Sum(x => x.IdctpnNavigation.Gia * x.SoLuong), 3)
+
+                })
+                .ToList();
+            ViewBag.TonKho = tonkho1;
+            return View("BaoCaoTonKhoPDF");
+
+        }
         public static double getTongTien(List<ChiTietPhieuXuat> chiTietPhieuXuats)
         {
             double tongTien = 0;
@@ -465,5 +543,6 @@ namespace QuanLyNhaHang.Controllers
         public List<ChiTietPhieuXuatMap> ChiTietPhieuXuat { get; set; }
         public string TuNgay { get;set; }
         public string DenNgay { get; set; }
+        public bool TieuHuy { get; set; }
     }
 }

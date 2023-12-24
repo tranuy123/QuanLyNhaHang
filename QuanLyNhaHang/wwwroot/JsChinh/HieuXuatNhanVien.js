@@ -44,7 +44,7 @@ function renderDoThi(labels, values) {
     ];
 
     var ctx = document.getElementById('employeePerformanceChart').getContext('2d');
-    var employeePerformanceChart = new Chart(ctx, {
+    _myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,

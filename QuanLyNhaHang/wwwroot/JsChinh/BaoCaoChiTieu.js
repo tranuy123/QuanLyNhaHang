@@ -137,7 +137,7 @@ function renderDoThiKhu(labels, values) {
         }]
     };
     // Khởi tạo biểu đồ
-    var _myChartK = new Chart(ctx, {
+     _myChartK = new Chart(ctx, {
         type: 'bar',
         data: doanhThuData,
         options: {

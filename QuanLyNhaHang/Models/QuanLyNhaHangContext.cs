@@ -51,7 +51,7 @@ namespace QuanLyNhaHang.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=TRAN-UY\\MSSQLSERVER22;Database=QuanLyNhaHang;User Id=sa;Password=123456;TrustServerCertificate=true");
+                optionsBuilder.UseSqlServer("Server=TRAN-UY\\MSSQLSERVER22;Database=QuanLyNhaHang;User Id=sa;Password=123456;MultipleActiveResultSets=True;TrustServerCertificate=true");
             }
         }
 
