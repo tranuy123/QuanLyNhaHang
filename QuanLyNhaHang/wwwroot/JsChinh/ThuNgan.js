@@ -27,45 +27,45 @@ $('#tbodyXNTT').on('keyup', 'input[name ="giamGia"]', function () {
     eTongTien.find('td[name="tongTien"]').text(formatTotal(tongThanhTien));
 
 });
-$('#tbodyXNTT').on('click', 'a.IDHDTT', function () {
-    var idCTHD = $(this).closest('tr').find('input#inputIDHDTT').val();
-    console.log(idCTHD);
-    UpdateHH(idCTHD);
-});
-function UpdateHH(idHH) {
-    var dls = $('#tbodyXNTT tr#collap-2474-' + idHH + ' td dl');
-    var tableData = [];
-    dls.each(function () {
-        var row = $(this);
-        var rowData = {};
-        rowData.Idcthd = parseInt(row.find('input[name="IDCTHD"]').val());
-        rowData.TyLeGiam = row.find('input[name="giamGia"]').val();
-        if (rowData.TyLeGiam == '') {
-            rowData.TyLeGiam = 0;
-        } else {
-            rowData.TyLeGiam = parseInt(rowData.TyLeGiam);
-        }        rowData.ThanhTien = parseFloat(row.find('input[name="thanhTien"]').val().replace(/,/g, ''));
-        tableData.push(rowData);
-    })
-    var data = {
-        IdHD: idHH,
-        ChiTietHoaDon: tableData
-    };
-    console.log(data);
-    $.ajax({
-        url: '/ThuNgan/UpdateHH', // Đường dẫn đến action xử lý form
-        method: 'POST',
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        success: function (response) {
-            $("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
-            });
-            $("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
-            });
-        }
-    });
-    formatNumberInput();
-}
+//$('#tbodyXNTT').on('click', 'a.IDHDTT', function () {
+//    var idCTHD = $(this).closest('tr').find('input#inputIDHDTT').val();
+//    console.log(idCTHD);
+//    UpdateHH(idCTHD);
+//});
+//function UpdateHH(idHH) {
+//    var dls = $('#tbodyXNTT tr#collap-2474-' + idHH + ' td dl');
+//    var tableData = [];
+//    dls.each(function () {
+//        var row = $(this);
+//        var rowData = {};
+//        rowData.Idcthd = parseInt(row.find('input[name="IDCTHD"]').val());
+//        rowData.TyLeGiam = row.find('input[name="giamGia"]').val();
+//        if (rowData.TyLeGiam == '') {
+//            rowData.TyLeGiam = 0;
+//        } else {
+//            rowData.TyLeGiam = parseInt(rowData.TyLeGiam);
+//        }        rowData.ThanhTien = parseFloat(row.find('input[name="thanhTien"]').val().replace(/,/g, ''));
+//        tableData.push(rowData);
+//    })
+//    var data = {
+//        IdHD: idHH,
+//        ChiTietHoaDon: tableData
+//    };
+//    console.log(data);
+//    $.ajax({
+//        url: '/ThuNgan/UpdateHH', // Đường dẫn đến action xử lý form
+//        method: 'POST',
+//        data: JSON.stringify(data),
+//        contentType: "application/json",
+//        success: function (response) {
+//            $("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
+//            });
+//            $("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
+//            });
+//        }
+//    });
+//    formatNumberInput();
+//}
 $('#tbodyXNNT').on('click', 'a.huyHD', function () {
     var idHD = $(this).closest('td').find('#inputIDHDNT').val();
     huyXNTT(idHD);

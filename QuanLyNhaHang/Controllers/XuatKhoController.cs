@@ -320,7 +320,9 @@ namespace QuanLyNhaHang.Controllers
         }
         public void TaoChiTietHoaDon(int idPX, int idHD)
         {
-            List<ChiTietPhieuXuat> chiTietPhieuXuats = context.ChiTietPhieuXuat.Where(x => x.Idpx == idPX)
+            List<ChiTietPhieuXuat> chiTietPhieuXuats = context.ChiTietPhieuXuat
+                .Include(x => x.IdhhNavigation)
+                .Where(x => x.Idpx == idPX)
                 .ToList();
             List<ChiTietHoaDon> chiTietHoaDons = new List<ChiTietHoaDon>();
             foreach (ChiTietPhieuXuat ct in chiTietPhieuXuats)
@@ -330,7 +332,7 @@ namespace QuanLyNhaHang.Controllers
                 cthd.Idhd = idHD;
                 cthd.Sl = Convert.ToInt32(ct.SoLuong);
                 cthd.DonGia = getGiaBan((int)ct.Idhh);
-                cthd.ThanhTien = ct.Gia * ct.SoLuong;
+                cthd.ThanhTien = ct.IdhhNavigation.GiaBan * ct.SoLuong;
                 cthd.DaXuat = true;
                 cthd.HangHoa = true;
                 cthd.Active = true;
@@ -368,7 +370,7 @@ namespace QuanLyNhaHang.Controllers
             var listHH = new List<dynamic>();
             List<ChiTietHoaDon> chiTietHoaDons = await context.ChiTietHoaDon
                 .Include(x => x.IdhdNavigation)
-                .Where(x => x.IdhdNavigation.Tgxuat.Value.Date >= tuNgay.Date && x.IdhdNavigation.Tgxuat.Value.Date <= denNgay.Date && x.DaXuat != true && x.IdtdNavigation.Idnta != 3).ToListAsync();
+                .Where(x => x.IdhdNavigation.Tgxuat.Value.Date >= tuNgay.Date && x.IdhdNavigation.Tgxuat.Value.Date <= denNgay.Date && x.DaXuat != true && x.IdtdNavigation.Idnta != 3 && x.HangHoa != true).ToListAsync();
             foreach (ChiTietHoaDon cthd in chiTietHoaDons)
             {
                 List<DinhMuc> dinhMucs = context.DinhMuc
@@ -439,14 +441,16 @@ namespace QuanLyNhaHang.Controllers
             return View("PhieuXuatNguyenLieu");
         }
         [HttpPost("/XuatKho/LichSuXuat")]
-        public async Task<dynamic> LichSuXuat(string TuNgay, string DenNgay, string maPhieu, bool TieuHuy)
+        public async Task<dynamic> LichSuXuat(string TuNgay, string DenNgay, string maPhieu, bool TieuHuy, int idHH)
         {
             DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             var phieuXuats = await context.PhieuXuat
+                .Include(x => x.ChiTietPhieuXuat)
                 .Where(x => (x.NgayTao.Value.Date >= tuNgay.Date && x.NgayTao.Value.Date <= denNgay.Date)
                 && (maPhieu == "" || maPhieu == null || x.SoPx == maPhieu)
-                && (TieuHuy == false || x.TieuHuy == TieuHuy))
+                && (TieuHuy == false || x.TieuHuy == TieuHuy)
+                && (idHH == 0 || x.ChiTietPhieuXuat.Any(ct => ct.IdctpnNavigation.Idhh == idHH)))
              .Select(x => new
              {
                  SoPx = x.SoPx,

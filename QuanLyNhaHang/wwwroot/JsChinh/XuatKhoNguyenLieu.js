@@ -163,6 +163,7 @@ function getDSNguyenLieu() {
             TuNgay: _tuNgay,
             DenNgay: _denNgay,
             TieuHuy: $('#tieuHuy').prop('checked'),
+            idHH: $('#hhLS').val(),
         },
         success: function (response) {
             $('#tbodyChiTietPhieuXuat').empty();

@@ -62,6 +62,7 @@ function TinhTongTienPhieuXuat() {
     var tongTien = 0;
     $('#tbodyCBNL tr').each(function () {
         var thanhTien = parseInt($(this).find('input[name="thanhTien"]').val().replace(/,/g, ''));
+        console.log(thanhTien);
         if (!isNaN(thanhTien)) {
             tongTien += thanhTien;
         }

@@ -395,7 +395,7 @@ namespace QuanLyNhaHang.Controllers
             var data1 = data.Select(x => new
             {
                 Ten = x.Ten,
-                Diem = tinhDiemHieuSuatTheoLichLamViecs(x.LichLamViec.ToList()),
+                Diem = tinhDiemHieuSuatTheoLichLamViecs(x.LichLamViec.Where(llv => llv.IdcaNavigation.ChiTietHoaDon.Count()>0).ToList()),
             })
             .ToList();
             return data1;

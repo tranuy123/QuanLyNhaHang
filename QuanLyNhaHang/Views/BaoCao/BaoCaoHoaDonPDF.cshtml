@@ -116,15 +116,14 @@
                             <tbody>
                                 @{
                                     double tongTH = 0;
-                                    double tongThanhToan = 0;
                                 }
                                 @foreach (HoaDon pn in Model)
                                 {
                                     <tr>
                                         @{
                                             var ListCTPNT = pn.ChiTietHoaDon.ToList();
-                                            var TienHang = Math.Round(ListCTPNT.Sum(x => x.Sl * x.DonGia).Value, 2);
-                                            tongTH += TienHang;
+                                            var TienHang = Math.Round(ListCTPNT.Sum(x => x.Sl * x.DonGia * x.TyLeGiam).Value, 2);
+                                            tongTH += (double)pn.TongTien;
                                         }
                                         <td class="text-center">@pn.Tgxuat.Value.ToString("dd-MM-yy")</td>
                                         <td class="text-center">@pn.MaHd</td>
@@ -133,7 +132,7 @@
                                         <td class="text-start">@pn.IdbanNavigation.TenBan</td>
 
 
-                                        <td class="text-end">@toDecimal(TienHang)</td>
+                                        <td class="text-end">@toDecimal(pn.TongTien)</td>
                                  
                                     </tr>
                                 }
@@ -142,7 +141,6 @@
                                 <tr style="background-color:lightgray">
                                     <td colspan="5"><b>Tổng:</b></td>
                                     <td class="text-end">@toDecimal(tongTH)</td>
-                                    <td class="text-end">@toDecimal(tongThanhToan)</td>
                                 </tr>
                             </tfoot>
                         </table>
