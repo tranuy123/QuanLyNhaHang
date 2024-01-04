@@ -327,7 +327,8 @@ connection.on("GiveHD", function (item,tt,ipmac) {
             $('.toastTTTB').toast('show');
         }
     }
-
+    $(".DivViewOrderPhucVu").load(location.href + " .DivViewOrderPhucVu>*", function () {
+    });
 });
 
 function GanSTTXNTT() {
@@ -364,12 +365,13 @@ connection.on("GiveHHD", function (data) {
     var trHHDC = $('#tbodyXNTT tr#collap-2474-' + data.idHD + '');
     trHHDC.remove();
     var IPMAC = $("#IDMAC").val();
+    $(".DivViewOrderPhucVu").load(location.href + " .DivViewOrderPhucVu>*", function () {
+    });
     if ((data.ipmac).trim() == IPMAC.trim()) {
         $('.btn-sendHYCTT').prop('disabled', true);
         $('.btn-sendYCTT').prop('disabled', false);
         showToast("Thành công", 200);
     }
-
     if ((data.ipmac).trim() == IPMACPV.trim()) {
         $('.btn-sendHYCTT').prop('disabled', true);
         $('.btn-sendYCTT').prop('disabled', false);
@@ -473,6 +475,8 @@ connection.on("HuyHDXNNT", function (ipmac) {
     });
     $("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
     });
+    $(".DivViewOrderPhucVu").load(location.href + " .DivViewOrderPhucVu>*", function () {
+    });
 });
 
 $(document).ready(function () {
@@ -516,12 +520,9 @@ $(document).ready(function () {
 });
 //------------------------------------------------------------------
 connection.on("NhanYeuCauHoTro", function (item) {
-    console.log(item);
     var idkhu = $("#idKhuOrderPhucVu").val();
-    console.log(idkhu);
     var tbody = $("#tbody-ThongBao");
 
-    tbody.empty(); // Xóa bỏ các hàng hiện tại trong bảng
 
             var tr = $(`<tr>
                         <td>${item.tenBan}</td>

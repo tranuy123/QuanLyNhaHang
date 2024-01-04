@@ -15,7 +15,15 @@
     }
     bool count(int id)
     {
-        if (context.HoaDon.Where(x => x.TinhTrangTt == false ||  x.TinhTrangTt == null && x.Idban == id).ToList().Count() == 0)
+        if (context.HoaDon.Where(x => (x.TinhTrang == null || x.TinhTrang == false) &&  x.TinhTrangTt == null && x.Idban == id).ToList().Count() == 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    bool TTBan(int id)
+    {
+        if (context.HoaDon.Where(x => x.TinhTrang == false && x.TinhTrangTt == null && x.Idban == id).ToList().Count() > 0)
         {
             return true;
         }
@@ -54,7 +62,7 @@
             </div> <!-- .card -->
     }
     else{
-            <div class="card my-4 flex-row  bg-info">
+            <div class="card my-4 flex-row  @(TTBan(item.Idban) ? "bg-warning" : "bg-info" )">
                                 <div class="card-header">
                                     <strong>@item.TenBan</strong>
                                 </div>
@@ -108,5 +116,6 @@
 
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/chat.js"></script>
 <script src="~/js/chatPV.js"></script>
     

@@ -95,12 +95,15 @@ namespace QuanLyNhaHang.Controllers
                 .ToList();
             double tongSL = 0;
             double tongThanhTien = 0;
-            foreach (TonKho tk in tonKhos)
-            {
-                tongSL += (double)tk.SoLuong;
-                tongThanhTien += (double)(tk.SoLuong * tk.IdctpnNavigation.Gia);
+            if (tonKhos.Count()>0) {
+                foreach (TonKho tk in tonKhos)
+                {
+                    tongSL += (double)tk.SoLuong;
+                    tongThanhTien += (double)(tk.SoLuong * tk.IdctpnNavigation.Gia);
+                }
+                return Math.Round((Math.Round(tongThanhTien) / Math.Round(tongSL, 3)));
             }
-            return Math.Round((Math.Round(tongThanhTien) / Math.Round(tongSL, 3)));
+            return 0;
         }
         public double getTonKho(int idhh)
         {
