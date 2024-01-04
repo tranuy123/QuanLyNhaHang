@@ -13,14 +13,6 @@
         return context.NhomThucAn.Find(id);
     }
 }
-@if (TempData["ThongBao"] != null)
-{
-    <script type="text/javascript" charset="utf-8">
-        window.onload = function () {
-            alert("@Html.Raw(@TempData["ThongBao"])");
-        };
-    </script>
-}
 <section class="section">
     <div style="margin-bottom: 20px; display: flex; justify-content: space-between">
       

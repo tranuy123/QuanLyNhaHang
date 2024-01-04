@@ -166,7 +166,7 @@ function themPhieuXuat() {
     //    return;
     //}
     var ngayNhap = $('input[name="ngayNhap"]').val();
-    var ghiChu = $('input[name="ghiChu"]').val();
+    var ghiChu = $('textarea[name="ghiChu"]').val();
     dataPhieuNhapMaster.append("GhiChu", ghiChu);
     dataPhieuNhapMaster.append("NgayNhap", ngayNhap);
     //dataPhieuNhapMaster.append("Idncc", idNCC);
@@ -190,4 +190,109 @@ function themPhieuXuat() {
             showToast(response.message, response.statusCode);
         }
     });
+}
+function offTab1() {
+    $('#borderedTabJustifiedContent').removeClass('active').addClass('hide');
+    $('#tabs-dsPhieu').addClass('active').addClass('show');
+
+}
+function offTab2() {
+    $('#borderedTabJustifiedContent').addClass('active').addClass('show');
+    $('#tabs-dsPhieu').removeClass('active').addClass('hide');
+
+}
+function getDSXKNL() {
+    //for (var i = 1; i <= 7; i++) {
+    //    addRowTableXKNL(i);
+    //}
+    _fromDay = $('#fromDay').val();
+    _toDay = $('#toDay').val();
+    _soPhieu = $('#soPhieuLS').val();
+
+    $.ajax({
+        url: '/XuatKho/LichSuXuat', // Đường dẫn đến action xử lý form
+        method: 'POST',
+        data: {
+            TuNgay: _fromDay,
+            DenNgay: _toDay,
+            maPhieu: _soPhieu,
+            TieuHuy: $('#tieuHuyLS').prop('checked'),
+        },
+        success: function (response) {
+            $('#tbody-XemPhieuXuat').empty();
+            $('#TienThanhToanTabLS').val('');
+            response.forEach(function (data, i) {
+                addRowTableXKNL(data, i);
+            });
+            /*TinhTongTienPhieuXuat();*/
+            //if (response.statusCode == 200) {
+            //    $('#tbodyChiTietPhieuXuat').empty();
+            //    $('#TienThanhToan').val('');
+
+            //}
+            //showToast(response.message, response.statusCode);
+        }
+    });
+}
+function addRowTableXKNL(data, i) {
+    var newRow = ` <tr class="accordion-toggle collapsed" id="c-2474${i}" data-toggle="collapse" data-parent="#c-2474${i}" href="#collap-2474${i}" aria-expanded="false">
+                                <td>${formatDay(data.ngayTao)}</td>
+                                <td colspan="2">${data.soPx}</td>
+                                <td>${data.soLuongHH} </td>
+                                <td colspan="2"> <input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.tongTien} id="tongTienXuat" name="tongTienXuat"/></td>
+                                <td>${data.tongChenhLech}</td>
+                                <td>
+                                    <button class="btn btn-sm dropdown-toggle more-horizontal" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="text-muted sr-only">Thao Tác</span>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">In</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr id="collap-2474${i}" class="in p-3 bg-blue-lt collapse fw-bold table-primary">
+                            <td class="text-center p-1">#</td>
+                            <td class="text-center p-1">Mã HH</td>
+                            <td class="text-center p-1 col-3">Tên HH</td>
+                            <td class="text-center p-1">ĐVT</td>
+                            <td class="text-center p-1">Số lượng xuất</td>
+                            <td class="text-center p-1">Giá</td>
+                            <td class="text-center p-1">Thành tiền</td>
+                            <td colspan="2" class="text-center p-1">Chênh lệch</td>
+                                </tr>
+                            `;
+    data.chiTietPhieuXuat.forEach(function (data, index) {
+        var j = index + 1;
+        newRow += `
+        <tr id="collap-2474${i}" class="in p-3 bg-light collapse table-secondary" style="">
+                                        <td class="col-sm-1">${j}</td>
+                                        <td class="col-sm-1">${data.idhhNavigation.maHh}</td>
+                                        <td class="col-sm-1">${data.idhhNavigation.tenHh}</td>
+                                        <td class="col-sm-1">${data.dvt}</td>
+                                        <td class="col-sm-1">${data.thucXuat}</td>
+                                        <td class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.gia}/></td>
+                                        <td class="col-sm-2"><input readonly autocomplete="off" type="text" class="w-100 form-control form-table formatted-number" style="width:55px;" value=${data.thucXuat * data.gia}/></td>
+                                        <td class="col-sm-2 text-truncate">${data.chenhLech}</td>
+     </tr>
+                                `;
+    });
+    $('#tbody-XemPhieuXuat').append(newRow);
+    formatNumberInput();
+    TinhTongTienPhieuXuatTabXem();
+
+}
+function TinhTongTienPhieuXuatTabXem() {
+    var tongTien = 0;
+    $('#tbody-XemPhieuXuat tr').each(function () {
+        var check = $(this).find('input[name="tongTienXuat"]').val();
+        if (check != undefined) {
+            var thanhTien = parseFloat($(this).find('input[name="tongTienXuat"]').val().replace(/,/g, ''));
+            if (!isNaN(thanhTien)) {
+                tongTien += thanhTien;
+            }
+        }
+
+
+    });
+    $('#TienThanhToanTabLS').val(formatTotal(tongTien));
 }

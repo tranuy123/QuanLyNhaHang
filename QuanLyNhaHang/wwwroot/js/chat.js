@@ -180,22 +180,50 @@ connection.on("ReceviPhucVu", function (listCTHDPV) {
     });
     $("#TableTGHoanThanhHH").load(location.href + " #TableTGHoanThanhHH>*", function () {
     });
+
 });
 
 
 
 $(document).ready(function () {
-    $(document).on('click', '.tdtght, .tdtghtHH', function () {
+    $(document).on('click', '#btntght', function () {
 
-        var id = $(this).find('#btntght').val();
+        var id = $(this).val();
 
         connection.invoke("SendPhucVu", id).catch(function (err) {
             return console.error(err.toString());
         });
     });
 });
+//--------------------------------------------- hủy hoàn thành món
+connection.on("XacNhanHuyHoanThanhMon", function (id) {
+    $("td.td-idcthd").filter(function () {
+        return $(this).text() === id;
+    }).closest("tr").find(".tdxacnhan1").text("");
+    $("td.td-idcthd").filter(function () {
+        return $(this).text() === id;
+    }).closest("tr").find(".btn-huy").prop("disabled", false);
 
+    $("#TableTGHoanThanh").load(location.href + " #TableTGHoanThanh>*", function () {
+    });
+    $("#TableTGBEP").load(location.href + " #TableTGBEP>*", function () {
+    });
+    $("#TableTGHoanThanhHH").load(location.href + " #TableTGHoanThanhHH>*", function () {
+    });
+    $("#TableTGBEPHH").load(location.href + " #TableTGBEPHH>*", function () {
+    });
+});
 
+$(document).ready(function () {
+    $(document).on('click', '#Huybtntght', function () {
+
+        var id = $(this).val();
+
+        connection.invoke("HuyHoanThanhMon", id).catch(function (err) {
+            return console.error(err.toString());
+        });
+    });
+});
 //----------------------------------------------
 connection.on("HienThiCTHD1", function (chitiethoadon) {
    
@@ -377,7 +405,11 @@ connection.on("NhanXNTT", function (ipmac) {
     //});
     //$("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
     //});
-
+    $("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
+    });
+    $("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
+    });
+    formatNumberInput();
 });
 
 $(document).ready(function () {
@@ -410,17 +442,12 @@ function UpdateHH(idHH) {
         IdHD: idHH,
         ChiTietHoaDon: tableData
     };
-    console.log(data);
     $.ajax({
         url: '/ThuNgan/UpdateHH', // Đường dẫn đến action xử lý form
         method: 'POST',
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function (response) {
-            $("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
-            });
-            $("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
-            });
         }
     });
     formatNumberInput();
@@ -442,7 +469,10 @@ connection.on("HuyHDXNNT", function (ipmac) {
     //});
     //$("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
     //});
-
+    $("#tbodyXNTT").load(location.href + " #tbodyXNTT>*", function () {
+    });
+    $("#tbodyXNNT").load(location.href + " #tbodyXNNT>*", function () {
+    });
 });
 
 $(document).ready(function () {

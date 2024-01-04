@@ -152,7 +152,7 @@ namespace QuanLyNhaHang.Controllers
             double soLuong = 0;
             if (chiTietPhieuXuats.Count()> 0)
             {
-                soLuong = (double)chiTietPhieuXuats.Sum(x => x.SoLuong);
+                soLuong = (double)chiTietPhieuXuats.Sum(x => x.ThucXuat);
             }
             return soLuong;
         }

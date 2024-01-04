@@ -1,42 +1,46 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using System.Globalization
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doanh thu bán hàng</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-    <title>Pie Chart with Percentage</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 </head>
 <body>
-    <canvas id="myPieChart" width="400" height="400"></canvas>
+    <div class="row">
+        <label class="col-sm-1 col-lg-1 col-form-label">Từ ngày</label>
+        <div class="col-sm-2 col-lg-2">
+            <input class="form-control"
+                   type="text"
+                   name="fromDay"
+                   id="fromDay"
+                   value="@DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture)"
+                   placeholder="Từ ngày" />
+        </div>
+        <label class="col-sm-1 col-lg-1 col-form-label">Đến ngày</label>
+        <div class="col-sm-2 col-lg-2">
+            <input class="form-control"
+                   type="text"
+                   name="toDay"
+                   id="toDay"
+                   value="@DateTime.Now.ToString("dd-MM-yyyy")"
+                   placeholder="Tới ngày" />
+        </div>
+        <div class="col-md-1 mb-2 col-lg-2 d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" onclick="doanhThuTheoThang()">
+                Doanh thu theo tháng
+            </button>
+        </div>
+        <div class="col-md-1 mb-2 col-lg-2 d-flex justify-content-end">
+            <button type="button" class="btn btn-primary" onclick="doanhThuTheoNgay()">
+                Doanh thu theo ngày
+            </button>
+        </div>
+    </div>
 
-    <script>
-        var data = {
-            labels: ["Label 1", "Label 2", "Label 3"],
-            datasets: [{
-                data: [30, 50, 20],
-                backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"]
-            }]
-        };
 
-        var options = {
-            responsive: true,
-            plugins: {
-                datalabels: {
-                    formatter: (value, context) => {
-                        return value + '%';
-                    },
-                    color: '#fff'
-                }
-            }
-        };
-
-        var ctx = document.getElementById("myPieChart").getContext("2d");
-        var myPieChart = new Chart(ctx, {
-            type: 'pie',
-            data: data,
-            options: options
-        });
-    </script>
+    <canvas id="doanhthu"></canvas>
 </body>
 </html>
+<script src="~/jschinh/common.js" defer asp-append-version="true"></script>
+<script src="~/jschinh/baocao.js" defer asp-append-version="true"></script>

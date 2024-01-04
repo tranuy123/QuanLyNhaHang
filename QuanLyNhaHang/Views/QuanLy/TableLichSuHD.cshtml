@@ -51,6 +51,9 @@
             </tr>
         </thead>
         <tbody>
+            @{
+                double tongTien = 0;
+            }
             @foreach (HoaDon p in ViewBag.ListPhieuNhap)
             {
                 <tr>
@@ -66,9 +69,21 @@
                         <button type="button" onclick="ViewPhieuNhap('@p.Idhd')" class="btn btn-outline-primary mx-1">Xem</button>
                     </td>
                 </tr>
+                tongTien += (double)@p.TongTien;
             }
 
         </tbody>
+        <tr>
+            <td class="text-center">Tổng</td>
+            <td class="text-left"></td>
+            <td class="text-left"></td>
+            <td class="text-left"></td>
+            <td class="text-center"></td>
+            <td class="text-right">@toDecimal(@tongTien)</td>
+
+            <td class="text-center">
+            </td>
+        </tr>
     </table>
 
 

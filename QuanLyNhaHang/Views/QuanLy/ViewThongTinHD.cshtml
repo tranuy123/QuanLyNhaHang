@@ -49,7 +49,7 @@
         else return new LichLamViec();
     }
     NhanVien getNhanVien(int? idnv){
-        NhanVien nv = context.NhanVien.FirstOrDefault(x => x.Idnnv == idnv );
+        NhanVien nv = context.NhanVien.FirstOrDefault(x => x.Idnv == idnv );
         if (nv != null) return nv;
         else return new NhanVien();
     }

@@ -13,9 +13,25 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="/QuanLy/UpdateHangHoa" method="post">
+        <form action="/QuanLy/UpdateHangHoa" method="post" enctype="multipart/form-data">
             <div class="forms-header text-center">
                 <h4 class="forms-title "><b>@ViewData["Title"]</b></h4>
+            </div>
+            <div class="form-group" style="display: flex; ">
+                <div>
+                    <label style="margin-bottom: 70px;">Hình ảnh</label>
+                    <input name="Avt" value="@(Model.Avatar != null ? @Model.Avatar : "")" class="form-control" type="file" id="Fileimage" accept="image/gif image/png image/jpeg">
+                </div>
+                <div style="max-width: 300px; max-height:250px; margin-left: 40px;">
+                    @if (Model.Avatar != null)
+                    {
+                        <img alt="" src="~/ImagesTD/@Model.Avatar" style="object-fit: cover;" width="auto" height="250px" id="image1">
+                    }
+                    else
+                    {
+                        <img alt="" src="" style="object-fit: cover;" width="auto" height="250px" id="image1">
+                    }
+                </div>
             </div>
             <div class="forms-body">
                 <div class="form-group">
@@ -78,3 +94,4 @@
 
     </div>
 </div>
+<script src="~/jschinh/hanghoa.js"></script>

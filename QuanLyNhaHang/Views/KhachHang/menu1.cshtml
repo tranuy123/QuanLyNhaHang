@@ -12,7 +12,9 @@
     }
     List<HangHoa> hangHoas = context.HangHoa
     .Include(x => x.IdnhhNavigation)
-    .Where(x => x.IdnhhNavigation.HangHoa == true && x.Active == true).ToList();
+    .Include(x => x.ChiTietPhieuNhap)
+    .ThenInclude(x => x.TonKho)
+    .Where(x => x.IdnhhNavigation.HangHoa == true && x.Active == true && x.ChiTietPhieuNhap.Any(pn => pn.TonKho.Any())).ToList();
     string macAddress = CommonServices.getDiaChiMac();
 
     ViewBag.IDMAC = macAddress;
@@ -20,7 +22,8 @@
     var IDSanh = context.Khu.FirstOrDefault(x => x.Idkhu == IDkhu.Idkhu);
     Gia getGia(int idtd, int ids)
     {
-        Gia nv = context.Gia.FirstOrDefault(x =>x.Idtd==idtd && x.Idsanh == ids && x.Active.Value);
+        Gia nv = context.Gia
+        .FirstOrDefault(x =>x.Idtd==idtd && x.Idsanh == ids && x.Active.Value);
         if (nv != null) return nv;
         else return null;
     }
@@ -44,7 +47,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Yummy Bootstrap Template - Index</title>
+    <title>Nhà hàng Trần Uy - khách hàng</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -88,7 +91,7 @@
       <a href="index.html" class="logo d-flex align-items-center me-auto me-lg-0">
         <!-- Uncomment the line below if you also wish to use an image logo -->
         <!-- <img src="assets/img/logo.png" alt=""> -->
-        <h1>Yummy<span>.</span></h1>
+        <h1>Trần Uy<span>.</span></h1>
       </a>
             <div class="toast toastMN bg-success" style="position: absolute; top: 5rem; right: 0;z-index: 99999;">
                 <div class="toast-header" style="justify-content: space-between;">

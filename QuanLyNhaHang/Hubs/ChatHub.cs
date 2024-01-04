@@ -53,11 +53,11 @@ namespace SignalRChat.Hubs
             string date = now.ToString("yyyyMMdd");
 
             string orderCode = $"{now:yyyyMMdd}-{ipmac}";
-            int count = context.HoaDon.Count(x => x.MaHd == orderCode);
+            int count = context.HoaDon.Count(x => x.MaHd.Contains(orderCode));
 
             string mahd = $"{now:yyyyMMdd}-{ipmac}-{count + 1}";
             int count1 = context.HoaDon.Count(x => x.MaHd == mahd);
-            string mahd1 = $"{now:yyyyMMdd}-{ipmac}-{count1 + 1}";
+            string mahd1 = mahd;
             var idb = context.Ban.FirstOrDefault(x => x.Ipmac == ipmac && x.Active == true).Idban;
             var TinhTrangHD = context.HoaDon.Where(x => x.TinhTrang == null && x.Idban == idb);
             var TinhTrangXNHD = context.HoaDon.Where(x=> x.TinhTrang == false && x.Idban == idb && x.TinhTrangTt == null);
@@ -248,6 +248,24 @@ namespace SignalRChat.Hubs
                     }).ToList();
 
             await Clients.All.SendAsync("ReceviPhucVu", listCTHDPV);
+        }
+        public async Task HuyHoanThanhMon(string id)
+        {
+            QuanLyNhaHangContext context = new QuanLyNhaHangContext();
+            try
+            {
+                ChiTietHoaDon ct = context.ChiTietHoaDon.FirstOrDefault(x => x.Idcthd == int.Parse(id));
+                ct.Tgbep = null;
+                context.ChiTietHoaDon.Update(ct);
+                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw ex;
+            }
+
+            await Clients.All.SendAsync("XacNhanHuyHoanThanhMon", id);
         }
 
         public async Task DeleteCTHD(string idcthd)

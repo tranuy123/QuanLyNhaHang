@@ -60,6 +60,8 @@ function renderDoThi(labels, values) {
             scales: {
                 y: {
                     beginAtZero: true,
+                    max: 10, // Giá trị tối đa trục y
+                    min: 0,
                     title: {
                         display: true,
                         text: 'Điểm'

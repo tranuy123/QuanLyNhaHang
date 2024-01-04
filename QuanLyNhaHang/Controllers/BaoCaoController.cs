@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
 using QuanLyNhaHang.Services;
+using static QuanLyNhaHang.Controllers.XuatKhoController;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -39,10 +40,12 @@ namespace QuanLyNhaHang.Controllers
             return data;
         }
         [HttpPost("/doanhThuTheoThang")]
-        public async Task<dynamic> doanhThuTheoThang()
+        public async Task<dynamic> doanhThuTheoThang(string fromDay, string toDay)
         {
+                        DateTime FromDay = DateTime.ParseExact(fromDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime ToDay = DateTime.ParseExact(toDay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
             var data = await context.HoaDon
-              .Where(x => x.Tgxuat != null)
+              .Where(x => x.Tgxuat != null && (x.Tgxuat.Value.Date >= FromDay.Date && x.Tgxuat.Value.Date <= ToDay.Date))
               .OrderBy(x => x.Tgxuat)
               .GroupBy(x => x.Tgxuat.Value.Month)
               .Select(x => new
@@ -119,6 +122,91 @@ namespace QuanLyNhaHang.Controllers
                 giaVon = giaVon,
                 listLoiNhuan = newlist,
             };
+        }
+        [HttpPost("/download/BaoCaoLoiNhuan")]
+        public IActionResult downloadBaoCaoLoiNhuan(string tuNgay, string denNgay)
+        {
+            var fullView = new HtmlToPdf();
+            fullView.Options.WebPageWidth = 1280;
+            fullView.Options.PdfPageSize = PdfPageSize.A4;
+            fullView.Options.MarginTop = 20;
+            fullView.Options.MarginBottom = 20;
+            fullView.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+
+            var url = Url.Action("viewBaoCaoLoiNhuanPDF", "BaoCao", new { TuNgay = tuNgay, DenNgay = denNgay });
+
+            var currentUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}" + url;
+
+            var pdf = fullView.ConvertUrl(currentUrl);
+
+            var pdfBytes = pdf.Save();
+            return File(pdfBytes, "application/pdf", "BaoCaoLoiNhuan.pdf");
+        }
+        public IActionResult viewBaoCaoLoiNhuanPDF(string TuNgay, string DenNgay)
+        {
+            DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            var doanhThu = context.HoaDon
+              .Where(x => x.Tgxuat.Value.Date >= tuNgay.Date && x.Tgxuat.Value.Date <= denNgay.Date)
+              .OrderBy(x => x.Tgxuat)
+              .GroupBy(x => x.Tgxuat.Value.Date)
+              .Select(x => new
+              {
+                  label = x.Key,
+                  doanhthu = x.Sum(x => x.TongTien)
+              })
+              .ToList();
+            var giaVon = context.PhieuXuat
+              .Include(x => x.ChiTietPhieuXuat)
+              .Where(x => x.NgayTao.Value.Date >= tuNgay.Date && x.NgayTao.Value.Date <= denNgay.Date)
+              .ToList()
+              .OrderBy(x => x.NgayTao)
+              .GroupBy(x => x.NgayTao.Value.Date)
+              .Select(x => new
+              {
+                  label = x.Key,
+                  doanhthu = tongPhieuNhap(x.ToList()),
+              })
+              .ToList();
+            var listLoiNhuan = new List<LoiNhuan>();
+            foreach (var d in doanhThu)
+            {
+                var data = new LoiNhuan
+                {
+                    Ngay = d.label,
+                    DoanhThu = (double)d.doanhthu,
+                    GiaVon = (double)0,
+                };
+                listLoiNhuan.Add(data);
+            }
+            foreach (var d in giaVon)
+            {
+                var data = new LoiNhuan
+                {
+                    Ngay = d.label,
+                    DoanhThu = (double)0,
+                    GiaVon = (double)d.doanhthu,
+                };
+                listLoiNhuan.Add(data);
+            }
+            List<LoiNhuan> newlist = listLoiNhuan.GroupBy(x => x.Ngay)
+            .Select(x => new LoiNhuan()
+            {
+                Ngay = x.Key,
+                DoanhThu = (double)x.Sum(item => (double)item.DoanhThu),
+                GiaVon = (double)x.Sum(item => (double)item.GiaVon)
+            }).ToList();
+            ViewBag.tuNgay = tuNgay.Date;
+            ViewBag.denNgay = denNgay.Date;
+            //ViewBag.LoiNhuan = listLoiNhuan.GroupBy(x => x.Ngay).Select(x => new LoiNhuan()
+            //{
+            //    Ngay = x.Key,
+            //    DoanhThu = x.First().DoanhThu,
+            //    GiaVon = x.Where(x => x.GiaVon != 0).First().GiaVon,
+            //});
+            ViewBag.LoiNhuan = newlist;
+            return View("BaoCaoLoiNhuanPDF");
+
         }
         public class LoiNhuan
         {
@@ -365,17 +453,22 @@ namespace QuanLyNhaHang.Controllers
                 .ThenInclude(x => x.IdcaNavigation)
                 .ThenInclude(x => x.ChiTietHoaDon)
                 .ThenInclude(x => x.IdhdNavigation)
+                .ThenInclude(x => x.IdbanNavigation)
                 .Include(x => x.IdtkNavigation)
                 .Where(x => x.IdtkNavigation.Idvt == 1 && x.LichLamViec.Any(llv => llv.IdcaNavigation.ChiTietHoaDon.Any(ct => ct.IdhdNavigation.Tgxuat.Value.Date >= FromDay && ct.IdhdNavigation.Tgxuat.Value.Date <= ToDay)))
                 .Select(x => new NhanVien()
                 {
                     Ten = x.Ten,
+                    Idnv = x.Idnv,
                     LichLamViec = x.LichLamViec
                     .Where(llv => llv.IdcaNavigation.ChiTietHoaDon.Count() >0)
                     .Select(llv => new LichLamViec()
                     {
+                        Idkhu = llv.Idkhu,
+                        Idnv = llv.Idnv,    
                         IdcaNavigation = new Ca()
                         {
+                            Idca = llv.IdcaNavigation.Idca,
                             ChiTietHoaDon = llv.IdcaNavigation.ChiTietHoaDon.Select(ct => new ChiTietHoaDon()
                             {
                                 TgphucVu = ct.TgphucVu,
@@ -383,24 +476,43 @@ namespace QuanLyNhaHang.Controllers
                                 IdhdNavigation = new HoaDon()
                                 {
                                     Tgxuat = ct.IdhdNavigation.Tgxuat,
-                                }
+                                    IdbanNavigation = ct.IdhdNavigation.IdbanNavigation,
+                                },
+                                
                             })
-                            .Where(ct => ct.IdhdNavigation.Tgxuat.Value.Date >= FromDay && ct.IdhdNavigation.Tgxuat.Value.Date <= ToDay)
+                            .Where(ct => ct.IdhdNavigation.Tgxuat.Value.Date >= FromDay && ct.IdhdNavigation.Tgxuat.Value.Date <= ToDay && ct.IdhdNavigation.IdbanNavigation.Idkhu == llv.Idkhu)
                             .ToList(),
                         }
                     })
                     .ToList(),
                 })
                 .ToListAsync();
+
             var data1 = data.Select(x => new
             {
                 Ten = x.Ten,
-                Diem = tinhDiemHieuSuatTheoLichLamViecs(x.LichLamViec.Where(llv => llv.IdcaNavigation.ChiTietHoaDon.Count()>0).ToList()),
+                Diem = tinhDiemLamViecTheoNhanVien(x),
             })
             .ToList();
-            return data1;
+            return data1.Where(x => !double.IsNaN(x.Diem)).ToList();
 
 
+        }
+        public float tinhDiemLamViecTheoNhanVien(NhanVien nhanViens)
+        {
+            return tinhDiemHieuSuatTheoLichLamViecs(nhanViens.LichLamViec.Where(llv => llv.IdcaNavigation.ChiTietHoaDon.Count() > 0).ToList());
+        }
+        public float tinhHieuSuatNhanVien(DateTime FromDay, DateTime ToDay, int idnv, List<LichLamViec> lichLamViecs)
+        {
+            var khus = lichLamViecs.GroupBy(x => x.Idkhu)
+                .Select(x => x.Key);
+
+            var chiTietHoaDon = context.ChiTietHoaDon
+                .Include(x => x.IdcaNavigation)
+                .ThenInclude(x => x.LichLamViec)
+                .Where(ct => ct.IdhdNavigation.Tgxuat.Value.Date >= FromDay && ct.IdhdNavigation.Tgxuat.Value.Date <= ToDay
+                 && ct.IdcaNavigation.LichLamViec.Any(x => x.Idnv == idnv && khus.Contains(x.Idkhu))).ToList();
+            return tinhDiemHieuSuatTheoChiTietHoaDon(chiTietHoaDon);
         }
         public float tinhDiemHieuSuatTheoLichLamViecs(List<LichLamViec> lichLamViecs)
         {

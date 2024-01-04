@@ -36,7 +36,9 @@ namespace QuanLyNhaHang.Controllers
             tk.Pass = hh.IdtkNavigation.Pass;
             context.TaiKhoan.Update(tk);
             NhanVien nv = context.NhanVien.Find(hh.Idnv);
-            nv.Image = UploadedFile(hh, Avt);
+            if (Avt != null) {
+                nv.Image = UploadedFile(hh, Avt);
+            }
             context.NhanVien.Update(nv);
             context.SaveChanges();
             TempData["ThongBao"] = "Cập nhập thành công!";

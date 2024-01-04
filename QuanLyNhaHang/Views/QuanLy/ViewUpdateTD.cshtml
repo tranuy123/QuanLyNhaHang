@@ -7,14 +7,7 @@
     }
 
 }
-@if (TempData["ThongBao"] != null)
-{
-                        <script type="text/javascript" charset="utf-8">
-                            window.onload = function () {
-                                alert("@Html.Raw(@TempData["ThongBao"])");
-                        };
-                        </script>
-}
+
 <div class="card">
     <div class="card-body">
         <form enctype="multipart/form-data" action="/QuanLy/updateTD" method="post">
@@ -25,7 +18,7 @@
                 <div class="form-group" style="display: flex; ">
                     <div>
                         <label style="margin-bottom: 70px;">Hình ảnh</label>
-                        <input name="Avt" class="form-control" type="file" id="Fileimage" accept="image/gif image/png image/jpeg">
+                        <input name="Avt" src="@(Model.Image != null ? @Model.Image : "")" class="form-control" type="file" id="Fileimage" accept="image/gif image/png image/jpeg">
                     </div>
                     <div style="max-width: 300px; max-height:250px; margin-left: 40px;">
                         @if (Model.Image != null)

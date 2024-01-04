@@ -12,7 +12,7 @@
     HangHoa getHHH(int? id)
     {
 
-        return context.HangHoa.Find(id);
+        return context.HangHoa.Include(x => x.IddvtNavigation).FirstOrDefault(x => x.Idhh == id);
     }
     NhanVien getNV(int? id)
     {
@@ -162,7 +162,14 @@
                                         }else{
                                             <td class="text-start">@hh.Ten</td>
                                         }
-                                        <td>phần</td>
+                                        @if (ct.HangHoa == true)
+                                        {
+                                            <td class="text-start">@hhh.IddvtNavigation.TenDvt</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="text-center">Phần</td>
+                                        }
                                         <td class="text-end">@toDecimal(ct.Sl)</td>
                                         <td class="text-end">@toDecimal(ct.DonGia)</td>
                                         <td class="text-end">@ct.TyLeGiam %</td>

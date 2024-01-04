@@ -13,17 +13,26 @@
 
 <div class="card">
     <div class="card-body">
-        <form action="/QuanLy/InsertHangHoa" method="post">
+        <form action="/QuanLy/InsertHangHoa" method="post" enctype="multipart/form-data">
             <div class="forms-header text-center">
                 <h4 class="forms-title "><b>Thêm hàng hóa</b></h4>
             </div>
             <div class="forms-body">
-                <div class="col-sm-12 col-md-12 pr-0 mt-2">
+@*                 <div class="col-sm-12 col-md-12 pr-0 mt-2">
                     <div class="row align-items-center">
                         <div class="col-auto avatar avatar-xl">
                             <img src="/ImagesTD/ava.jpg" class="thumbnail-sm" id="previewImage">
                         </div>
                         <div class="col-auto"> <input type="file" name="Avatar" class="form-control" id="fileAvatar" placeholder="Chọn file avatar"></div>
+                    </div>
+                </div> *@
+                <div class="form-group" style="display: flex; ">
+                    <div>
+                        <label style="margin-bottom: 70px;">Hình ảnh</label>
+                        <input name="Avt" class="form-control" type="file" id="Fileimage" accept="image/gif image/png image/jpeg">
+                    </div>
+                    <div style="max-width: 300px; max-height:250px; margin-left: 40px;">
+                        <img alt="" style="object-fit: cover;" width="auto" height="250px" id="image1">
                     </div>
                 </div>
                 <div class="form-group">

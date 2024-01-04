@@ -6,7 +6,7 @@
     string macAddress = CommonServices.getDiaChiMac();
     var idb = context.Ban.FirstOrDefault(x => x.Ipmac == macAddress).Idban;
     var TinhTrangXNHD = context.HoaDon.Where(x => x.TinhTrang == false && x.Idban == idb && x.TinhTrangTt == null);
-    var TinhTrangXNHD1 = context.HoaDon.Where(x => x.TinhTrang == true && x.Idban == idb && x.TinhTrangTt == false);
+    var TinhTrangXNHD1 = context.HoaDon.Where(x => x.TinhTrang == true && x.Idban == idb && (x.TinhTrangTt == false || x.TinhTrangTt == null));
     List<ChiTietHoaDon> getListCTHD()
     {
         return context.ChiTietHoaDon.Include(x =>x.IdhdNavigation.IdbanNavigation).Where(x => x.HangHoa != true && x.IdhdNavigation.Idban == idb && (x.IdhdNavigation.TinhTrangTt == false || x.IdhdNavigation.TinhTrangTt == null)).ToList();
@@ -37,14 +37,6 @@
         return d.Value.ToString("#,##0.00");
     }
 
-}
-@if (TempData["ThongBao"] != null)
-{
-    <script type="text/javascript" charset="utf-8">
-        window.onload = function () {
-            alert("@Html.Raw(@TempData["ThongBao"])");
-        };
-    </script>
 }
 
 
@@ -90,7 +82,7 @@
                                                     <td class="tdxacnhan1"></td>
 
                                                 } else{
-                                                    <td class="tdxacnhan1"> Bếp đã xác nhận </td>
+                                                    <td class="tdxacnhan1"> Bếp đã xác nhận yêu cầu </td>
 
                                                 }
                                                 <td>
@@ -155,7 +147,7 @@
                             {
                                 <td colspan="2" class="text-end">
                                 <button class="btn btn-outline-success btn-sendYCTT" value="@idhd" disabled>Thanh toán</button>
-                                <button class="btn btn-outline-danger btn-sendHYCTT" value="@idhd"> Hủy</button>
+                                    <button class="btn btn-outline-danger btn-sendHYCTT" @(@TinhTrangXNHD1.Count() > 0? "disabled" : "") value="@idhd"> Hủy</button>
                             </td>
                             }else{
                                 <td colspan="2" class="text-end">

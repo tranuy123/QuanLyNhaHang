@@ -255,7 +255,7 @@ namespace QuanLyNhaHang.Controllers
 
             //}
         }
-        [Route("/HoaDonPDF/{id:int}")]
+        [Route("/HoaDonPDF/{id:int}")] 
         public IActionResult viewPDF(int id)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();

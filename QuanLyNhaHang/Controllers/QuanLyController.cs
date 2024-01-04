@@ -13,6 +13,7 @@ using System.Data;
 using SelectPdf;
 using QuanLyNhaHang.Services;
 using System.Threading.Tasks;
+using System.Runtime.Intrinsics.X86;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -58,7 +59,7 @@ namespace QuanLyNhaHang.Controllers
             if (avt != null)
             {
                 string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "ImagesTD");
-                uniqueFileName = model.MaTd + ".jpg";
+                uniqueFileName = model.MaTd + DateTime.Now.ToString("dd-MM-yyyy") + ".jpg";
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
@@ -85,7 +86,10 @@ namespace QuanLyNhaHang.Controllers
             dv.MaTd = dvt.MaTd;
             dv.Idnta = dvt.Idnta;
             dv.Detail = dvt.Detail;
-            dv.Image = UploadedFile(dvt, avt);
+            if (avt != null)
+            {
+                dv.Image = UploadedFile(dvt, avt);
+            }
 
             context.ThucDon.Update(dv);
             context.SaveChanges();
@@ -1058,17 +1062,35 @@ namespace QuanLyNhaHang.Controllers
             return View("ViewInsertHangHoa");
         }
         [HttpPost]
-        public IActionResult InsertHangHoa(HangHoa nsx)
+        public IActionResult InsertHangHoa(HangHoa nsx, IFormFile Avt)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
 
             nsx.Active = true;
+            nsx.Avatar = UploadedFileHH(nsx,Avt);
             context.HangHoa.Add(nsx);
             context.SaveChanges();
             TempData["ThongBao"] = "Thêm thành công!";
             return RedirectToAction("ViewHangHoa");
 
         }
+        private string UploadedFileHH(HangHoa model, IFormFile avt)
+        {
+            string uniqueFileName = null;
+
+            if (avt != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "ImagesTD");
+                uniqueFileName = model.MaHh + DateTime.Now.ToString("dd-MM-yyyy") + ".jpg";
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    avt.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
+        }
+
         [Route("/QuanLy/ViewUpdateHangHoa/{id}")]
         public IActionResult ViewUpdateHangHoa(int id)
 
@@ -1078,7 +1100,7 @@ namespace QuanLyNhaHang.Controllers
             HangHoa nsx = context.HangHoa.Find(id);
             return View(nsx);
         }
-        public IActionResult UpdateHangHoa(HangHoa nsx)
+        public IActionResult UpdateHangHoa(HangHoa nsx, IFormFile avt)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             HangHoa n = context.HangHoa.Find(nsx.Idhh);
@@ -1087,6 +1109,9 @@ namespace QuanLyNhaHang.Controllers
             n.Idnhh = nsx.Idnhh;
             n.Iddvt = nsx.Iddvt;
             n.GiaBan = nsx.GiaBan;
+            if (avt != null) {
+                n.Avatar = UploadedFileHH(nsx, avt);
+            }
 
 
             context.HangHoa.Update(n);
@@ -1222,7 +1247,7 @@ namespace QuanLyNhaHang.Controllers
             return View("ViewInsertNhanVien");
         }
         [Route("/QuanLy/InsertNhanVien")]
-        public IActionResult InsertNhanVien(NhanVien nsx)
+        public IActionResult InsertNhanVien(NhanVien nsx, IFormFile avt)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             var check = context.TaiKhoan.FirstOrDefault(x => x.TenTk == nsx.IdtkNavigation.TenTk);
@@ -1250,6 +1275,7 @@ namespace QuanLyNhaHang.Controllers
             var maNV = context.NhanVien.Count();
             nsx.Idtk = tk.Idtk;
             nsx.MaMv = "NV" + maNV.ToString("D5");
+            nsx.Image = UploadedFileNV(nsx, avt);
             nsx.Active = true;
             context.NhanVien.Add(nsx);
             context.SaveChanges();
@@ -1279,7 +1305,7 @@ namespace QuanLyNhaHang.Controllers
                 .ThenInclude(x => x.IdvtNavigation).FirstOrDefault(x => x.Idnv == id);
             return View(nsx);
         }
-        public IActionResult UpdateNhanVien(NhanVien nsx)
+        public IActionResult UpdateNhanVien(NhanVien nsx, IFormFile Avt)
         {
             QuanLyNhaHangContext context = new QuanLyNhaHangContext();
             var check = context.TaiKhoan.FirstOrDefault(x => x.TenTk == nsx.IdtkNavigation.TenTk && x.Idtk != nsx.Idtk);
@@ -1307,6 +1333,10 @@ namespace QuanLyNhaHang.Controllers
             n.QueQuan = nsx.QueQuan;
             n.Email = nsx.Email;
             n.Idnnv = nsx.Idnnv;
+            if (Avt != null)
+            {
+                n.Image = UploadedFileNV(n, Avt);
+            }
             TaiKhoan tk = context.TaiKhoan.Find(nsx.Idtk);
             tk.TenTk = nsx.IdtkNavigation.TenTk;
             tk.Pass = nsx.IdtkNavigation.Pass;
@@ -1357,6 +1387,22 @@ namespace QuanLyNhaHang.Controllers
                                                 }).ToListAsync();
             return models;
 
+        }
+        private string UploadedFileNV(NhanVien model, IFormFile Avt)
+        {
+            string uniqueFileName = null;
+
+            if (Avt != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "ImagesTD");
+                uniqueFileName = model.MaMv + DateTime.Now.ToString("dd-MM-yyyy") + ".jpg";
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    Avt.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
         }
     } 
     

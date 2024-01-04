@@ -125,7 +125,7 @@ function themPhieuXuat() {
     //    return;
     //}
     var ngayNhap = $('input[name="ngayNhap"]').val();
-    var ghiChu = $('input[name="ghiChu"]').val();
+    var ghiChu = $('textarea[name="ghiChu"]').val();
     dataPhieuNhapMaster.append("GhiChu", ghiChu);
     dataPhieuNhapMaster.append("NgayNhap", ngayNhap);
     //dataPhieuNhapMaster.append("Idncc", idNCC);

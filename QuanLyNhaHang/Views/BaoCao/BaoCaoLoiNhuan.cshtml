@@ -4,7 +4,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="row">
+    <form action="/download/BaoCaoLoiNhuan" method="post" class="row">
         <label class="col-sm-1 col-lg-1 col-form-label">Từ ngày</label>
         <div class="col-sm-2 col-lg-2">
             <input type="text" name="tuNgay" class="form-control" value="@DateTime.Now.ToString("dd-MM-yyyy")" placeholder="dd-MM-yyyy" id="tuNgay">
@@ -18,7 +18,12 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </div>
-    </div>
+        <div class="col-md-1 mb-2 col-lg-4 d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">
+                Xuất PDF
+            </button>
+        </div>
+    </form>
 
 
     <div class="col-md-16 mb-12">

@@ -18,7 +18,7 @@ function doanhThuTheoThang() {
             _values = [];
             // Chuyển dữ liệu từ JSON sang mảng để cấu hình đồ thị
             data.forEach(function (item) {
-                _labels.push(moment(item.label).format('MM/YYYY')); // Định dạng ngày tháng
+                _labels.push(item.label); // Định dạng ngày tháng
                 _values.push(item.doanhthu);
             });
             // Xóa biểu đồ cũ trước khi vẽ biểu đồ mới

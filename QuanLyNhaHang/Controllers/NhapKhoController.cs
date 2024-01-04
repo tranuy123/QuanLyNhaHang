@@ -4,12 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyNhaHang.Models;
 using QuanLyNhaHang.Models.Mapping;
 using QuanLyNhaHang.Services;
+using SelectPdf;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using static QuanLyNhaHang.Controllers.XuatKhoController;
 
 namespace QuanLyNhaHang.Controllers
 {
@@ -130,5 +132,65 @@ namespace QuanLyNhaHang.Controllers
             public PhieuNhapMap PhieuNhap { get; set; }
             public List<ChiTietPhieuNhapMap> ChiTietPhieuNhap { get; set; }
         }
+        [HttpPost("/download/BaoCaoLSNhapKho")]
+        public IActionResult downloadBaoCaoLSNhapKho(string fromDay, string toDay, string soPhieuLS)
+        {
+            var fullView = new HtmlToPdf();
+            fullView.Options.WebPageWidth = 1280;
+            fullView.Options.PdfPageSize = PdfPageSize.A4;
+            fullView.Options.MarginTop = 20;
+            fullView.Options.MarginBottom = 20;
+            fullView.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+
+            var url = Url.Action("viewBaoCaoLSNhapKhoPDF", "NhapKho", new { TuNgay = fromDay, DenNgay = toDay, maPhieu = soPhieuLS});
+
+            var currentUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}" + url;
+
+            var pdf = fullView.ConvertUrl(currentUrl);
+
+            var pdfBytes = pdf.Save();
+            return File(pdfBytes, "application/pdf", "BaoCaoLSNhapKho.pdf");
+        }
+        public IActionResult viewBaoCaoLSNhapKhoPDF(string TuNgay, string DenNgay, string maPhieu)
+        {
+            DateTime tuNgay = DateTime.ParseExact(TuNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            DateTime denNgay = DateTime.ParseExact(DenNgay, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            List<LSNhapKho> phieuXuats = context.PhieuNhap
+                .Where(x => (x.NgayNhap.Value.Date >= tuNgay.Date && x.NgayNhap.Value.Date <= denNgay.Date)
+                && (maPhieu == "" || maPhieu == null || x.SoPn == maPhieu))
+             .Select(x => new LSNhapKho
+             {
+                 SoPx = x.SoPn,
+                 NgayTao = x.NgayNhap,
+                 GhiChu = x.GhiChu,
+                 TongTien = NhapKhoController.getTongTien(x.ChiTietPhieuNhap.ToList()),
+                 SoLuongHH = x.ChiTietPhieuNhap.Count(),
+             })
+            .ToList();
+            ViewBag.tuNgay = tuNgay.Date;
+            ViewBag.denNgay = denNgay.Date;
+            ViewBag.PhieuNhap = phieuXuats;
+            return View("BaoCaoLSNhapKhoPDF");
+
+        }
+        public static double getTongTien(List<ChiTietPhieuNhap> chiTietPhieuXuats)
+        {
+            double tongTien = 0;
+            foreach (ChiTietPhieuNhap ct in chiTietPhieuXuats)
+            {
+                tongTien += (float)(Math.Round((float)ct.SoLuong, 3) * Math.Round((float)ct.Gia, 3));
+            }
+            return (double)Math.Round(tongTien, 3);
+        }
+        public class LSNhapKho
+        {
+            public string SoPx { get; set; }
+            public DateTime? NgayTao { get; set; }
+            public string GhiChu { get; set; }
+            public double TongTien { get; set; }
+            public int SoLuongHH { get; set; }
+
+        }
     }
+
 }
